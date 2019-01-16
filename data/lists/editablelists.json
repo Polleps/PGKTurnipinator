@@ -1,8 +1,0 @@
-{
-  "name": "editablelists",
-  "list": [{
-    "key": "bannedwords"
-  }, {
-    "key": "joinableroles"
-  }]
-}

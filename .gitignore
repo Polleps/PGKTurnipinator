@@ -61,8 +61,8 @@ typings/
 .next
 
 #Build output dir
-built/*
-!built/.gitkeep
+# built/*
+# !built/.gitkeep
 
-data/lists/*
-!data/lists/.gitkeep
+# data/lists/*
+# !data/lists/.gitkeep
