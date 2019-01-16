@@ -59,3 +59,10 @@ typings/
 
 # next.js build output
 .next
+
+#Build output dir
+built/*
+!built/.gitkeep
+
+data/lists/*
+!data/lists/.gitkeep
