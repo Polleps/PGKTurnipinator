@@ -1,5 +1,7 @@
 {
-  "extends": ["tslint:recommended"],
+  "extends": [
+    "tslint:recommended"
+  ],
   "linterOptions": {
     "exclude": [
       "config/**/*.js",
@@ -18,6 +20,9 @@
     "no-console": {
       "severity": "warning"
     },
-    "jsx-boolean-value": ["never"]
+    "jsx-boolean-value": [
+      "never"
+    ],
+    "max-classes-per-file": false
   }
 }

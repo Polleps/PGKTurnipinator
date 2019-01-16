@@ -21,7 +21,6 @@ class SClient {
   }
 }
 
-// tslint:disable-next-line:max-classes-per-file
 class SLists {
   private static instance: SLists;
 

@@ -5,6 +5,8 @@ import {
   PingCommand,
   LeaveCommand,
   RegisterCommand,
+  PlayCommand,
+  StopCommand,
 } from "./commands";
 
 export default class CommandFactory {
@@ -15,6 +17,9 @@ export default class CommandFactory {
     "join",
     "leave",
     "register",
+    "play",
+    "stop",
+    "skip",
   ];
 
   public createCommand(tag: string): Command {
@@ -29,6 +34,12 @@ export default class CommandFactory {
         return new LeaveCommand();
       case "register":
         return new RegisterCommand();
+      case "play":
+        return new PlayCommand();
+      case "stop":
+        return new StopCommand();
+      case "skip":
+        return new StopCommand();
       default:
         throw new Error("Command Does not exist");
     }
