@@ -11,37 +11,30 @@ import {
 
 export default class CommandFactory {
 
-  public static commandList: string[] = [
-    "ping",
-    "fixbot",
-    "join",
-    "leave",
-    "register",
-    "play",
-    "stop",
-    "skip",
-  ];
+  private commands: Map<string, () => Command>;
+
+  constructor() {
+    this.commands = new Map<string, () => Command>([
+      ["ping", () => new PingCommand()],
+      ["fixbot", () => new FixbotCommand()],
+      ["join", () => new JoinCommand()],
+      ["leave", () => new LeaveCommand()],
+      ["register", () => new RegisterCommand()],
+      ["play", () => new PlayCommand()],
+      ["stop", () => new StopCommand()],
+      ["skip", () => new StopCommand()],
+    ]);
+  }
+
+  public get commandList() {
+    return this.commands.keys();
+  }
 
   public createCommand(tag: string): Command {
-    switch (tag) {
-      case "ping":
-        return new PingCommand();
-      case "fixbot":
-        return new FixbotCommand();
-      case "join":
-        return new JoinCommand();
-      case "leave":
-        return new LeaveCommand();
-      case "register":
-        return new RegisterCommand();
-      case "play":
-        return new PlayCommand();
-      case "stop":
-        return new StopCommand();
-      case "skip":
-        return new StopCommand();
-      default:
-        throw new Error("Command Does not exist");
+    if (this.commands.has(tag)) {
+      return this.commands.get(tag)();
     }
+
+    throw new Error("Command does not exist");
   }
 }

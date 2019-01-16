@@ -16,9 +16,11 @@ export default class CommandController {
   constructor() {
     this._commandFactory = new CommandFactory();
     this._commands = new Map<string, Command>();
-    CommandFactory.commandList.forEach((c) => {
+
+    for (const c of this._commandFactory.commandList) {
       this._commands.set(c, this._commandFactory.createCommand(c));
-    });
+    }
+
     this._help = new Help(this._commands);
     this.botminList = sList.lists[LIST.BOTADMINS].data;
   }
