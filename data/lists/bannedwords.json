@@ -1,0 +1,10 @@
+{
+  "name": "bannedwords",
+  "list": [{
+    "key": "daisy"
+  }, {
+    "key": "blablabla"
+  }, {
+    "key": "olifant"
+  }]
+}
