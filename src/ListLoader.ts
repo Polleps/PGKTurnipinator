@@ -10,6 +10,7 @@ export default class ListLoader {
         new List("botadmins.json"),
         new List("joinableroles.json"),
         new List("editablelists.json"),
+        new List("shucfixes.json"),
       );
       Promise.all(lists.map((l: List) => l.load()))
         .then(() => resolve(lists));
@@ -25,4 +26,5 @@ export enum LIST {
   BOTADMINS,
   JOINABLEROLES,
   EDITABLELISTS,
+  SHUCFIXES,
 }
