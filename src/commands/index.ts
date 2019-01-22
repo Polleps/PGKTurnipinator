@@ -6,3 +6,4 @@ export * from "./Leave";
 export * from "./Register";
 export * from "./Play";
 export * from "./Stop";
+export * from "./Shucfix";

@@ -7,6 +7,7 @@ import {
   RegisterCommand,
   PlayCommand,
   StopCommand,
+  ShucfixCommand,
 } from "./commands";
 
 export default class CommandFactory {
@@ -23,6 +24,7 @@ export default class CommandFactory {
       ["play", () => new PlayCommand()],
       ["stop", () => new StopCommand()],
       ["skip", () => new StopCommand()],
+      ["shucfix", () => new ShucfixCommand()],
     ]);
   }
 

@@ -6,8 +6,7 @@ import { ITrigger } from "./ITrigger";
 
 export class ShucfixTrigger implements ITrigger {
   private list: IList[];
-  // private shucID: string = "164482857702522881";
-  private shucID: string = "117237798880280590";
+  private shucID: string = "164482857702522881";
 
   constructor() {
     this.list = sList.lists[LIST.SHUCFIXES].data;
