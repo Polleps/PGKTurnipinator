@@ -1,7 +1,8 @@
 import * as express from "express";
 import * as bodyParser from "body-parser";
 import * as Discord from "discord.js";
-import { UserRouter } from "./routers";
+import { UserRouter } from "./routers/User.router";
+import { AuthRouter } from "./routers/Auth.router";
 
 export default class Server {
   private app: express.Application;
@@ -31,11 +32,19 @@ export default class Server {
     this.app.use(bodyParser.json());
     // support application/x-www-form-urlencoded post data
     this.app.use(bodyParser.urlencoded({ extended: false }));
+    // app.use(session({
+    //   secret: "eioejfisoejfos",
+    //   resave: false,
+    //   saveUninitialized: false,
+    // }));
     this.setupRoutes();
   }
 
   private setupRoutes() {
-    const userRouter = new UserRouter();
-    this.app.use("/users", userRouter.router);
+    // const userRouter = new UserRouter();
+    const authRouter = new AuthRouter();
+    // this.app.use("/users", userRouter.router);
+    this.app.use("/", express.static("public"));
+    this.app.use("/auth", authRouter.router);
   }
 }
