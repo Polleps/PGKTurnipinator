@@ -1,4 +1,4 @@
-import { BannedUserWordsList, List } from "./lists";
+import { BannedUserWordsList, NeeUserList, List } from "./lists";
 
 export default class ListLoader {
 
@@ -11,6 +11,7 @@ export default class ListLoader {
         new List("joinableroles.json"),
         new List("editablelists.json"),
         new List("shucfixes.json"),
+        new NeeUserList("neeuserlist.json"),
       );
       Promise.all(lists.map((l: List) => l.load()))
         .then(() => resolve(lists));
@@ -27,4 +28,5 @@ export enum LIST {
   JOINABLEROLES,
   EDITABLELISTS,
   SHUCFIXES,
+  NEEUSERLIST,
 }
