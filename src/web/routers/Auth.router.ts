@@ -1,6 +1,6 @@
 import { Request, Response, Router } from "express";
 import Config from "../../Config";
-import { fetchUserToken } from "../services/authorisation.service";
+import { fetchUserToken, encodeToken } from "../services/authorisation.service";
 
 export class AuthRouter {
   private _router: Router;
@@ -25,7 +25,8 @@ export class AuthRouter {
         return res.send("Error Something went wrong");
       }
       const userData = await fetchUserToken(code);
-      res.cookie("accesstoken", userData.access_token, { maxAge: 900000 });
+      const token = await encodeToken(userData);
+      res.cookie("token", token, { maxAge: 900000 });
       res.redirect("/");
     });
   }

@@ -5,9 +5,11 @@ import * as fs from "fs";
 
 const APIURL = "https://discordapp.com/api/v6";
 const TOKENURL = "/oauth2/token";
+const baseDir = process.cwd();
 let tokenKey: Buffer | undefined;
 
 export const fetchUserToken = async (code: string): Promise<ITokenRespose> => {
+  // TODO: State checking in token request.
   const body = {
     client_id: Config.CLIENTID,
     client_secret: Config.CLIENTSECRET,
@@ -36,16 +38,14 @@ export const verifyActionRequest = async (token: string): Promise<IDecodedToken>
   return pJWTVerify(token, tokenKey);
 };
 
-function loadPrivateKey(): Promise<Buffer> {
-  return new Promise((resolve, reject) => {
-    fs.readFile("../../../token.key", (err, data) => {
-      if (err) {
-        throw new Error("Could not read token.key, make sure it exists.");
-      }
-      resolve(data);
-    });
-  });
-}
+export const encodeToken = async (data: ITokenRespose) => {
+  if (!tokenKey) {
+    tokenKey = await loadPrivateKey();
+  }
+  const { access_token, refresh_token, expires_in } = data;
+  const tokenData = { access_token, refresh_token, expires: Date.now() + (expires_in * 1000) };
+  return pJWTSign(JSON.stringify(tokenData), tokenKey);
+};
 
 export const pJWTVerify = (token: string, secret: Buffer): Promise<IDecodedToken> => {
   return new Promise((resolve, reject) => {
@@ -57,18 +57,41 @@ export const pJWTVerify = (token: string, secret: Buffer): Promise<IDecodedToken
       }
     });
   });
+};
+
+const pJWTSign = (payload: string, key: Buffer): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    jwt.sign(payload, key, (err, token) => {
+      if (err) {
+        reject(err);
+      }
+      resolve(token);
+    });
+  });
+};
+
+function loadPrivateKey(): Promise<Buffer> {
+  return new Promise((resolve, reject) => {
+    fs.readFile(`${baseDir}/token.key`, (err, data) => {
+      if (err) {
+        console.log(err);
+        throw new Error("Could not read token.key, make sure it exists.");
+      }
+      resolve(data);
+    });
+  });
 }
 
 interface IDecodedToken {
-  accesstoken: string;
-  refreshtoken: string;
-  accesstokenExpireDate: Date;
-
+  access_token: string;
+  refresh_token: string;
+  expires_in: number;
 }
+
 interface ITokenRespose {
   access_token: string;
   token_type: string;
-  expires_in: Date;
+  expires_in: number;
   refresh_token: string;
   scope: string;
 }

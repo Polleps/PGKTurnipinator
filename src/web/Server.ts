@@ -3,6 +3,7 @@ import * as bodyParser from "body-parser";
 import * as Discord from "discord.js";
 import { UserRouter } from "./routers/User.router";
 import { AuthRouter } from "./routers/Auth.router";
+import { ActionRouter } from "./routers/Action.router";
 
 export default class Server {
   private app: express.Application;
@@ -43,8 +44,10 @@ export default class Server {
   private setupRoutes() {
     // const userRouter = new UserRouter();
     const authRouter = new AuthRouter();
+    const actionRouter = new ActionRouter();
     // this.app.use("/users", userRouter.router);
     this.app.use("/", express.static("public"));
     this.app.use("/auth", authRouter.router);
+    this.app.use("/actions", actionRouter.router);
   }
 }

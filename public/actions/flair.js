@@ -1,12 +1,15 @@
 import Action from "./action.js";
+import { createAgent } from "../agent.js";
 
 export default class Flair extends Action {
-  constructor(args) {
+  constructor(args, token) {
     super(args);
+    this.agent = createAgent(token);
   }
 
   run() {
-    console.log('flair');
+    const { perform, role } = this.args;
+    return this.agent.postAction({ action: 'flair', perform, role });
   }
 
   isValid() {
