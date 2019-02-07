@@ -1,8 +1,8 @@
 import { parseQueryString } from './urlParser.js';
-import { createCookieGetter } from './cookieParser.js';
+import { getAccesstoken, saveToken, setRemember } from './indentifier.js';
+import { performAction } from './actionRouter.js';
 
-const getCookie = createCookieGetter(document.cookie);
-const accessToken = getCookie('accesstoken');
+const accessToken = 'aaaaaaaa' || getAccesstoken();
 const query = parseQueryString(window.location.search);
 console.log(query);
 (function () {
@@ -14,12 +14,19 @@ console.log(query);
     </section>
     <section>
       <a href="/auth/login" class="login-btn">Link Discord</a>
-    </section>
+      </section>
+      <section>
+        <input type="checkbox" id="remember" checked name="remember"> <label for="remember">Remember Discord User.</label>
+      </section>
     `;
+    const rememberEL = document.querySelector('#remember');
+    setRemember(rememberEL.checked);
+    rememberEL.addEventListener('change', (e) => setRemember(e.target.checked));
   } else {
     contentEL.innerHTML = `
     <section>Logged In</section>
     `;
+    performAction(query);
   }
 })()
 
