@@ -21,3 +21,14 @@ export const saveToken = (token) => {
 export const setRemember = (remember) => {
   localStorage.setItem('remember', `${remember}`);
 }
+
+export const forgetToken = () => {
+  sessionStorage.removeItem('token');
+  localStorage.removeItem('token');
+  deleteCookie('token');
+
+}
+
+function deleteCookie(name) {
+  document.cookie = name + '=; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+}

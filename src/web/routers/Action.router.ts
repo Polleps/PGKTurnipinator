@@ -1,12 +1,18 @@
 import { Request, Response, Router } from "express";
-import { verifyActionRequest } from "../services/authorisation.service";
+import { verifyActionRequest, refreshUserToken, encodeToken } from "../services/authorisation.service";
 import UserInfoCache from "../UserInfoCache";
-import { flair } from "../actions/Flair";
+import ActionService from "../services/action.service";
+import { IAction } from "../actions/IAction";
+import { IUserInfo } from "../discord.agent";
 
 export class ActionRouter {
   private _router: Router;
+  private actionService: ActionService;
+
   constructor() {
     this._router = Router();
+    this.actionService = new ActionService();
+
     this.setupRoutes();
   }
 
@@ -15,21 +21,40 @@ export class ActionRouter {
   }
 
   private setupRoutes() {
-    this._router.post("/run", async (req: Request, res: Response) => {
+
+    // ::AUTH MIDDLEWHERE
+    this._router.use((async (req: Request, res: Response, next) => {
       const { body } = req;
 
       try {
-        const token = await verifyActionRequest(body.token);
+        let token = await verifyActionRequest(body.token);
+
+        if (token.expires <= Date.now()) {
+          const userData = await refreshUserToken(token.refresh_token);
+          const newToken = await encodeToken(userData);
+          token = await verifyActionRequest(newToken);
+          res.cookie("token", newToken, { maxAge: 900000 });
+        }
+
         const userInfo = await UserInfoCache.get(token.access_token);
+        res.locals.userInfo = userInfo;
+        next();
 
-        const { action } = body;
-        // Todo: Make a factory for different action functions
-        flair(userInfo, action.perform, action.role);
-
-        res.status(200).json({ message: "Success" });
-      } catch (err) {
-        res.send(404).json({ message: err });
+      } catch (e) {
+        console.error(e);
+        res.status(400).json({ message: "Could not authenticate." });
       }
+    }));
+
+    // ::POST:: [URL]/actions/run
+    this._router.post("/run", async (req: Request, res: Response) => {
+      const { body } = req;
+      const userInfo = res.locals.userInfo as IUserInfo;
+      const action = body.action as IAction;
+
+      const message = this.actionService.run(userInfo, action);
+
+      res.status(200).json({ message });
     });
   }
 }

@@ -18,17 +18,20 @@ export const fetchUserToken = async (code: string): Promise<ITokenRespose> => {
     redirect_uri: Config.RedirectURI,
     scope: "identify",
   };
-  const urlencoded = new URLSearchParams();
-  Object.keys(body).forEach((key) => urlencoded.append(key, body[key]));
-  const headers = {
-    "Content-Type": "application/x-www-form-urlencoded",
-  };
+  return callTokenEndpoint(body);
+};
 
-  return fetch(APIURL + TOKENURL, {
-    method: "POST",
-    headers,
-    body: urlencoded,
-  }).then((res) => res.json());
+export const refreshUserToken = async (refresh_token: string): Promise<ITokenRespose> => {
+  // TODO: State checking in token request.
+  const body = {
+    client_id: Config.CLIENTID,
+    client_secret: Config.CLIENTSECRET,
+    grant_type: "refresh_token",
+    refresh_token,
+    redirect_uri: Config.RedirectURI,
+    scope: "identify",
+  };
+  return callTokenEndpoint(body);
 };
 
 export const verifyActionRequest = async (token: string): Promise<IDecodedToken> => {
@@ -82,10 +85,24 @@ function loadPrivateKey(): Promise<Buffer> {
   });
 }
 
+const callTokenEndpoint = async (body) => {
+  const urlencoded = new URLSearchParams();
+  Object.keys(body).forEach((key) => urlencoded.append(key, body[key]));
+  const headers = {
+    "Content-Type": "application/x-www-form-urlencoded",
+  };
+
+  return fetch(APIURL + TOKENURL, {
+    method: "POST",
+    headers,
+    body: urlencoded,
+  }).then((res) => res.json());
+};
+
 interface IDecodedToken {
   access_token: string;
   refresh_token: string;
-  expires_in: number;
+  expires: number;
 }
 
 interface ITokenRespose {

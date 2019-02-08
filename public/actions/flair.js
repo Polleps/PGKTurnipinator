@@ -9,7 +9,7 @@ export default class Flair extends Action {
 
   run() {
     const { perform, role } = this.args;
-    return this.agent.postAction({ action: 'flair', perform, role });
+    return this.agent.postAction({ name: 'flair', args: [perform, role] });
   }
 
   isValid() {

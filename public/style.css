@@ -34,6 +34,12 @@ header {
   grid-area: header;
   background-color: #36393f;
   text-align: center;
+  -webkit-border-top-left-radius: 8px;
+  -webkit-border-top-right-radius: 8px;
+  -moz-border-radius-topleft: 8px;
+  -moz-border-radius-topright: 8px;
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
 }
 
 .content {
@@ -51,6 +57,19 @@ header {
 footer {
   background-color: #36393f;
   grid-area: footer;
+  -webkit-border-bottom-right-radius: 8px;
+  -webkit-border-bottom-left-radius: 8px;
+  -moz-border-radius-bottomright: 8px;
+  -moz-border-radius-bottomleft: 8px;
+  border-bottom-right-radius: 8px;
+  border-bottom-left-radius: 8px;
+  text-align: center;
+  padding: 3px;
+}
+
+footer a {
+  padding: 2px;
+  margin-bottom: 2px;
 }
 
 .login-btn {
@@ -68,3 +87,10 @@ footer {
   font-size: 18px;
 }
 
+.action-message {
+  font-size: 2.1rem;
+}
+
+.fail-message {
+  color: red;
+}
