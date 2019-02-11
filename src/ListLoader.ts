@@ -6,7 +6,7 @@ export default class ListLoader {
     return new Promise<List[]>((resolve, reject) => {
       const lists = new Array<List>(
         new List("bannedwords.json"),
-        new BannedUserWordsList("banneduserwords.json"),
+        // new BannedUserWordsList("banneduserwords.json"),
         new List("botadmins.json"),
         new List("joinableroles.json"),
         new List("editablelists.json"),
@@ -22,7 +22,7 @@ export default class ListLoader {
 
 export enum LIST {
   BANNEDWORDS = 0,
-  BANNEDUSERWORDS,
+  // BANNEDUSERWORDS,
   BOTADMINS,
   JOINABLEROLES,
   EDITABLELISTS,
