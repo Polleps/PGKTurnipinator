@@ -9,6 +9,7 @@ export default class Config {
   public static readonly RedirectURI: string = process.env.REDIRECT_URI;
   public static readonly CLIENTID: string = process.env.CLIENT_ID;
   public static readonly CLIENTSECRET: string = process.env.CLIENT_SECRET;
+  public static readonly SMASHGG_API_KEY: string = process.env.SMASHGG_API_KEY;
   private constructor() {
   }
 }

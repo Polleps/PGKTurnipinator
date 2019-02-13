@@ -4,6 +4,7 @@ import UserInfoCache from "../UserInfoCache";
 import ActionService from "../services/action.service";
 import { IAction } from "../actions/IAction";
 import { IUserInfo } from "../discord.agent";
+import { fetchTournamentDetails } from "../services/smashgg.service";
 
 export class ActionRouter {
   private _router: Router;
@@ -55,6 +56,12 @@ export class ActionRouter {
       const message = this.actionService.run(userInfo, action);
 
       res.status(200).json({ message });
+    });
+
+    this._router.post("/tournament/:slug", async (req: Request, res: Response) => {
+      // TODO: Catch errors.
+      const details = await fetchTournamentDetails(req.params.slug);
+      res.status(200).json({message: "success", data: details});
     });
   }
 }

@@ -30,15 +30,19 @@ function renderNoToken() {
 }
 
 function doAction(action) {
-  performAction(action, accessToken)
-    .then((res) => {
-      console.log(res);
-      sessionStorage.removeItem('previousURLState');
-      renderSuccessMessage(res.message);
-    })
-    .catch((res) => {
-      renderFailMessage(res.message);
-    });
+  try {
+    performAction(action, accessToken);
+  } catch (err) {
+    renderFailMessage(err);
+  }
+  // .then((res) => {
+  //   console.log(res);
+  //   sessionStorage.removeItem('previousURLState');
+  //   renderSuccessMessage(res.message);
+  // })
+  // .catch((res) => {
+  //   renderFailMessage(res.message);
+  // });
 }
 
 const renderNoAction = () => {
@@ -58,7 +62,7 @@ const renderFailMessage = (message) => {
 
 const renderLogout = () => {
   const footerEL = findElement('footer');
-  footerEL.innerHTML = `<a href="#" id="logout">Logout</a>`;
+  footerEL.innerHTML = `<a href="#" id="logout" class="logout-btn"><i class="material-icons">exit_to_app</i>Logout</a>`;
   const logoutEL = findElement('#logout');
   logoutEL.addEventListener('click', (e) => {
     forgetToken();
