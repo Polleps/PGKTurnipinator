@@ -1,9 +1,10 @@
+@import url('https://fonts.googleapis.com/css?family=Roboto:300');
 body {
   margin: 0;
   padding: 0;
   background-color: #202225;
   color: white;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-family: 'Roboto', sans-serif;
   /* height: 100vh; */
 }
 
@@ -27,7 +28,7 @@ a:visited {
   grid-template-columns: 1fr 2fr 2fr 2fr 1fr;
   grid-template-rows: 1fr 10fr 0.2fr;
   height: 80vh;
-  margin-top: 10vh;
+  margin-top: 1rem;
 }
 
 header {
@@ -104,6 +105,10 @@ footer a {
 }
 
 /* Form Styling */
+.fetch-error {
+  color: red;
+}
+
 .tournament-form {
   width: 80%;
   margin: 0px auto;
@@ -113,6 +118,7 @@ footer a {
   margin-top: 10px;
   display: flex;
   flex-direction: row;
+  flex-wrap: wrap;
   width: 100%;
 }
 
@@ -120,6 +126,10 @@ footer a {
   border-bottom: 1px white solid;
   margin-top: 1rem;
   margin-bottom: 1.5rem;
+}
+
+.date-divider {
+  padding: 0.4rem;
 }
 
 .gap {
@@ -151,7 +161,10 @@ footer a {
   outline: none;
   border-bottom: white 1px solid;
 }
-
+.counter {
+  font-size: 0.8rem;
+  margin-left: 0.4rem;
+}
 .flex1 {
   flex-grow: 1;
 }
@@ -184,6 +197,15 @@ footer a {
   background-image: url('/assets/place.svg');
 }
 
+.logo-holder {
+  flex-basis: 2rem;
+}
+
+.flex1 img {
+  max-width: 100%;
+  padding: 1rem;
+}
+
 .add-btn {
   text-align: start;
   margin: auto;
@@ -191,10 +213,12 @@ footer a {
 
 .icon-label {
   display: flex;
+  flex-direction: row;
+  align-items: center;
 }
 
 .icon-label i {
-  margin-right: 5px;
+  margin-right: 0.7rem;
 }
 
 .fill-btn {
@@ -223,4 +247,28 @@ footer a {
 
 ::placeholder {
   color: rgb(175, 175, 175);
+}
+@media only screen and (max-width: 900px) {
+  .page-container {
+    grid-template-areas:
+    '. header header header .'
+    '. content content content .'
+    '. footer footer footer .';
+    grid-template-columns: 0.3fr 2fr 1fr 2fr 0.3fr;
+  }
+}
+@media only screen and (max-width: 750px) {
+  .page-container {
+    grid-template-areas:
+    'header header header'
+    'content content content'
+    'footer footer footer';
+    grid-template-columns: 1fr 1fr 1fr;
+    margin-top: 0px;
+    height: 100vh;
+  }
+  header {
+    grid-area: header;
+    border-radius: 0px;
+  }
 }

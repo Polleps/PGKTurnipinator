@@ -3,7 +3,8 @@ import { LIST } from "../../ListLoader";
 import { IUserInfo } from "../discord.agent";
 import { Role, GuildMember } from "discord.js";
 import { IAction, Performer } from "./IAction";
-const PGK = "185043146147627009";
+import Config from "../../Config";
+const PGK = Config.GUILD_ID;
 
 export const flair: Performer = (userInfo: IUserInfo, action: IAction) => {
   if (!action.args || action.args.length < 2) {

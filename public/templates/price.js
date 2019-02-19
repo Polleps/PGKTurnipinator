@@ -30,7 +30,7 @@ export const priceInput = ({key, name = '', amount = '', isLast, onNew, onDelete
       classes: 'flex1',
       placeholder: 'Amount',
       bind: (val) => {
-        state.cap = val;
+        state.amount = val;
         bind(state);
       },
     })}

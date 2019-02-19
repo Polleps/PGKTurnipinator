@@ -52,16 +52,22 @@ export class ActionRouter {
       const { body } = req;
       const userInfo = res.locals.userInfo as IUserInfo;
       const action = body.action as IAction;
-
-      const message = this.actionService.run(userInfo, action);
-
-      res.status(200).json({ message });
+      try {
+        const message = this.actionService.run(userInfo, action);
+        res.status(200).json({ message });
+      } catch (e) {
+        res.status(200).json({error: true, message: e.message});
+      }
     });
 
-    this._router.post("/tournament/:slug", async (req: Request, res: Response) => {
+    this._router.post("/tournamentdetails/:slug", async (req: Request, res: Response) => {
       // TODO: Catch errors.
-      const details = await fetchTournamentDetails(req.params.slug);
-      res.status(200).json({message: "success", data: details});
+      try {
+        const details = await fetchTournamentDetails(req.params.slug);
+        res.status(200).json({message: "success", data: details});
+      } catch (e) {
+        res.status(400).json({message: "invalid tournament", error: true});
+      }
     });
   }
 }

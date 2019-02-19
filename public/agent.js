@@ -1,6 +1,6 @@
 export const createAgent = (token) => {
   const baseURL = '/actions';
-  const tournamentURL = '/actions/tournament';
+  const tournamentURL = '/actions/tournamentdetails';
 
   return {
     postAction: async (action) => {
@@ -12,6 +12,9 @@ export const createAgent = (token) => {
     },
 
     fetchTournamentDetails: async (slug) => {
+      if (slug.trim() === '') {
+        return {message: 'Enter a slug', error: true};
+      }
       const headers = { 'Content-Type': 'application/json' };
       const body = { token };
       const options = { headers, body: JSON.stringify(body), method: 'POST' };

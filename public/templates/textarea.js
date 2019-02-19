@@ -5,8 +5,9 @@ export const textarea = ({
   bind = () => { return; },
   classes,
   placeholder = '',
-  cols= '30',
-  rows= '10'
+  cols= '60',
+  rows= '10',
+  maxLength = 500,
 }) => {
   return html`
     <textarea
@@ -18,6 +19,7 @@ export const textarea = ({
       wrap="hard"
       cols=${cols}
       rows=${rows}
+      maxlength=${maxLength}
     />
   `;
 }

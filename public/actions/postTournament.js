@@ -14,12 +14,16 @@ export default class PostTournament extends Action {
     this.state = {
       smashggLink: '',
       title: '',
-      date: '',
+      startDate: '',
+      endDate: '',
       location: '',
       events: [{name: '', cap: '', key: randomID()}],
       description: '',
       prices: [{name: '', amount: '', key: randomID()}],
+      imgURL: '',
     }
+    this.submitTournament = this.submitTournament.bind(this);
+    this.postMessage = undefined;
   }
 
   run() {
@@ -30,7 +34,8 @@ export default class PostTournament extends Action {
     const contentEL = document.querySelector('.content');
     const ui = html`
     <form action="post" class="tournament-form">
-      <h3>Enter Tournament Details</h3>
+      <h4>Enter Tournament Details</h4>
+      <div class="form-row"><span>Smash.gg</span></div>
       <div class="form-row">
         ${input({
           name: "smashgg",
@@ -38,14 +43,19 @@ export default class PostTournament extends Action {
           classes: ["flex1 icon-input ta-link"],
           bind: (val) => {
             this.state.smashggLink = val;
-            this.fetchTournament(val).then(() => this.render());
           },
           placeholder: 'Smash.gg slug (e.g. elysium-yggdrasil)'
         })}
-        <a href="#" class="fill-btn flex-auto">Fill</a>
-        <!-- <input type="url" name="smashgg" id="taSmashgg" placeholder="smash.gg link" class="flex1 icon-input ta-link"> -->
+        ${html`<a href="#" class="fill-btn flex-auto" @click=${() => this.fetchTournament(this.state.smashggLink).then(() => this.render())}>Fill</a>`}
       </div>
+      ${this.state.error ? html`<span class="fetch-error">${this.state.error}</span>` : ''}
       <div class="form-row gap"></div>
+      <div class="form-row">
+        <span class="icon-label">
+          <i class="material-icons">list</i>
+          Details
+        </span>
+      </div>
       <div class="form-row">
         ${input({
           name: "title",
@@ -56,14 +66,7 @@ export default class PostTournament extends Action {
         })}
       </div>
       <div class="form-row">
-        ${input({
-          type: "datetime-local",
-          name: "date",
-          value: this.state.date,
-          classes: "flex1 icon-input ta-date",
-          bind: (val) => this.state.date = val,
-        })}
-        ${input({
+      ${input({
           name: "location",
           value: this.state.location,
           classes: "flex1 icon-input ta-location",
@@ -71,22 +74,62 @@ export default class PostTournament extends Action {
           bind: (val) => this.state.location = val,
         })}
       </div>
+      <div class="form-row">
+        ${input({
+          type: "datetime-local",
+          name: "start_date",
+          value: this.state.startDate,
+          classes: "flex1 icon-input ta-date",
+          bind: (val) => this.state.startDate = val,
+        })}
+        <span class="flex-auto date-divider"> - </span>
+        ${input({
+          type: "datetime-local",
+          name: "end_date",
+          value: this.state.endDate,
+          classes: "flex1 icon-input ta-date",
+          bind: (val) => this.state.endDate = val,
+        })}
+      </div>
       <div class="form-row"><span class="icon-label"><i class="material-icons">games</i>Events/Games</span></div>
         ${this.mapEvents()}
-      <div class="form-row"><span>Description</span></div>
+        <div class="form-row">
+        <span class="icon-label">
+          <i class="material-icons">speaker_notes</i>
+          Additional Notes
+          ${this.state.description.length > 0 ?
+          html`<span class="counter">(${this.state.description.length}/250)</span>`
+          : ''}
+        </span>
+      </div>
       <div class="form-row">
         ${textarea({
           name: "description",
           value: this.state.description,
           classes: "flex1",
-          bind: (val) => this.state.description = val,
+          bind: (val) => {
+            this.state.description = val;
+            this.render();
+          },
+          maxLength: 250,
         })}
+        ${this.state.imgURL ?
+        html`
+        <div class="flex1 logo-holder">
+          <img src="${this.state.imgURL}" />
+        </div>`
+        : ''}
       </div>
       <div class="form-row"><span class="icon-label"><i class="material-icons">euro_symbol</i>Prices</span></div>
       ${this.mapPrices()}
       <div class="form-row">
-        <a href="#" class="post-btn">Post</a>
+        <a href="#" class="post-btn" @click=${createClick(this.submitTournament)}>Post</a>
       </div>
+      ${this.postMessage ? html`
+        <div class="form-row">
+          <span class="fetch-error flex-auto">${this.postMessage}</span>
+        </div>
+      ` : ''}
     </form>`;
     render(ui, contentEL);
   }
@@ -129,7 +172,7 @@ export default class PostTournament extends Action {
         this.render();
       },
       bind: (val) => {
-        this.state.prices[index] = {name: val.name, anount: val.amount, key: val.key};
+        this.state.prices[index] = {name: val.name, amount: val.amount, key: val.key};
       },
       isLast: this.state.prices.length - 1 === index,
     }))
@@ -137,18 +180,44 @@ export default class PostTournament extends Action {
 
   async fetchTournament(slug) {
     const result = await this.agent.fetchTournamentDetails(slug);
+    if (result.error) {
+      this.state.error = result.message;
+      return;
+    }
     const { data } = result;
+    this.state.error = '';
     this.state.title = data.name;
     this.state.location = data.address;
-    this.state.date = parseDate(new Date(data.startAt * 1000));
+    this.state.startDate = parseDate(new Date(data.startAt * 1000));
+    this.state.endDate = parseDate(new Date(data.endAt * 1000));
     this.state.events = data.events.map((evt) => ({name: evt, cap: '', key: randomID()}));
+    this.state.imgURL = data.image;
+    this.state.locationID = data.mapsPlaceId;
     return;
   }
 
   isValid() {
     return true;
   }
+
+  submitTournament() {
+    this.agent.postAction({name: 'posttournament', args: [JSON.stringify(this.state)]})
+    .then((res) => {
+      console.log(res);
+      if (res.error) {
+        this.postMessage = res.message;
+        this.render();
+      }
+    });
+  }
 }
+
+const createClick = (func) => ({
+  handleEvent(e) {
+    func(e);
+  },
+  capture: true,
+});
 
 const parseDate = (date) => {
   const aZ = (x) => x < 10 ? `0${x}` : x;
