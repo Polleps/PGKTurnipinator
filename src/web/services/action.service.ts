@@ -1,5 +1,5 @@
 import { Performer, IAction } from "../actions/IAction";
-import { flair } from "../actions";
+import { flair, postTournament } from "../actions";
 import { IUserInfo } from "../discord.agent";
 
 export default class ActionService {
@@ -8,6 +8,7 @@ export default class ActionService {
   constructor() {
     this.actions = new Map<string, Performer>();
     this.actions.set("flair", flair);
+    this.actions.set("posttournament", postTournament);
   }
 
   public run(userInfo: IUserInfo, action: IAction): string {
