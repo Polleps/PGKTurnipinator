@@ -42,9 +42,9 @@ export default class PostTournament extends Action {
           value: this.state.smashggLink,
           classes: ["flex1 icon-input ta-link"],
           bind: (val) => {
-            this.state.smashggLink = val;
+            this.extractSlug(val);
           },
-          placeholder: 'Smash.gg slug (e.g. elysium-yggdrasil)'
+          placeholder: 'Smash.gg link (or slug)'
         })}
         ${html`<a href="#" class="fill-btn flex-auto" @click=${() => this.fetchTournament(this.state.smashggLink).then(() => this.render())}>Fill</a>`}
       </div>
@@ -176,6 +176,25 @@ export default class PostTournament extends Action {
       },
       isLast: this.state.prices.length - 1 === index,
     }))
+  }
+
+  extractSlug(link) {
+    try {
+      const linkURL = new URL(link);
+      const path = linkURL.pathname.split('/');
+
+      path.shift();
+
+      if (path.length < 2 || path[0] !== 'tournament') {
+        this.state.error = 'Invalid Link';
+        return this.render();
+      }
+
+      this.state.smashggLink = path[1];
+    } catch(e) {
+      // If link is not parsable to a URL try fetching it as a slug.
+      this.state.smashggLink = link;
+    }
   }
 
   async fetchTournament(slug) {
