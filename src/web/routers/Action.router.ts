@@ -5,6 +5,7 @@ import ActionService from "../services/action.service";
 import { IAction } from "../actions/IAction";
 import { IUserInfo } from "../discord.agent";
 import { fetchTournamentDetails } from "../services/smashgg.service";
+import { userCanFetchTournament } from "../services/access.service";
 
 export class ActionRouter {
   private _router: Router;
@@ -57,6 +58,14 @@ export class ActionRouter {
         res.status(200).json({ message });
       } catch (e) {
         res.status(200).json({error: true, message: e.message});
+      }
+    });
+
+    this._router.use("/tournamentdetails", async (req: Request, res: Response, next) => {
+      if (userCanFetchTournament(res.locals.userInfo as IUserInfo)) {
+        next();
+      } else {
+        res.status(400).send({error: true, message: "User is not permitted"});
       }
     });
 
