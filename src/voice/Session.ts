@@ -71,7 +71,9 @@ export default class Session {
   private async printInfo(info: ytdl.videoInfo, displayName: string) {
     const embed = new Discord.RichEmbed()
       .setColor("#ff1919")
-      .addField("Now Playing:", `[${info.title}](${info.video_url})`)
+      .setAuthor(info.author.name || "#", info.author.avatar || "#", info.author.channel_url || "#")
+      .addField("Playing", `[${info.title || "No Title Found"}](${info.video_url || "#"})`)
+      .addField("Duration", formatLength(+info.length_seconds))
       .setFooter(`Requested by: ${displayName}`);
 
     try {
@@ -95,3 +97,13 @@ interface ISessionEvent {
   name: SessionEventName;
   func: () => void;
 }
+
+const formatLength = (l: number): string => {
+  const sL = (l / 60).toFixed(2);
+  const splitLength = sL.split(".");
+  return splitLength.map((x) => padZero(x)).join(":");
+};
+
+const padZero = (x: string | number): string => {
+  return `${x}`.length < 2 ? `0${x}` : `${x}`;
+};

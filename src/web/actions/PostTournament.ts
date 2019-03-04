@@ -16,15 +16,15 @@ export const postTournament: Performer = (userInfo: IUserInfo, action: IAction):
   const role = guild.roles.find((x) => x.name === roleName);
 
   if (!action.args || action.args.length < 1) {
-    return "Invalid Action.";
+    throw new Error("Invalid Action.");
   }
 
   if (!user) {
-    return "You're not in the Discord.";
+    throw new Error("You're not in the Discord.");
   }
 
   if (!user.roles.has(role.id)) {
-    return "You are not allowed to post tournaments.";
+    throw new Error("You are not allowed to post tournaments.");
   }
 
   try {

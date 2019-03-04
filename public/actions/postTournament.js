@@ -201,7 +201,7 @@ export default class PostTournament extends Action {
     const result = await this.agent.fetchTournamentDetails(slug);
     if (result.error) {
       this.state.error = result.message;
-      return;
+      return this.render();
     }
     const { data } = result;
     this.state.error = '';
@@ -225,6 +225,10 @@ export default class PostTournament extends Action {
       console.log(res);
       if (res.error) {
         this.postMessage = res.message;
+        this.render();
+      }
+      else {
+        this.postMessage = "";
         this.render();
       }
     });

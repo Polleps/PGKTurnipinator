@@ -1,6 +1,7 @@
 import { parseQueryString } from './urlParser.js';
 import { getToken, saveToken, setRemember, forgetToken } from './indentifier.js';
 import { performAction } from './actionRouter.js';
+import { findElement } from './helpers.js';
 
 const accessToken = getToken();
 const query = parseQueryString(window.location.search) || {};
@@ -35,24 +36,11 @@ function doAction(action) {
   } catch (err) {
     renderFailMessage(err);
   }
-  // .then((res) => {
-  //   console.log(res);
-  //   sessionStorage.removeItem('previousURLState');
-  //   renderSuccessMessage(res.message);
-  // })
-  // .catch((res) => {
-  //   renderFailMessage(res.message);
-  // });
 }
 
 const renderNoAction = () => {
   const contentEL = findElement('.content');
   contentEL.innerHTML = `<section>Logged In</section>`;
-}
-
-const renderSuccessMessage = (message) => {
-  const contentEL = findElement('.content');
-  contentEL.innerHTML = `<section class="action-message">${message}</section>`;
 }
 
 const renderFailMessage = (message) => {
@@ -68,8 +56,6 @@ const renderLogout = () => {
     forgetToken();
   });
 }
-
-const findElement = (str) => document.querySelector(str);
 
 (function () {
   if (!accessToken) return renderNoToken();

@@ -1,5 +1,6 @@
 import Action from "./action.js";
 import { createAgent } from "../agent.js";
+import { findElement } from "../helpers.js";
 
 export default class Flair extends Action {
   constructor(args, token) {
@@ -7,9 +8,11 @@ export default class Flair extends Action {
     this.agent = createAgent(token);
   }
 
-  run() {
+  async run() {
     const { perform, role } = this.args;
-    return this.agent.postAction({ name: 'flair', args: [perform, role] });
+    const result = await this.agent.postAction({ name: 'flair', args: [perform, role] });
+    const contentEL = findElement('.content');
+    contentEL.innerHTML = `<section class="action-message">${result.message}</section>`
   }
 
   isValid() {
