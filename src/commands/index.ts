@@ -6,3 +6,5 @@ export * from "./Leave";
 export * from "./Play";
 export * from "./Stop";
 export * from "./Shucfix";
+export * from "./PostFlairText";
+export * from "./ShuffleChannels";

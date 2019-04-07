@@ -7,6 +7,8 @@ import {
   PlayCommand,
   StopCommand,
   ShucfixCommand,
+  PostFlairTextCommand,
+  ShuffleChannelsCommand,
 } from "./commands";
 
 export default class CommandFactory {
@@ -23,6 +25,8 @@ export default class CommandFactory {
       ["stop", () => new StopCommand()],
       ["skip", () => new StopCommand()],
       ["shucfix", () => new ShucfixCommand()],
+      ["postflairtext", () => new PostFlairTextCommand()],
+      ["shufflechannels", () => new ShuffleChannelsCommand()],
     ]);
   }
 

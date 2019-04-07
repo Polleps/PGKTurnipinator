@@ -1,4 +1,4 @@
-import { BannedUserWordsList, List } from "./lists";
+import { JoinableRoles, List } from "./lists";
 
 export default class ListLoader {
 
@@ -8,7 +8,7 @@ export default class ListLoader {
         new List("bannedwords.json"),
         // new BannedUserWordsList("banneduserwords.json"),
         new List("botadmins.json"),
-        new List("joinableroles.json"),
+        new JoinableRoles("joinableroles.json"),
         new List("editablelists.json"),
         new List("shucfixes.json"),
       );
