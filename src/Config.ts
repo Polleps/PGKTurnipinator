@@ -13,6 +13,7 @@ export default class Config {
   public static readonly GUILD_ID: string = process.env.GUILD_ID;
   public static readonly POST_TOURNAMENT_ROLE_NAME: string = process.env.POST_TOURNAMENT_ROLE_NAME;
   public static readonly TOURNAMEN_AGENDA_ID: string = process.env.TOURNAMEN_AGENDA_ID;
+  public static readonly SERVERURL: string = process.env.SERVERURL;
   private constructor() {
   }
 }

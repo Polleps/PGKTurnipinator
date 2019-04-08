@@ -4,6 +4,7 @@ import Config from "../../Config";
 import { sClient } from "../../Context";
 import { Guild, GuildMember, RichEmbed, TextChannel } from "discord.js";
 import { URL } from "url";
+import * as moment from "moment";
 
 const guildID = Config.GUILD_ID;
 const roleName = Config.POST_TOURNAMENT_ROLE_NAME;
@@ -46,7 +47,7 @@ const postInChannel = (guild: Guild, user: GuildMember, tournamentDetails: IPars
 
 const buildEmbed = (user: GuildMember, tournamentDetails: IParsedTournament): RichEmbed => {
   let embed = new RichEmbed();
-  embed.setAuthor(`${user.user.username}#${user.user.discriminator}`, user.user.avatarURL);
+  // embed.setAuthor(`${user.user.username}#${user.user.discriminator}`, user.user.avatarURL);
   embed.setColor(3552822);
   embed.setThumbnail(tournamentDetails.imgURL);
   embed.addField(tournamentDetails.title, "\u200B");
@@ -134,7 +135,7 @@ const createGoogleMapsURL = (location: string, googleMapsID: string): string => 
 };
 
 const formatDate = (x: Date): string => {
-  return `${padNumber(x.getDate())}-${padNumber(x.getMonth())}-${x.getFullYear()}`;
+  return moment(x).format("MMMM Do YYYY");
 };
 
 const padNumber = (x: number): string => {
