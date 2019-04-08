@@ -13,6 +13,9 @@ export class ShuffleChannelsCommand extends Command {
   }
 
   public run(message: Discord.Message, args?: string[]): boolean {
+    message.reply("Command is disabled.");
+    return true;
+
     console.log(message.guild.channels.filter((c) => c.type === "category").map((c) => c.position).join(", "));
     const categoryChannels = message.guild.channels.filter((c) => c.type === "category" && c.name !== "adminning");
     const categoryNames = categoryChannels.map((c) => c.name);

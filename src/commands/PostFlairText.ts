@@ -16,17 +16,27 @@ export class PostFlairTextCommand extends Command {
   }
 
   public run(message: Message, args?: string[]): boolean {
-    message.reply("Pong");
+    const embeds = sList.lists[LIST.JOINABLEROLES].data.map((role) => formatedMessage(role));
+    embeds.forEach((embed) => {
+      message.channel.send(embed);
+    });
     return true;
   }
 
 }
 
-// const formatedMessage = (role: IJoinableRoles): RichEmbed => {
-//   const embed = new RichEmbed();
-//   embed.title = role.key;
+const formatedMessage = (role: IJoinableRoles): RichEmbed => {
+  const embed = new RichEmbed();
+  embed.title = role.key;
+  embed.setColor(11931720);
+  if (role.description) {
+    embed.setDescription(role.description);
+  }
 
-// }
+  embed.addField("\u200B", `[Add](${formatActionURL(role, true)}) | [Remove](${formatActionURL(role, false)})`);
 
-const formatActionURL = (role: IJoinableRoles, join: boolean): string =>
-  `${Config.SERVERURL}/?action=flair&perform=${join ? "add" : "remove"}&role=${role.key}`;
+  return embed;
+}
+
+const formatActionURL = (role: IJoinableRoles, join: boolean): URL =>
+  new URL(`${Config.SERVERURL}/?action=flair&perform=${join ? "add" : "remove"}&role=${role.key}`);

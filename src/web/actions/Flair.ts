@@ -12,7 +12,7 @@ export const flair: Performer = (userInfo: IUserInfo, action: IAction) => {
   }
 
   const mod = action.args[0];
-  const roleName = action.args[1];
+  const roleName = decodeURIComponent(action.args[1]);
 
   const roles = sList.lists[LIST.JOINABLEROLES].data.map(((x) => `${x.key}`));
 
