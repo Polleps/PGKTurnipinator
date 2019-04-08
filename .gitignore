@@ -67,3 +67,4 @@ built/*
 data/lists/*
 !data/lists/.gitkeep
 token.key
+.DS_Store
