@@ -5,4 +5,4 @@ export interface IAction {
   args?: string[];
 }
 
-export type Performer = (userInfo: IUserInfo, action: IAction) => string;
+export type Performer = (userInfo: IUserInfo, action: IAction) => Promise<string>;

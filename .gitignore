@@ -63,8 +63,6 @@ typings/
 #Build output dir
 built/*
 !built/.gitkeep
-
-data/lists/*
-!data/lists/.gitkeep
 token.key
 .DS_Store
+firebasekey.json

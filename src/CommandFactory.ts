@@ -9,6 +9,7 @@ import {
   ShucfixCommand,
   PostFlairTextCommand,
   ShuffleChannelsCommand,
+  SeedDBCommand,
 } from "./commands";
 
 export default class CommandFactory {
@@ -27,6 +28,7 @@ export default class CommandFactory {
       ["shucfix", () => new ShucfixCommand()],
       ["postflairtext", () => new PostFlairTextCommand()],
       ["shufflechannels", () => new ShuffleChannelsCommand()],
+      ["seeddb", () => new SeedDBCommand()],
     ]);
   }
 

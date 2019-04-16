@@ -33,6 +33,7 @@ export const fetchTournamentDetails = async (slug: string): Promise<ITournamentD
     "Authorization": `Bearer ${Config.SMASHGG_API_KEY}`,
   };
   const body = { query, variables: { slug } };
+  console.log(body);
   const options = {
     method: "POST",
     headers,
@@ -41,6 +42,7 @@ export const fetchTournamentDetails = async (slug: string): Promise<ITournamentD
 
   const result = await fetch(baseURL, options).then((res) => res.json());
   const { name, mapsPlaceId, startAt, endAt, images, venueAddress, events } = result.data.tournament;
+  const img = images.find((img) => img.type === "profile");
   const tournamentDetails: ITournamentDetails = {
     name,
     mapsPlaceId,
@@ -48,7 +50,7 @@ export const fetchTournamentDetails = async (slug: string): Promise<ITournamentD
     startAt,
     endAt,
     events: events.map((evt) => evt.name),
-    image: images.find((img) => img.type === "profile").url,
+    image: img ? img.url : "",
   };
   return tournamentDetails;
 };

@@ -1,18 +1,17 @@
 import { Message } from "discord.js";
 import { Command } from "./Command";
-import { sList } from "../Context";
-import { LIST } from "../ListLoader";
-import { List } from "../lists";
+import { BasicSetCache } from "../stores";
+import { store } from "../Store";
 
 export class ShucfixCommand extends Command {
-  private list: List;
+  private shucfixCache: BasicSetCache;
 
   constructor() {
     super();
     this._tag = "shucfix";
     this._usage = `\`${this._prefix}${this._tag} [add/remove] [text]\``;
     this._description = "Add or remove shucfixes.";
-    this.list = sList.lists[LIST.SHUCFIXES];
+    this.shucfixCache = store.cache("shucfixes") as BasicSetCache;
   }
 
   public run(message: Message, args?: string[]): boolean {
@@ -40,24 +39,21 @@ export class ShucfixCommand extends Command {
   }
 
   private addPrefix(msg: Message, prefix: string): void {
-    if (this.list.data.some((x) => x.key === prefix)) {
+    if (this.shucfixCache.has(prefix)) {
       msg.reply(`${prefix} is already a shucfix`);
       return;
     }
-
-    this.list.data.push({ key: prefix });
-    this.list.save().then(() => msg.reply(`${prefix} is now a shucfix`));
+    this.shucfixCache.add(prefix)
+      .then(() => msg.reply(`${prefix} is now a shucfix`));
   }
 
   private removePrefix(msg: Message, prefix: string): void {
-    const index = this.list.data.findIndex((x) => x.key === prefix);
-    if (index === -1) {
+    if (!this.shucfixCache.has(prefix)) {
       msg.reply(`${prefix} is not a shucfix`);
       return;
     }
-
-    this.list.data.splice(index, 1);
-    this.list.save().then(() => msg.reply(`removed ${prefix} from shucfixes`));
+    this.shucfixCache.delete(prefix)
+      .then(() => msg.reply(`removed ${prefix} from shucfixes`));
   }
 
   private verify(args?: string[]): boolean {

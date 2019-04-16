@@ -1,15 +1,13 @@
 import * as Discord from "discord.js";
-import { sList } from "../Context";
-import { LIST } from "../ListLoader";
-import { IList } from "../lists";
 import { ITrigger } from "./ITrigger";
+import { BasicSetCache } from "../stores";
+import { store } from "../Store";
 
 export class ShucfixTrigger implements ITrigger {
-  private list: IList[];
   private shucID: string = "164482857702522881";
-
+  private shucfixCache: BasicSetCache;
   constructor() {
-    this.list = sList.lists[LIST.SHUCFIXES].data;
+    this.shucfixCache = store.cache("shucfixes") as BasicSetCache;
   }
 
   public run(msg: Discord.Message): boolean {
@@ -22,6 +20,6 @@ export class ShucfixTrigger implements ITrigger {
   }
 
   private fetchRandomName(): string {
-    return this.list[Math.floor(Math.random() * this.list.length)].key;
+    return this.shucfixCache.random();
   }
 }

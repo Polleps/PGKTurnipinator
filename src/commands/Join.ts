@@ -1,27 +1,23 @@
 import * as Discord from "discord.js";
 import { Command } from "./Command";
-import { LIST } from "../ListLoader";
-import { sList } from "../Context";
+import { store } from "../Store";
+import { JoinableRoleCache } from "../stores";
 
 export class JoinCommand extends Command {
+  private roleCache: JoinableRoleCache;
+
   constructor() {
     super();
     this._tag = "join";
     this._usage = ``;
     // tslint:disable-next-line:max-line-length
     this._description = `Use the join command to get access to certain roles, Use \`${this._prefix}join roles\` to see which roles you get access to.`;
+    this.roleCache = store.cache("joinableroles") as JoinableRoleCache;
   }
 
   public run(message: Discord.Message, args?: string[]): boolean {
     if (!args) {
       this.sendUsage(message);
-      return true;
-    }
-    const roles = sList.lists[LIST.JOINABLEROLES].data.map(((role) => `${role.key}`));
-
-    // ------ !join roles
-    if (args[0].toLowerCase() === "roles") {
-      message.reply(this.compileRolesList(roles)).then((m: Discord.Message) => m.delete(60000));
       return true;
     }
 
@@ -31,15 +27,16 @@ export class JoinCommand extends Command {
     if (!this.checkIfInServer(message, rolename)) {
       return true;
     }
-    // Rolename should be in the list.
-    if (!this.checkIfInList(message, rolename, roles)) {
+
+    if (!this.roleCache.has(rolename)) {
+      message.reply(`${rolename} is not joinable role`);
       return true;
     }
-    // User should not already have the role.
+
     if (!this.checkIfUserHasRole(message, rolename)) {
       return true;
     }
-    // Role will be added to the user.
+
     this.addRoleToUser(message, rolename);
     return true;
   }
@@ -67,20 +64,5 @@ export class JoinCommand extends Command {
       return false;
     }
     return true;
-  }
-
-  private checkIfInList(message: Discord.Message, rolename: string, roles: string[]): boolean {
-    if (!roles.some((role) => role === rolename)) {
-      message.reply(`${rolename} is not a joinable role.
-      use \`${this._prefix}join roles\` to get list of joinable roles`)
-        .then((m: Discord.Message) => m.delete(60000));
-      return false;
-    }
-    return true;
-  }
-
-  private compileRolesList(roles: string[]): string {
-    const str = "**List of joinable roles:**\n";
-    return str + roles.map((role) => `- ${role}\n`).join("");
   }
 }
