@@ -1,15 +1,18 @@
 import * as Discord from "discord.js";
 import { Command } from "./Command";
-import { LIST } from "../ListLoader";
-import { sList } from "../Context";
+import { store } from "../Store";
+import { JoinableRoleCache } from "../stores";
 
 export class LeaveCommand extends Command {
+  private roleCache: JoinableRoleCache;
+
   constructor() {
     super();
     this._tag = "leave";
     this._usage = ``;
     // tslint:disable-next-line:max-line-length
     this._description = `Use the leave command to remove a certain roles`;
+    this.roleCache = store.cache("joinableroles") as JoinableRoleCache;
   }
 
   public run(message: Discord.Message, args?: string[]): boolean {
@@ -17,23 +20,19 @@ export class LeaveCommand extends Command {
       this.sendUsage(message);
       return true;
     }
-    const roles = sList.lists[LIST.JOINABLEROLES].data.map(((role) => `${role.key}`));
-
-    // ------ !join [role name]
     const rolename = args.join(" ").trim();
-    // Roll should exist in the server the message was posted in.
-    if (!this.checkIfInServer(message, rolename)) {
-      return true;
-    }
-    // Rolename should be in the list.
-    if (!this.checkIfInList(message, rolename, roles)) {
-      return true;
-    }
-    // User should not already have the role.
+
     if (!this.checkIfUserHasRole(message, rolename)) {
       return true;
     }
-    // Role will be added to the user.
+
+    if (!this.checkIfInServer(message, rolename)) {
+      return true;
+    }
+    if (!this.roleCache.has(rolename)) {
+      message.reply(`${rolename} cannot be removed.`);
+      return true;
+    }
     this.removeRoleFromUser(message, rolename);
     return true;
   }
@@ -58,15 +57,6 @@ export class LeaveCommand extends Command {
   private checkIfInServer(message: Discord.Message, rolename: string): boolean {
     if (!message.guild.roles.some((role) => role.name === rolename)) {
       message.reply("Role does not exist in this server.").then((m: Discord.Message) => m.delete(30000));
-      return false;
-    }
-    return true;
-  }
-
-  private checkIfInList(message: Discord.Message, rolename: string, roles: string[]): boolean {
-    if (!roles.some((role) => role === rolename)) {
-      message.reply(`${rolename} can not be removed.`)
-        .then((m: Discord.Message) => m.delete(60000));
       return false;
     }
     return true;

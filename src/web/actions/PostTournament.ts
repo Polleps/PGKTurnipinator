@@ -10,7 +10,7 @@ const guildID = Config.GUILD_ID;
 const roleName = Config.POST_TOURNAMENT_ROLE_NAME;
 const tournamentagendaID = Config.TOURNAMEN_AGENDA_ID;
 
-export const postTournament: Performer = (userInfo: IUserInfo, action: IAction): string => {
+export const postTournament: Performer = async (userInfo: IUserInfo, action: IAction): Promise<string> => {
   const client = sClient.client;
   const guild = client.guilds.get(guildID);
   const user = guild.members.get(userInfo.id);

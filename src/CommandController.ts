@@ -2,16 +2,15 @@ import * as Discord from "discord.js";
 import CommandFactory from "./CommandFactory";
 import { Command } from "./commands/Command";
 import Config from "./Config";
-import { sList } from "./Context";
 import Help from "./Help";
-import { LIST } from "./ListLoader";
-import { IList } from "./lists";
+import { BasicSetCache } from "./stores";
+import { store } from "./Store";
 
 export default class CommandController {
   private _commandFactory: CommandFactory;
   private _commands: Map<string, Command>;
   private _help: Help;
-  private botminList: IList[];
+  private botminCache: BasicSetCache;
 
   constructor() {
     this._commandFactory = new CommandFactory();
@@ -22,7 +21,7 @@ export default class CommandController {
     }
 
     this._help = new Help(this._commands);
-    this.botminList = sList.lists[LIST.BOTADMINS].data;
+    this.botminCache = store.cache("botadmins") as BasicSetCache;
   }
 
   public processMessage(message: Discord.Message): void {
@@ -61,6 +60,6 @@ export default class CommandController {
   }
 
   private isBotAdmin(user: Discord.User): boolean {
-    return this.botminList.some((x) => x.key === user.id);
+    return this.botminCache.has(user.id);
   }
 }

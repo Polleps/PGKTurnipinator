@@ -1,8 +1,7 @@
 import * as Discord from "discord.js";
-import { BannedWordsTrigger, ITrigger, ShucfixTrigger } from "./triggers";
+import { ITrigger, ShucfixTrigger } from "./triggers";
 export default class TriggerController {
   private triggers: ITrigger[] = new Array<ITrigger>(
-    new BannedWordsTrigger(),
     new ShucfixTrigger(),
   );
 

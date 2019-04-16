@@ -1,11 +1,11 @@
 import { RichEmbed, Message } from "discord.js";
 import { Command } from "./Command";
-import { LIST } from "../ListLoader";
-import { sList } from "../Context";
-import { IJoinableRoles } from "../lists";
 import Config from "../Config";
+import { IJoinableRole, JoinableRoleCache } from "../stores";
+import { store } from "../Store";
 
 export class PostFlairTextCommand extends Command {
+  private roles: JoinableRoleCache;
   constructor() {
     super();
     this._tag = "postflairtext";
@@ -13,21 +13,21 @@ export class PostFlairTextCommand extends Command {
     this._description = "It's just ping";
     this._isPublic = false;
     this._isAdminCommand = true;
+    this.roles = store.cache("joinableroles") as JoinableRoleCache;
   }
 
   public run(message: Message, args?: string[]): boolean {
-    const embeds = sList.lists[LIST.JOINABLEROLES].data.map((role) => formatedMessage(role));
-    embeds.forEach((embed) => {
-      message.channel.send(embed);
+    this.roles.data.forEach((role) => {
+      message.channel.send(formatedMessage(role));
     });
     return true;
   }
 
 }
 
-const formatedMessage = (role: IJoinableRoles): RichEmbed => {
+const formatedMessage = (role: IJoinableRole): RichEmbed => {
   const embed = new RichEmbed();
-  embed.title = role.key;
+  embed.title = role.name;
   embed.setColor(11931720);
   if (role.description) {
     embed.setDescription(role.description);
@@ -38,5 +38,5 @@ const formatedMessage = (role: IJoinableRoles): RichEmbed => {
   return embed;
 }
 
-const formatActionURL = (role: IJoinableRoles, join: boolean): URL =>
-  new URL(`${Config.SERVERURL}/?action=flair&perform=${join ? "add" : "remove"}&role=${role.key}`);
+const formatActionURL = (role: IJoinableRole, join: boolean): URL =>
+  new URL(`${Config.SERVERURL}/?action=flair&perform=${join ? "add" : "remove"}&role=${role.name}`);

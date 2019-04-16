@@ -11,7 +11,7 @@ export default class ActionService {
     this.actions.set("posttournament", postTournament);
   }
 
-  public run(userInfo: IUserInfo, action: IAction): string {
+  public async run(userInfo: IUserInfo, action: IAction): Promise<string> {
     if (this.actions.has(action.name)) {
       return this.actions.get(action.name)(userInfo, action);
     } else {
