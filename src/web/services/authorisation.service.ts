@@ -56,6 +56,7 @@ export const pJWTVerify = (token: string, secret: Buffer): Promise<IDecodedToken
       if (err) {
         reject(err);
       } else {
+        console.log("DATA", data);
         resolve(data);
       }
     });

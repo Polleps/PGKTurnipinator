@@ -1,9 +1,7 @@
 import * as express from "express";
 import * as bodyParser from "body-parser";
 import * as Discord from "discord.js";
-import { UserRouter } from "./routers/User.router";
-import { AuthRouter } from "./routers/Auth.router";
-import { ActionRouter } from "./routers/Action.router";
+import { ActionRouter, AuthRouter, InviteRouter, TournamentRouter } from "./routers";
 
 export default class Server {
   private app: express.Application;
@@ -33,11 +31,6 @@ export default class Server {
     this.app.use(bodyParser.json());
     // support application/x-www-form-urlencoded post data
     this.app.use(bodyParser.urlencoded({ extended: false }));
-    // app.use(session({
-    //   secret: "eioejfisoejfos",
-    //   resave: false,
-    //   saveUninitialized: false,
-    // }));
     this.setupRoutes();
   }
 
@@ -45,9 +38,14 @@ export default class Server {
     // const userRouter = new UserRouter();
     const authRouter = new AuthRouter();
     const actionRouter = new ActionRouter();
-    // this.app.use("/users", userRouter.router);
-    this.app.use("/", express.static("public"));
+    const inviteRouter = new InviteRouter();
+    const tournamentRouter = new TournamentRouter();
+    this.app.use("/bot", express.static("public/dist"));
+    this.app.use("/agenda", express.static("agenda/dist"));
+
     this.app.use("/auth", authRouter.router);
     this.app.use("/actions", actionRouter.router);
+    this.app.use("/invite", inviteRouter.router);
+    this.app.use("/tournaments", tournamentRouter.router);
   }
 }

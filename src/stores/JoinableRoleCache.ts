@@ -9,7 +9,7 @@ export interface IJoinableRole {
 export class JoinableRoleCache extends StoreCache<Map<string, IJoinableRole>, string, IJoinableRole> {
   constructor(collection: CollectionReference) {
     super(collection);
-    this.cache = new Map<string,IJoinableRole>();
+    this.cache = new Map<string, IJoinableRole>();
   }
 
   public async add(x: IJoinableRole): Promise<void> {

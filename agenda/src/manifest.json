@@ -1,0 +1,21 @@
+{
+  "name": "Tournament Agenda",
+  "short_name": "Agenda",
+  "icons": [
+    {
+      "src": "./assets/agenda_logo_192.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "./assets/agenda_logo_512.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ],
+  "start_url": "/agenda",
+  "scope": "/agenda",
+  "display": "standalone",
+  "background_color": "#ececec",
+  "theme_color": "#000"
+}

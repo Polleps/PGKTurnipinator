@@ -42,19 +42,19 @@ export default class CommandController {
         // Admin commands should only be able to be used by botadmins.
         if (command.isAdminCommand && !this.isBotAdmin(message.author)) {
           message.reply("This command can only be used by the staff.");
-          message.delete();
+          message.delete().catch((err) => console.log(err));
           return;
         }
         // If excecuting the command returns true the users message should be removed.
         const shouldRemoveMessage = command.run(message, messageArr);
         if (shouldRemoveMessage) {
-          message.delete();
+          message.delete().catch((err) => console.log(err));
         }
       } else {
         message.reply(
           `${commandTag} is not a command.\nType \`${
           Config.CommandPrefix}help\` to see a list of available commands.`);
-        message.delete();
+        message.delete().catch((err) => console.log(err));
       }
     }
   }

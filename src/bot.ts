@@ -23,7 +23,7 @@ class Main {
     const messageHandler = new MessageHandler();
     const server = new Server(client);
     if (Config.EnableWebServer) {
-      await server.start(Config.ServerPort);
+      await server.start(+process.env.PORT || Config.ServerPort);
     }
 
     client.on("ready", (): void => {
@@ -34,11 +34,22 @@ class Main {
       messageHandler.processMessage(message);
     });
 
-    client.login(Config.TestToken);
+    client.on("error", (error) => {
+      console.error(error);
+    });
+
+    client.on("disconnect", (e) => {
+      console.error("Bot disconnected");
+    });
+
+    try {
+      await client.login(Config.TestToken);
+    } catch (e) {
+      console.error(e);
+    }
     return;
   }
 }
-
 const bot = new Main([]);
 // tslint:disable-next-line:no-console
 bot.main().then(() => log("main done"));

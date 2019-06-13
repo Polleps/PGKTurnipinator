@@ -24,10 +24,13 @@ export class AuthRouter {
       if (!code) {
         return res.send("Error Something went wrong");
       }
+      console.log("callback called");
       const userData = await fetchUserToken(code);
+      console.log("Callback received Userdata", userData);
       const token = await encodeToken(userData);
-      res.cookie("token", token, { maxAge: 900000 });
-      res.redirect("/");
+      console.log("Calback encoded token", token);
+      res.cookie("token", token, { maxAge: 900000, path: "/bot/"});
+      res.redirect("/bot");
     });
   }
 }

@@ -2,9 +2,12 @@ import { Performer, IAction } from "./IAction";
 import { IUserInfo } from "../discord.agent";
 import Config from "../../Config";
 import { sClient } from "../../Context";
+import ITournament from "../../models/ITournament";
+import { store } from "../../Store";
 import { Guild, GuildMember, RichEmbed, TextChannel } from "discord.js";
 import { URL } from "url";
 import * as moment from "moment";
+import { TournamentStoreCache } from "../../stores";
 
 const guildID = Config.GUILD_ID;
 const roleName = Config.POST_TOURNAMENT_ROLE_NAME;
@@ -29,8 +32,11 @@ export const postTournament: Performer = async (userInfo: IUserInfo, action: IAc
   }
 
   try {
-    const parsedTournament = JSON.parse(action.args[0]) as IParsedTournament;
-    postInChannel(guild, user, parsedTournament);
+    const parsedTournament = JSON.parse(action.args[0]) as ITournament;
+    if (action.args[1] !== "saveonly") {
+      postInChannel(guild, user, parsedTournament);
+    }
+    storeTournament(parsedTournament);
   } catch (err) {
     console.log(err);
     throw new Error("Invalid Tournament Details.");
@@ -39,17 +45,17 @@ export const postTournament: Performer = async (userInfo: IUserInfo, action: IAc
   return "Done";
 };
 
-const postInChannel = (guild: Guild, user: GuildMember, tournamentDetails: IParsedTournament): void => {
+const postInChannel = (guild: Guild, user: GuildMember, tournamentDetails: ITournament): void => {
   const channel = guild.channels.get(tournamentagendaID) as TextChannel;
   const embed = buildEmbed(user, tournamentDetails);
   channel.send(embed);
 };
 
-const buildEmbed = (user: GuildMember, tournamentDetails: IParsedTournament): RichEmbed => {
+const buildEmbed = (user: GuildMember, tournamentDetails: ITournament): RichEmbed => {
   let embed = new RichEmbed();
   // embed.setAuthor(`${user.user.username}#${user.user.discriminator}`, user.user.avatarURL);
   embed.setColor(3552822);
-  embed.setThumbnail(tournamentDetails.imgURL);
+  embed.setThumbnail(tournamentDetails.image);
   embed.addField(tournamentDetails.title, "\u200B");
   embed = buildLocation(embed, tournamentDetails);
   embed = buildDateField(embed, tournamentDetails);
@@ -60,12 +66,12 @@ const buildEmbed = (user: GuildMember, tournamentDetails: IParsedTournament): Ri
   return embed;
 };
 
-const buildLocation = (embed: RichEmbed, tD: IParsedTournament): RichEmbed => {
+const buildLocation = (embed: RichEmbed, tD: ITournament): RichEmbed => {
   const gUrl = createGoogleMapsURL(tD.location, tD.locationID);
   return embed.addField("🗺 Location", `[${tD.location}](${gUrl})`);
 };
 
-const buildEvents = (embed: RichEmbed, tD: IParsedTournament): RichEmbed => {
+const buildEvents = (embed: RichEmbed, tD: ITournament): RichEmbed => {
   const events = tD.events.filter((x) => !!x.name);
 
   if (events.length === 0) {
@@ -77,12 +83,12 @@ const buildEvents = (embed: RichEmbed, tD: IParsedTournament): RichEmbed => {
   const caps = events.map((x) => `${x.cap}` || "-").join("\n");
   embed.addField("🕹 Events", names, hasCaps);
   if (hasCaps) {
-    embed.addField("Player Cap", caps, true);
+    embed.addField("Cap", caps, true);
   }
   return embed;
 };
 
-const buildPrices = (embed: RichEmbed, tD: IParsedTournament): RichEmbed => {
+const buildPrices = (embed: RichEmbed, tD: ITournament): RichEmbed => {
   if (!tD.prices) {
     return embed;
   }
@@ -97,7 +103,7 @@ const buildPrices = (embed: RichEmbed, tD: IParsedTournament): RichEmbed => {
   return embed;
 };
 
-const buildDescription = (embed: RichEmbed, tD: IParsedTournament): RichEmbed => {
+const buildDescription = (embed: RichEmbed, tD: ITournament): RichEmbed => {
   if (!tD.description || tD.description.trim().length === 0) {
     return embed;
   }
@@ -107,11 +113,11 @@ const buildDescription = (embed: RichEmbed, tD: IParsedTournament): RichEmbed =>
   return embed.addField("Additional Info", tD.description);
 };
 
-const buildLink = (embed: RichEmbed, tD: IParsedTournament): RichEmbed => {
-  return embed.addField("More Info/Register", `[Smash.gg](${"https://smash.gg/tournament/" + tD.smashggLink})`);
+const buildLink = (embed: RichEmbed, tD: ITournament): RichEmbed => {
+  return embed.addField("More Info/Register", `[Smash.gg](${"https://smash.gg/tournament/" + tD.url})`);
 };
 
-const buildDateField = (embed: RichEmbed, tD: IParsedTournament): RichEmbed => {
+const buildDateField = (embed: RichEmbed, tD: ITournament): RichEmbed => {
   const startDate = new Date(tD.startDate);
   const endDate = new Date(tD.endDate);
   const spansSingleDay = compareDay(startDate, endDate);
@@ -142,25 +148,7 @@ const padNumber = (x: number): string => {
   return x < 10 ? `0${x}` : `${x}`;
 };
 
-interface IParsedTournament {
-  smashggLink: string;
-  title: string;
-  startDate: string;
-  endDate: string;
-  location: string;
-  locationID: string;
-  events: IEvent[];
-  description?: string;
-  prices?: IPrice[];
-  imgURL: string;
-}
-
-interface IEvent {
-  name: string;
-  cap?: string;
-}
-
-interface IPrice {
-  name: string;
-  amount: string;
-}
+const storeTournament = (t: ITournament) => {
+  const cache = store.cache("tournaments") as TournamentStoreCache;
+  cache.add(t);
+};

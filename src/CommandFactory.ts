@@ -20,15 +20,15 @@ export default class CommandFactory {
     this.commands = new Map<string, () => Command>([
       ["ping", () => new PingCommand()],
       ["fixbot", () => new FixbotCommand()],
-      ["join", () => new JoinCommand()],
-      ["leave", () => new LeaveCommand()],
-      ["play", () => new PlayCommand()],
-      ["stop", () => new StopCommand()],
-      ["skip", () => new StopCommand()],
-      ["shucfix", () => new ShucfixCommand()],
+      // ["join", () => new JoinCommand()],
+      // ["leave", () => new LeaveCommand()],
+      // ["play", () => new PlayCommand()],
+      // ["stop", () => new StopCommand()],
+      // ["skip", () => new StopCommand()],
+      // ["shucfix", () => new ShucfixCommand()],
       ["postflairtext", () => new PostFlairTextCommand()],
-      ["shufflechannels", () => new ShuffleChannelsCommand()],
-      ["seeddb", () => new SeedDBCommand()],
+      // ["shufflechannels", () => new ShuffleChannelsCommand()],
+      // ["seeddb", () => new SeedDBCommand()],
     ]);
   }
 

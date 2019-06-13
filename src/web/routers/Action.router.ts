@@ -39,6 +39,7 @@ export class ActionRouter {
         }
 
         const userInfo = await UserInfoCache.get(token.access_token);
+        console.log("User Info", userInfo);
         res.locals.userInfo = userInfo;
         next();
 
