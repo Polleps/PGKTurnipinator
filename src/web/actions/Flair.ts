@@ -22,10 +22,13 @@ export const flair: Performer = async (userInfo: IUserInfo, action: IAction) => 
 
   const client = sClient.client;
   const guild = client.guilds.get(PGK);
+  // console.log("Guild", guild);
   const user = guild.members.get(userInfo.id);
   const role = guild.roles.find((x) => x.name === roleName);
 
   if (!user || !role) {
+    console.log("User", user.displayName);
+    console.log("Role", role);
     return "Invalid arguments.";
   }
 

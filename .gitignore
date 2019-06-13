@@ -56,6 +56,8 @@ typings/
 
 # dotenv environment variables file
 .env
+.env.dev
+.env.prod
 
 # next.js build output
 .next
@@ -63,6 +65,10 @@ typings/
 #Build output dir
 built/*
 !built/.gitkeep
+agenda/dist/*
+!agenda/dist/.gitkeep
+public/dist/*
+!public/dist/.gitkeep
 token.key
 .DS_Store
 firebasekey.json

@@ -32,7 +32,7 @@ export class BasicSetCache extends StoreCache<Set<string>, string, string> {
   }
 
   public random(): string {
-    return this.cache.values[Math.floor(Math.random() * this.cache.size)];
+    return [...this.cache.values()][Math.floor(Math.random() * this.cache.size)];
   }
 
   public has(index: string): boolean {

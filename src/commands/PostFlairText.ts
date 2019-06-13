@@ -17,26 +17,51 @@ export class PostFlairTextCommand extends Command {
   }
 
   public run(message: Message, args?: string[]): boolean {
-    this.roles.data.forEach((role) => {
-      message.channel.send(formatedMessage(role));
+    const roles = Array.from(this.roles.data.values());
+    const provinceRoles = roles.filter((r) => r.description === "provincie");
+    const normalRoles = roles.filter((r) => r.description !== "provincie");
+    normalRoles.forEach((role) => {
+      message.channel.send(formattedMessage(role));
     });
+    message.channel.send(formatProvinceMessage(provinceRoles));
     return true;
   }
 
 }
 
-const formatedMessage = (role: IJoinableRole): RichEmbed => {
+const formattedMessage = (role: IJoinableRole): RichEmbed => {
   const embed = new RichEmbed();
+  const formatControls = controlLinkBuilder(embed, { useRoleTitle: false, inline: false });
   embed.title = role.name;
   embed.setColor(11931720);
   if (role.description) {
     embed.setDescription(role.description);
   }
 
-  embed.addField("\u200B", `[Add](${formatActionURL(role, true)}) | [Remove](${formatActionURL(role, false)})`);
+  formatControls(role);
 
   return embed;
 }
 
+const formatProvinceMessage = (roles: IJoinableRole[]): RichEmbed => {
+  const embed = new RichEmbed();
+  const formatControls = controlLinkBuilder(embed, { useRoleTitle: true, inline: true });
+  embed.title = "Province Roles";
+  embed.setColor(11931720);
+  embed.setDescription("Give your self a province role so you can be notified when something smash related is happening in your area.");
+  roles.forEach((role) => formatControls(role));
+  return embed;
+}
+
+const controlLinkBuilder = (embed: RichEmbed, options: { useRoleTitle: boolean, inline: boolean }) => {
+  return (role: IJoinableRole) => {
+    embed.addField(
+      options.useRoleTitle ? role.name : "\u200B",
+      `[Add](${formatActionURL(role, true)}) | [Remove](${formatActionURL(role, false)})`,
+      options.inline,
+    );
+  };
+};
+
 const formatActionURL = (role: IJoinableRole, join: boolean): URL =>
-  new URL(`${Config.SERVERURL}/?action=flair&perform=${join ? "add" : "remove"}&role=${role.name}`);
+  new URL(`${Config.SERVERURL}/bot?action=flair&perform=${join ? "add" : "remove"}&role=${role.name}`);

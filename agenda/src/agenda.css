@@ -1,0 +1,506 @@
+@import url('https://fonts.googleapis.com/css?family=Roboto&display=swap');
+:root {
+  --theme-color: #c32b3e;
+}
+html {
+  /* font-family: Arial, Helvetica, sans-serif; */
+  font-family: 'Roboto', sans-serif;
+}
+body {
+  margin: 0px;
+  padding: 0px;
+  background-color: #ececec;
+  overflow-y: hidden;
+}
+
+header {
+  background-color: var(--theme-color);
+  color: white;
+  padding: 5px;
+}
+
+.header-container {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+}
+footer {
+  background-color: var(--theme-color);;
+  color: white;
+}
+header, footer, .page {
+  position: relative;
+}
+a {
+  color: black;
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: none;
+}
+
+a:visited {
+  text-decoration: none;
+}
+
+ul {
+  list-style: none;
+  padding: 0px;
+}
+
+header h2 {
+  text-align: center;
+  flex-basis: 80%;
+  margin-top: 0.2rem;
+  margin-bottom: 0.2rem;
+}
+
+header .small-title {
+  flex-basis: 60%;
+}
+
+header .install-btn {
+  flex-basis: 10%;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  position: relative;
+}
+
+header .install-btn i {
+  margin-right: 2px;
+}
+
+.page {
+  overflow: auto;
+  height: calc(100vh - 2rem);
+}
+.card-list > li {
+  margin-top: 2em;
+}
+
+.devider-inner {
+  max-width: 1100px;
+  margin: auto;
+  text-align: center;
+  display: flex;
+  align-items: center;
+}
+
+.devider-line {
+  border-bottom: solid 1px black;
+  height: 1px;
+  flex-grow: 1;
+
+}
+
+.devider-month {
+  color: black;
+  padding: 0px 10px;
+}
+
+.card {
+  background-color: white;
+  border-radius: 15px;
+  margin: 0px 1.6rem;
+  display: grid;
+  grid-template-areas:
+  "pf pf"
+  "pf pf"
+  "title title"
+  "info events"
+  "register register";
+  grid-template-columns: 1fr 1fr;
+  overflow: hidden;
+
+}
+
+[prcount] .card .pf-image-holder::before {
+  position: absolute;
+  content: "PR";
+  padding: 2px;
+  text-align: center;
+  color: white;
+  height: 1.6rem;
+  padding-top: 0.8rem;
+  width: 2rem;
+  margin-right: 10px;
+  z-index: 10;
+  border-radius: 15px 0px 10px 0px;
+  background: rgb(85, 85, 255);
+}
+
+.pf-image-holder {
+  grid-area: pf;
+}
+
+.pf-image-holder img {
+  width: 100%;
+  max-height: 250px;
+
+  object-fit: cover;
+}
+
+.pf-image-holder::after {
+  display: block;
+  position: relative;
+  background-image: linear-gradient(to bottom, transparent 75%, rgba(255, 255, 255, 0.8) 90%, white 100%);
+  margin-top: -150px;
+  height: 150px;
+  width: 100%;
+  content: '';
+}
+
+.tournament-title {
+  grid-area: title;
+  text-align: center;
+  font-size: 1.3rem;
+  padding: 1rem;
+}
+.tournament-info-list {
+  grid-area: info;
+  padding: 0.5rem;
+  padding-left: 1rem;
+}
+
+.event-list {
+  grid-area: events;
+  padding: 0.5rem;
+}
+
+.button-holder {
+  padding: 1rem;
+  grid-area: register;
+  text-align: center;
+  align-self: center;
+}
+
+.register-button {
+  background-color: rgb(211, 43, 43);
+  color: white;
+  padding: 10px 3rem;
+  border-radius: 10px;
+}
+
+.register-button:hover {
+  transition: 200ms;
+  background-color: rgb(177, 37, 37);
+}
+
+.icon-text {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+}
+
+.icon-text i {
+  margin-right: 10px;
+}
+
+.icon-center {
+  justify-content: center;
+}
+
+.icon-btn {
+  cursor: pointer;
+  -moz-user-select: none;
+  user-select: none;
+}
+
+.calendar-control-bar {
+  margin: auto;
+  background: var(--theme-color);;
+  color: white;
+  padding: 0px 0px;
+  padding-bottom: 0.3rem;
+  display: flex;
+  max-height: 1.5rem;
+  justify-content: center;
+}
+
+.bar-item {
+  align-self: center;
+}
+
+
+.month-name {
+  min-width: 150px;
+  text-align: center;
+}
+
+.bar-item i {
+  margin: auto;
+}
+
+.calendar {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(30px, 1fr));
+  grid-template-rows: 0.5fr repeat(5, minmax(80px, 3fr));
+  margin: auto;
+  background-color: #c4c4c4;
+  grid-gap: 1px;
+  height: calc(100% - 2.3rem);
+}
+.calendar-item-container[prcount]::before {
+  position: absolute;
+  content: "PR";
+  padding: 2px;
+  text-align: center;
+  color: white;
+  padding-top: 0.2rem;
+  width: 1.5rem;
+  font-size: 0.6rem;
+  border-radius: 0px 0px 10px 0px;
+  background: rgb(85, 85, 255);
+}
+
+.calendar-item-container {
+  height: 100%;
+}
+.calendar-item {
+    /* min-height: 130px; */
+    background: white;
+    height:100%;
+    text-align: center;
+    background-size: cover;
+    display: flex;
+    flex-direction: column;
+    flex-flow: column-reverse;
+    background-position: center;
+}
+
+.date-num {
+  width: 100%;
+  padding-top: 0px;
+  padding-bottom: 2px;
+}
+
+.today .date-num {
+  color: white;
+  background-color: rgb(48, 48, 48);
+  border-radius: 50%;
+  width: 1.4rem;
+  height: 1.1rem;
+  line-height: 20px;
+  margin: 0px auto;
+  text-align: center;
+  font-size: 0.8rem;
+}
+
+.tournament-holder {
+  background: linear-gradient(to bottom, transparent 0%, rgba(255, 255, 255, 0.3) 10%, rgba(255,255,255, 0.7) 20%);
+}
+.calendar-tournament {
+  /* background-color: rgba(255,255,255, 0.7); */
+  width: 100%;
+  padding-bottom: 0.2rem;
+  max-width: 90%;
+  margin: auto;
+  font-size: 0.8rem;
+  border-bottom: solid 1px;
+}
+
+.calendar-tournament:first-of-type {
+  padding-top: 0.3rem;
+}
+
+.calendar-tournament:last-of-type {
+  border: 0px;
+}
+.calendar-header {
+  min-height: 20px;
+  background: white;
+  text-align: center;
+  padding: 5px;
+  background-color: #c4c4c4;
+}
+
+.calendar-header:last-of-type {
+  border-radius: 0px 10px 0px 0px;
+  background: red;
+}
+
+.other-month {
+  background-color: #ebebeb;
+}
+
+.has-tournament .date-num {
+  background-color: rgba(255,255,255, 0.7);
+}
+
+@media screen and (min-width: 700px) {
+  .header-container {
+    margin: auto;
+    width: 100%;
+    max-width: 1100px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .header-container h2 {
+    text-align: left;
+    flex-basis: 95%;
+  }
+  .devider-line {
+    border-bottom: solid 1px white;
+    flex-grow: 1;
+    box-shadow: 0 1px 3px #676767;
+  }
+
+  .devider-month {
+    color: white;
+    text-shadow: 0 1px 3px #676767;
+  }
+
+  body::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background-image: url("./assets/banner.webp");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    filter: blur(10px);
+  }
+  .calendar-control-bar {
+    max-width: 1100px;
+    margin: auto;
+    margin-top: 10px;
+    background: var(--theme-color);;
+    color: white;
+    padding: 10px 0px;
+    border-radius: 10px;
+    display: flex;
+    justify-content: center;
+    box-shadow: 0px 2px 7px -1px black;
+  }
+  .calendar {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    grid-template-rows: 0.5fr repeat(5, 3fr);
+    max-width: 1100px;
+    margin: auto;
+    margin-top: 10px;
+    background-color: #c4c4c4;
+    grid-gap: 1px;
+    box-shadow: 0px 2px 7px -1px black;
+    height: calc(90vh - 80px);
+  }
+  .card {
+    box-shadow: 0px 1px 13px 0px black;
+    grid-template-areas:
+    "pf title title register"
+    "pf info events register";
+    grid-template-rows: 1fr 2fr;
+    grid-template-columns: 1.2fr 2.5fr 2.8fr 1fr;
+    justify-items: start;
+    max-height: 200px;
+    max-width: 1100px;
+    margin: auto;
+  }
+
+  .pf-image-holder img {
+    object-fit: cover;
+    height: 100%;
+  }
+  .pf-image-holder::after {
+    display: block;
+    position: relative;
+    background-image: linear-gradient(to bottom, transparent 100%, rgba(255, 255, 255, 0.0) 90%, transparent 100%);
+    margin-top: -150px;
+    height: 0px;
+    width: 100%;
+    content: '';
+  }
+
+  .card-list > li {
+    margin: 1rem;
+    margin-top: 2em;
+  }
+  :hover[tooltip]{
+    /* margin:20px; */
+    display: block;
+    position:relative;
+  }
+
+  [tooltip]::before {
+      display: none;
+      content: "";
+      position: absolute;
+      top:-6px;
+      left:50%;
+      transform: translateX(-50%);
+      border-width: 4px 6px 0 6px;
+      border-style: solid;
+      border-color: rgba(0,0,0,0.7) transparent transparent     transparent;
+      z-index: 100;
+  }
+  [tooltip]::after {
+      display: none;
+      z-index: 101;
+      content: attr(tooltip);
+      position: absolute;
+      left:50%;
+      top:-6px;
+      transform: translateX(-50%)   translateY(-100%);
+      background: rgba(0,0,0,0.7);
+      text-align: center;
+      color: #fff;
+      padding:4px 2px;
+      font-size: 12px;
+      font-family: Arial, Helvetica, sans-serif;
+      min-width: 80px;
+      border-radius: 5px;
+      pointer-events: none;
+  }
+  :hover[tooltip]::before {
+    display: block;
+  }
+
+  :hover[tooltip]::after {
+    display: block;
+  }
+  [tooltip-position='left']::before{
+    left:0%;
+    top:50%;
+    margin-left:-12px;
+    transform:translatey(-50%) rotate(-90deg)
+  }
+  [tooltip-position='top']::before{
+    left:50%;
+  }
+  [tooltip-position='bottom']::before{
+    top:100%;
+    margin-top:8px;
+    transform: translateX(-50%) translatey(-100%) rotate(-180deg)
+  }
+  [tooltip-position='right']::before{
+    left:100%;
+    top:50%;
+    margin-left:1px;
+    transform:translatey(-50%) rotate(90deg)
+  }
+  [tooltip-position='left']::after{
+    left:0%;
+    top:50%;
+    margin-left:-8px;
+    transform: translateX(-100%)   translateY(-50%);
+  }
+  [tooltip-position='top']::after{
+    left:50%;
+  }
+  [tooltip-position='bottom']::after{
+    top:100%;
+    margin-top:8px;
+    transform: translateX(-50%) translateY(0%);
+  }
+  [tooltip-position='right']::after{
+    left:100%;
+    top:50%;
+    margin-left:8px;
+    transform: translateX(0%)   translateY(-50%);
+  }
+}

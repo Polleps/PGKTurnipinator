@@ -10,7 +10,7 @@ export class PingCommand extends Command {
   }
 
   public run(message: Discord.Message, args?: string[]): boolean {
-    message.reply("Pong");
+    message.reply("Pong").catch((err) => console.log(err));
     return true;
   }
 }

@@ -2,7 +2,7 @@ import * as Discord from "discord.js";
 import { ITrigger, ShucfixTrigger } from "./triggers";
 export default class TriggerController {
   private triggers: ITrigger[] = new Array<ITrigger>(
-    new ShucfixTrigger(),
+    // new ShucfixTrigger(),
   );
 
   public runTriggers(msg: Discord.Message): boolean {
