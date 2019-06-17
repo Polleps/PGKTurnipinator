@@ -1,7 +1,7 @@
 {
   "apps" : [{
     "name"        : "bot",
-    "script"      : "./bot.js",
+    "script"      : "./built/bot.js",
     "watch"       : true,
     "env": {
       "NODE_ENV": "development"
