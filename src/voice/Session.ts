@@ -1,5 +1,6 @@
 import * as Discord from "discord.js";
 import * as ytdl from "ytdl-core";
+import * as ytdlDiscord from "ytdl-core-discord";
 
 export default class Session {
   private voiceChannel: Discord.VoiceChannel;
@@ -41,14 +42,17 @@ export default class Session {
     return;
   }
 
-  private playVideo() {
+  private async playVideo() {
     const video = this.queue.shift();
-    const stream = ytdl(video.url, { filter: "audioonly", quality: "highestaudio" });
-    stream.on("info", (info) => this.printInfo(info, video.displayName));
+    const stream = await ytdlDiscord(video.url, { filter: "audioonly", quality: "highestaudio" });
+    // stream.on("info", (info) => this.printInfo(info, video.displayName));
+    ytdl.getInfo(video.url).then((info) => this.printInfo(info, video.displayName));
     stream.on("error", (err) => {
       console.error(err);
     });
-    const dispatcher = this.connection.playStream(stream, { seek: 0, volume: this.volume });
+
+    const dispatcher = this.connection.playOpusStream(stream, { seek: 0, volume: this.volume });
+
     dispatcher.on("end", () => {
       if (this.queue.length !== 0) {
         this.playVideo();
@@ -69,18 +73,20 @@ export default class Session {
   }
 
   private async printInfo(info: ytdl.videoInfo, displayName: string) {
+    let image = "#";
+    try {
+      image = info.player_response.videoDetails.thumbnail.thumbnails.pop().url;
+    } catch (e) {
+      console.error(e);
+    }
+
     const embed = new Discord.RichEmbed()
       .setColor("#ff1919")
       .setAuthor(info.author.name || "#", info.author.avatar || "#", info.author.channel_url || "#")
       .addField("Playing", `[${info.title || "No Title Found"}](${info.video_url || "#"})`)
       .addField("Duration", formatLength(+info.length_seconds))
-      .setFooter(`Requested by: ${displayName}`);
-
-    try {
-      embed.setThumbnail(info.thumbnail_url);
-    } catch (err) {
-      console.error(err);
-    }
+      .setFooter(`Requested by: ${displayName}`)
+      .setThumbnail(image);
 
     this.msgChannel.send(embed);
     return;
