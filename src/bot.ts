@@ -36,10 +36,12 @@ class Main {
 
     client.on("error", (error) => {
       console.error(error);
+      process.exit();
     });
 
     client.on("disconnect", (e) => {
       console.error("Bot disconnected");
+      process.exit();
     });
 
     try {
