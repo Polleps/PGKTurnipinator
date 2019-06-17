@@ -3,7 +3,7 @@ import "./env";
 import Config from "./Config";
 import { sClient } from "./Context";
 import MessageHandler from "./MessageHandler";
-import Server from "./web/server";
+import Server from "./web/Server";
 import { createLogger } from "./utils/logger";
 import { store } from "./Store";
 
