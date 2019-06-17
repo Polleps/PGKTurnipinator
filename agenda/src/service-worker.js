@@ -47,7 +47,7 @@ if (workbox) {
     }),
   );
   workbox.routing.registerRoute(
-    new RegExp('https://images.smash.gg/images/tournament/(.*)'),
+    new RegExp('https://smashgg.imgix.net/images/tournament/(.*)'),
     workbox.strategies.cacheFirst({
       cacheName: 'smashgg-images',
       plugins: [

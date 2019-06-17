@@ -6,8 +6,9 @@ const link = (slug) => {
 export const calendarDay = (day) => {
   const crop = '?auto=compress,format&w=280&h=280&fit=crop'
   const hasTournament = !!day.tournaments.length
+  const imageURL = hasTournament ? day.tournaments[0].image.replace('images.smash.gg', 'smashgg.imgix.net') : '#';
   const today = Date.now();
-  const style = hasTournament ? `background-image: url(${day.tournaments[0].image + crop})` : '';
+  const style = hasTournament ? `background-image: url(${imageURL + crop})` : '';
   const classes = `${!day.isSelectedMonth ? "other-month" : ""} ${hasTournament ? "has-tournament" : ""}` +
                   `${isToday(new Date(today), new Date(day.date)) ? "today" : ""}`;
   const pr = hasTournament ? day.tournaments[0].pr : false
