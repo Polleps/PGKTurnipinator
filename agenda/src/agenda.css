@@ -329,6 +329,14 @@ header .install-btn i {
   background-color: rgba(255,255,255, 0.7);
 }
 
+.registration-warning {
+  display: flex;
+  color: #c31919;
+  justify-content: center;
+  align-items: center;
+  padding: 0.3rem;
+}
+
 @media screen and (min-width: 700px) {
   .header-container {
     margin: auto;

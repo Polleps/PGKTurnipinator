@@ -15,6 +15,7 @@ export default interface ITournament {
   prices?: IPrice[];
   pr?: boolean;
   participants?: number;
+  registrationClosesAt?: Date;
 }
 
 interface IEvent {

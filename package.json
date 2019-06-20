@@ -9,7 +9,8 @@
     "start": "node ./built/bot.js",
     "prod": "NODE_ENV=production node ./built/bot.js",
     "debug": "tsc && node --inspect ./built/bot.js",
-    "build": "tsc"
+    "build": "tsc",
+    "buildall": "./build.sh"
   },
   "author": "Polle Pas",
   "license": "ISC",

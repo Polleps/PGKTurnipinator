@@ -29,10 +29,11 @@ query TournamentQuery($slug: String) {
 }
 `;
 
-const participantsQuery = `
+const statusQuery = `
 query TournamentQuery($id: ID) {
   tournament(id: $id){
     id
+    registrationClosesAt
     participants(query:{}){
       pageInfo{
         total
@@ -63,11 +64,16 @@ export const fetchTournamentDetails = async (slug: string): Promise<ITournamentD
   return tournamentDetails;
 };
 
-export const fetchTournamentStatus = async (id: string): Promise<{ id: number, participants: number }> => {
-  const result = (await executeQuery(participantsQuery, { id })) as IParticipantsResult;
+export const fetchTournamentStatus = async (id: string): Promise<{
+  id: number,
+  participants: number,
+  registrationClosesAt: Date,
+}> => {
+  const result = (await executeQuery(statusQuery, { id })) as IStatusResult;
   return {
     id: result.data.tournament.id,
     participants: result.data.tournament.participants.pageInfo.total,
+    registrationClosesAt: result.data.tournament.registrationClosesAt,
   };
 };
 
@@ -98,10 +104,11 @@ interface ITournamentDetails {
   events: string[];
 }
 
-interface IParticipantsResult {
+interface IStatusResult {
   data: {
     tournament: {
       id: number;
+      registrationClosesAt: Date;
       participants: {
         pageInfo: {
           total: number;

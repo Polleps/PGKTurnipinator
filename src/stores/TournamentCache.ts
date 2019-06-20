@@ -47,17 +47,18 @@ export class TournamentStoreCache extends StoreCache<ITournament[], number, ITou
       const data = doc.data();
       this.cache.push(data as ITournament);
     });
-    await this.updateParticipants();
+    await this.updateStatus();
     this.updateExpire();
     return;
   }
 
-  private async updateParticipants() {
+  private async updateStatus() {
     const tournaments = this.cache.filter((t) => t.endDate >= new Date() && t.id);
-    const participants = await Promise.all(tournaments.map((t) => fetchTournamentStatus(`${t.id}`)));
-    participants.forEach((p) => {
+    const status = await Promise.all(tournaments.map((t) => fetchTournamentStatus(`${t.id}`)));
+    status.forEach((p) => {
       const tournament = this.cache.find((t) => t.id === p.id);
       tournament.participants = p.participants;
+      tournament.registrationClosesAt = p.registrationClosesAt;
     });
     return;
   }

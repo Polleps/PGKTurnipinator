@@ -12,7 +12,7 @@ export const card = (t) => html`
     ${title(t.title)}
     ${info(t)}
     ${eventList(t.events)}
-    ${registerButton(t.url)}
+    ${registerButton(t.url, t.registrationClosesAt)}
   </div>
 </li>
 `;

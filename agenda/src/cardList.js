@@ -8,6 +8,7 @@ export const cardList = ({ onDateChange, onViewChange}) => {
   return (tournaments, month, year) => {
     const today = new Date();
     let lastMonth = undefined;
+    console.log(tournaments);
     const sortedTournaments = tournaments.sort((a, b) => a.startDate - b.startDate)
                                           .filter(t => t.endDate >= today);
     const devidedTournaments = sortedTournaments.flatMap((t) => {

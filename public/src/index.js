@@ -50,10 +50,13 @@ const renderFailMessage = (message) => {
 
 const renderLogout = () => {
   const footerEL = findElement('footer');
+
   footerEL.innerHTML = `<a href="#" id="logout" class="logout-btn"><i class="material-icons">exit_to_app</i>Logout</a>`;
   const logoutEL = findElement('#logout');
+
   logoutEL.addEventListener('click', (e) => {
     forgetToken();
+    document.location.reload(true);
   });
 }
 
