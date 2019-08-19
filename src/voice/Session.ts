@@ -1,6 +1,7 @@
 import * as Discord from "discord.js";
 import * as ytdl from "ytdl-core";
 import * as ytdlDiscord from "ytdl-core-discord";
+import * as moment from "moment";
 
 export default class Session {
   private voiceChannel: Discord.VoiceChannel;
@@ -105,9 +106,14 @@ interface ISessionEvent {
 }
 
 const formatLength = (l: number): string => {
-  const sL = (l / 60).toFixed(2);
-  const splitLength = sL.split(".");
-  return splitLength.map((x) => padZero(x)).join(":");
+  if (!l) {
+    return "Duration Not Found";
+  }
+  const duration = moment.duration(l, "seconds");
+  const hours = duration.hours();
+  const minutes = duration.minutes();
+  const seconds = duration.seconds();
+  return `${hours ? `${padZero(hours)}:` : ""}${padZero(minutes)}:${padZero(seconds)}`;
 };
 
 const padZero = (x: string | number): string => {
