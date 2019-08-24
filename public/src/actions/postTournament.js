@@ -265,7 +265,7 @@ export default class PostTournament extends Action {
       })
       .then((res) => {
         if (res.error) {
-          this.showMessage(res.error, true);
+          this.showMessage(res.message, true);
         }
         else {
           this.showMessage("Tournament Posted", false);
