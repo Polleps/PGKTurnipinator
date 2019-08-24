@@ -4,7 +4,7 @@ import Config from "../../Config";
 import { sClient } from "../../Context";
 import ITournament from "../../models/ITournament";
 import { store } from "../../Store";
-import { Guild, GuildMember, RichEmbed, TextChannel } from "discord.js";
+import { Guild, GuildMember, RichEmbed, NewsChannel } from "discord.js";
 import { URL } from "url";
 import * as moment from "moment";
 import { TournamentStoreCache } from "../../stores";
@@ -46,7 +46,7 @@ export const postTournament: Performer = async (userInfo: IUserInfo, action: IAc
 };
 
 const postInChannel = (guild: Guild, user: GuildMember, tournamentDetails: ITournament): void => {
-  const channel = guild.channels.get(tournamentagendaID) as TextChannel;
+  const channel = guild.channels.get(tournamentagendaID) as NewsChannel;
   const embed = buildEmbed(user, tournamentDetails);
   channel.send(embed);
 };
