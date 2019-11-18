@@ -6,7 +6,7 @@ const link = (slug) => {
 }
 
 const formatUrl = url => {
-  return url ? url.replace('images.smash.gg', 'smashgg.imgix.net') :
+  return url ? url.replace('images.smash.gg', 'smashgg.imgix.net') : noImage;
 }
 export const calendarDay = (day) => {
   const crop = '?auto=compress,format&w=280&h=280&fit=crop'
