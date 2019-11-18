@@ -289,8 +289,8 @@ header .install-btn i {
 }
 
 .tournament-holder {
-  /* background: linear-gradient(to bottom, transparent 0%, rgba(255, 255, 255, 0.3) 10%, rgba(255,255,255, 0.7) 20%); */
-  background: red;
+  background: linear-gradient(to bottom, transparent 0%, rgba(255, 255, 255, 0.3) 10%, rgba(255,255,255, 0.7) 20%);
+  /* background: red; */
 
 }
 .calendar-tournament {
