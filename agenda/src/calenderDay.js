@@ -1,12 +1,17 @@
 import { html } from 'lit-html';
 import { repeat } from 'lit-html/directives/repeat';
+import noImage from './assets/no-image.jpg';
 const link = (slug) => {
   return `https://smash.gg/tournament/${slug}`;
+}
+
+const formatUrl = url => {
+  return url ? url.replace('images.smash.gg', 'smashgg.imgix.net') :
 }
 export const calendarDay = (day) => {
   const crop = '?auto=compress,format&w=280&h=280&fit=crop'
   const hasTournament = !!day.tournaments.length
-  const imageURL = hasTournament ? day.tournaments[0].image.replace('images.smash.gg', 'smashgg.imgix.net') : '#';
+  const imageURL = hasTournament ? formatUrl(day.tournaments[0].image) : '#';
   const today = Date.now();
   const style = hasTournament ? `background-image: url(${imageURL + crop})` : '';
   const classes = `${!day.isSelectedMonth ? "other-month" : ""} ${hasTournament ? "has-tournament" : ""}` +

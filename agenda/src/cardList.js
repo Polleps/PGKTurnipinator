@@ -4,6 +4,7 @@ import { card } from './card.js';
 import { devider } from './devider.js';
 
 export const cardList = ({ onDateChange, onViewChange}) => {
+  const isNum = x => (+x === +x) && x !== null;
 
   return (tournaments, month, year) => {
     const today = new Date();
@@ -26,7 +27,7 @@ export const cardList = ({ onDateChange, onViewChange}) => {
     return html`
       <div class="card-holder">
         <ul class="card-list">
-          ${repeat(devidedTournaments, (t) => t.title, (t) => t.month ? devider(t) : card(t))}
+          ${repeat(devidedTournaments, (t) => t.title, (t) => isNum(t.month) ? devider(t) : card(t))}
         </ul>
       </div>
     `;
