@@ -1,10 +1,6 @@
 import StoreCache from "./StoreCache";
 import { CollectionReference } from "@google-cloud/firestore";
-
-export interface IJoinableRole {
-  name: string;
-  description?: string;
-}
+import IJoinableRole from "../interfaces/IJoinableRole";
 
 export class JoinableRoleCache extends StoreCache<Map<string, IJoinableRole>, string, IJoinableRole> {
   constructor(collection: CollectionReference) {

@@ -1,7 +1,8 @@
 import { RichEmbed, Message } from "discord.js";
 import { Command } from "./Command";
 import Config from "../Config";
-import { IJoinableRole, JoinableRoleCache } from "../stores";
+import { JoinableRoleCache } from "../stores";
+import IJoinableRole from "../interfaces/IJoinableRole";
 import { store } from "../Store";
 
 export class PostFlairTextCommand extends Command {
