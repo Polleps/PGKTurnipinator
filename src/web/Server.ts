@@ -1,7 +1,7 @@
 import * as express from "express";
 import * as bodyParser from "body-parser";
 import * as Discord from "discord.js";
-import { ActionRouter, AuthRouter, InviteRouter, TournamentRouter } from "./routers";
+import { ActionRouter, AuthRouter, InviteRouter, TournamentRouter, CalendarRouter } from "./routers";
 
 export default class Server {
   private app: express.Application;
@@ -40,9 +40,11 @@ export default class Server {
     const actionRouter = new ActionRouter();
     const inviteRouter = new InviteRouter();
     const tournamentRouter = new TournamentRouter();
+    const calendarRouter = new CalendarRouter();
     this.app.use("/bot", express.static("public/dist"));
     this.app.use("/agenda", express.static("agenda/dist"));
 
+    this.app.use("/calendar", calendarRouter.router);
     this.app.use("/auth", authRouter.router);
     this.app.use("/actions", actionRouter.router);
     this.app.use("/invite", inviteRouter.router);

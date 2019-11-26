@@ -29,6 +29,13 @@ export class TournamentStoreCache extends StoreCache<ITournament[], number, ITou
     return this.cache[index];
   }
 
+  public getUpcoming(): ITournament[] {
+    if (Date.now() > this.expires) {
+      this.fillCache();
+    }
+    return this.cache.filter((t) => new Date() < t.endDate);
+  }
+
   public get data(): ITournament[] {
     if (Date.now() > this.expires) {
       this.fillCache();
