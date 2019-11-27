@@ -1,11 +1,18 @@
 @import url('https://fonts.googleapis.com/css?family=Roboto&display=swap');
 :root {
-  --theme-color: #c32b3e;
+
+  --primary-colour: #c32b3e;
+  --primary-light-colour: #db5060;
+  --secondary-colour: white;
+  --today-color: #3a8af3;
+  --lh: 0.96rem;
+  --header-size: 1rem;
 }
 html {
   /* font-family: Arial, Helvetica, sans-serif; */
   font-family: 'Roboto', sans-serif;
 }
+
 body {
   margin: 0px;
   padding: 0px;
@@ -14,7 +21,7 @@ body {
 }
 
 header {
-  background-color: var(--theme-color);
+  background-color: var(--primary-colour);
   color: white;
   padding: 5px;
 }
@@ -25,12 +32,14 @@ header {
   align-items: center;
 }
 footer {
-  background-color: var(--theme-color);;
+  background-color: var(--primary-colour);
   color: white;
 }
+
 header, footer, .page {
   position: relative;
 }
+
 a {
   color: black;
   text-decoration: none;
@@ -51,6 +60,7 @@ ul {
 
 header h2 {
   text-align: center;
+  font-size: var(--header-size);
   flex-basis: 80%;
   margin-top: 0.2rem;
   margin-bottom: 0.2rem;
@@ -72,9 +82,16 @@ header .install-btn i {
   margin-right: 2px;
 }
 
+.line-clamp {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
 .page {
   overflow: auto;
-  height: calc(100vh - 2rem);
+  height: calc(100vh - 1.5rem);
 }
 .card-list > li {
   margin-top: 2em;
@@ -177,7 +194,7 @@ header .install-btn i {
 }
 
 .register-button {
-  background-color: rgb(211, 43, 43);
+  background-color: var(--primary-colour);
   color: white;
   padding: 10px 3rem;
   border-radius: 10px;
@@ -185,7 +202,7 @@ header .install-btn i {
 
 .register-button:hover {
   transition: 200ms;
-  background-color: rgb(177, 37, 37);
+  background-color: var(--primary-light-colour);
 }
 
 .icon-text {
@@ -210,7 +227,7 @@ header .install-btn i {
 
 .calendar-control-bar {
   margin: auto;
-  background: var(--theme-color);;
+  background: var(--primary-colour);
   color: white;
   padding: 0px 0px;
   padding-bottom: 0.3rem;
@@ -265,8 +282,8 @@ header .install-btn i {
     text-align: center;
     background-size: cover;
     display: flex;
-    flex-direction: column;
-    flex-flow: column-reverse;
+    flex-flow: column;
+    justify-content: space-between;
     background-position: center;
 }
 
@@ -274,32 +291,29 @@ header .install-btn i {
   width: 100%;
   padding-top: 0px;
   padding-bottom: 2px;
-}
-
-.today .date-num {
-  color: white;
-  background-color: rgb(48, 48, 48);
-  border-radius: 50%;
-  width: 1.4rem;
-  height: 1.1rem;
-  line-height: 20px;
-  margin: 0px auto;
-  text-align: center;
-  font-size: 0.8rem;
+  min-width: 13px;
+  margin-top: 0.2rem;
+  font-size: 0.7rem;
 }
 
 .tournament-holder {
-  background: linear-gradient(to bottom, transparent 0%, rgba(255, 255, 255, 0.3) 10%, rgba(255,255,255, 0.7) 20%);
-  /* background: red; */
+  /* background: linear-gradient(to bottom, transparent 0%, rgba(255, 255, 255, 0.3) 10%, rgba(255,255,255, 0.7) 20%); */
+  background: var(--primary-colour);
+  color: white;
 
+}
+
+.today .tournament-holder {
+  background: var(--today-color);
 }
 .calendar-tournament {
   /* background-color: rgba(255,255,255, 0.7); */
+  line-height: var(--lh);
   width: 100%;
   padding-bottom: 0.2rem;
-  max-width: 90%;
+  /* max-width: 95%; */
   margin: auto;
-  font-size: 0.8rem;
+  font-size: 0.65rem;
   border-bottom: solid 1px;
 }
 
@@ -309,6 +323,10 @@ header .install-btn i {
 
 .calendar-tournament:last-of-type {
   border: 0px;
+}
+
+.calendar-tournament a {
+  color: white;
 }
 .calendar-header {
   min-height: 20px;
@@ -320,7 +338,6 @@ header .install-btn i {
 
 .calendar-header:last-of-type {
   border-radius: 0px 10px 0px 0px;
-  background: red;
 }
 
 .other-month {
@@ -328,7 +345,21 @@ header .install-btn i {
 }
 
 .has-tournament .date-num {
-  background-color: rgba(255,255,255, 0.7);
+  background-color: black;
+  border-radius: 100px;
+  color: white;
+  width: fit-content;
+  padding: 0.3rem;
+  align-self: center;
+}
+
+.today .date-num {
+  background-color: var(--today-color);
+  border-radius: 100px;
+  color: white;
+  width: fit-content;
+  padding: 0.3rem;
+  align-self: center;
 }
 
 .registration-warning {
@@ -340,6 +371,11 @@ header .install-btn i {
 }
 
 @media screen and (min-width: 700px) {
+  :root {
+    --lh: 1rem;
+    --header-size: 2rem;
+  }
+
   .header-container {
     margin: auto;
     width: 100%;
@@ -379,7 +415,7 @@ header .install-btn i {
     max-width: 1100px;
     margin: auto;
     margin-top: 10px;
-    background: var(--theme-color);;
+    background: var(--primary-colour);
     color: white;
     padding: 10px 0px;
     border-radius: 10px;
@@ -399,6 +435,25 @@ header .install-btn i {
     box-shadow: 0px 2px 7px -1px black;
     height: calc(90vh - 80px);
   }
+
+  .calendar-tournament {
+    font-size: 0.8rem;
+  }
+  .tournament-holder {
+    font-size: 1em;
+    border-radius: 16px 16px 16px 16px;
+    margin: 0.6rem 0.3rem;
+  }
+
+  .has-tournament .tournament-holder {
+    padding: 0px 5px;
+  }
+
+  .date-num {
+    font-size: 1rem;
+    min-width: 18px;
+  }
+
   .card {
     box-shadow: 0px 1px 13px 0px black;
     grid-template-areas:
