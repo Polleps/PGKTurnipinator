@@ -11,12 +11,19 @@ const formatUrl = url => {
 export const calendarDay = (day) => {
   const crop = '?auto=compress,format&w=280&h=280&fit=crop'
   const hasTournament = !!day.tournaments.length
-  const imageURL = hasTournament ? formatUrl(day.tournaments[0].image) : '#';
   const today = Date.now();
+  
+  const imageURL = hasTournament ? formatUrl(day.tournaments[0].image) : '#';
   const style = hasTournament ? `background-image: url(${imageURL + crop})` : '';
-  const classes = `${!day.isSelectedMonth ? "other-month" : ""} ${hasTournament ? "has-tournament" : ""}` +
-                  `${isToday(new Date(today), new Date(day.date)) ? "today" : ""}`;
+
+  const classes = [
+    ...(!day.isSelectedMonth ? ["other-month"] : []),
+    ...(hasTournament ? ["has-tournament"] : []),
+    ...(isToday(new Date(today), new Date(day.date)) ? ["today"] : []),
+  ].join(" ");
+
   const pr = hasTournament ? day.tournaments[0].pr : false
+
   return html`
     <div class="calendar-item-container" ?prcount=${pr}>
       <div class="calendar-item ${classes}" style="${style}" >
@@ -30,7 +37,7 @@ export const calendarDay = (day) => {
 }
 
 const tournamentItem = (tournament) => html`
-  <section class="calendar-tournament"><a href=${link(tournament.url)}>${tournament.title}</a></section>
+  <section class="calendar-tournament line-clamp"><a href=${link(tournament.url)}>${tournament.title}</a></section>
 `;
 
 const isToday = (a, b) => a.getDate() === b.getDate() &&
