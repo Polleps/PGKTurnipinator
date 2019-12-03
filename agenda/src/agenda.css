@@ -5,6 +5,10 @@
   --primary-light-colour: #db5060;
   --secondary-colour: white;
   --today-color: #3a8af3;
+  --bg-color: white;
+  --bg-color-alpha: rgba(255, 255, 255, 0);
+  --primary-text-color: black;
+  --secondary-text-color: white;
   --lh: 0.96rem;
   --header-size: 1rem;
 }
@@ -41,7 +45,7 @@ header, footer, .page {
 }
 
 a {
-  color: black;
+  color: var(--primary-text-color);
   text-decoration: none;
 }
 
@@ -106,7 +110,7 @@ header .install-btn i {
 }
 
 .devider-line {
-  border-bottom: solid 1px black;
+  border-bottom: solid 1px var(--primary-text-color);
   height: 1px;
   flex-grow: 1;
 
@@ -118,7 +122,7 @@ header .install-btn i {
 }
 
 .card {
-  background-color: white;
+  background-color: var(--bg-color);
   border-radius: 15px;
   margin: 0px 1.6rem;
   display: grid;
@@ -162,7 +166,7 @@ header .install-btn i {
 .pf-image-holder::after {
   display: block;
   position: relative;
-  background-image: linear-gradient(to bottom, transparent 75%, rgba(255, 255, 255, 0.8) 90%, white 100%);
+  background-image: linear-gradient(to bottom, transparent 75%, var(--bg-color-alpha) 90%,var(--bg-color) 100%);
   margin-top: -150px;
   height: 150px;
   width: 100%;
@@ -195,7 +199,7 @@ header .install-btn i {
 
 .register-button {
   background-color: var(--primary-colour);
-  color: white;
+  color: var(--secondary-text-color);
   padding: 10px 3rem;
   border-radius: 10px;
 }
@@ -228,7 +232,7 @@ header .install-btn i {
 .calendar-control-bar {
   margin: auto;
   background: var(--primary-colour);
-  color: white;
+  color: var(--secondary-text-color);
   padding: 0px 0px;
   padding-bottom: 0.3rem;
   display: flex;
@@ -326,7 +330,7 @@ header .install-btn i {
 }
 
 .calendar-tournament a {
-  color: white;
+  color: var(--secondary-text-color);
 }
 .calendar-header {
   min-height: 20px;
