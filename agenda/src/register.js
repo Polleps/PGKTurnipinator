@@ -25,7 +25,7 @@ const formatWarning = (closeDate) => {
     return '';
   }
   const closeTime = (new Date(closeDate)).getTime() * 1000;
-  console.log(closeTime, Date.now());
+  // console.log(closeTime, Date.now());
   if (closeTime < Date.now()) {
     return 'Registration Closed';
   }

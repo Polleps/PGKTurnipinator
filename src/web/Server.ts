@@ -1,7 +1,14 @@
 import * as express from "express";
 import * as bodyParser from "body-parser";
 import * as Discord from "discord.js";
-import { ActionRouter, AuthRouter, InviteRouter, TournamentRouter, CalendarRouter } from "./routers";
+import {
+  ActionRouter,
+  AuthRouter,
+  InviteRouter,
+  TournamentRouter,
+  CalendarRouter,
+  ServerInfoRouter,
+} from "./routers";
 
 export default class Server {
   private app: express.Application;
@@ -41,6 +48,8 @@ export default class Server {
     const inviteRouter = new InviteRouter();
     const tournamentRouter = new TournamentRouter();
     const calendarRouter = new CalendarRouter();
+    const serverInfoRouter = new ServerInfoRouter(this.client);
+
     this.app.use("/bot", express.static("public/dist"));
     this.app.use("/agenda", express.static("agenda/dist"));
 
@@ -49,5 +58,7 @@ export default class Server {
     this.app.use("/actions", actionRouter.router);
     this.app.use("/invite", inviteRouter.router);
     this.app.use("/tournaments", tournamentRouter.router);
+    this.app.use("/serverinfo", serverInfoRouter.router);
+    this.app.use("/", express.static("home"));
   }
 }
