@@ -1,0 +1,310 @@
+@import url('https://fonts.googleapis.com/css?family=Montserrat:300,400,500,600,700&display=swap');
+:root {
+  --text-on-light: #525252;
+}
+
+body {
+    font-family: 'Montserrat', sans-serif;
+    display: grid;
+    background-color: white;
+    padding: 0;
+    margin: 0;
+    min-height: 100vh;
+    grid-template-columns: 1fr 4fr 4fr 1fr;
+    grid-template-rows: minmax(25%, 500px) 2fr;
+    max-width: 100%;
+    justify-items: center;
+    grid-template-areas:
+    'header header header header'
+    'main main main main'
+}
+
+body::before {
+    position: absolute;
+    content: "";
+    top: 0px; left: 0px;
+    background: url(img/banner.jpg);
+    background-size: cover;
+    background-position: bottom;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    /* filter: blur(1px); */
+    z-index: -1;
+    width: 100%;
+    height: 100%;
+}
+
+a {
+  text-decoration: none;
+  color: #6B64CC;
+}
+
+abbr {
+  text-decoration: none;
+}
+
+h4 {
+  padding: 0px;
+  margin: 0px;
+}
+
+header {
+    grid-area: header;
+    color: var(--text-on-light);
+    /* min-height: 10rem;
+    max-height:  40rem; */
+    width: 100%;
+    background-color: rgba(255, 255, 255, 0.774);
+    display: grid;
+    grid-template-areas:
+    '. . . .'
+    '. h-logo h-title .'
+    '. h-logo h-subtitle .'
+    '. . h-login-button .'
+    '. . h-member-count .'
+    'nav nav nav nav';
+    grid-template-columns: 3fr 1fr 4fr 1fr;
+    grid-template-rows: 2fr 1fr 1fr 1fr 2fr 1fr;
+    justify-content: space-evenly;
+}
+
+header .pgk-logo {
+    grid-area: h-logo;
+    justify-self: center;
+    width: inherit;
+}
+
+header h1 {
+    grid-area: h-title;
+    font-size: 2.5rem;
+}
+
+header .subtitle {
+    grid-area: h-subtitle;
+}
+
+.join-button {
+    color: white;
+    text-align: center;
+    font-weight: bold;
+    grid-area: h-login-button;
+    background-color: #576db9;
+    /* width: 40%; */
+    width: 40%;
+    height: 3em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 20px;
+}
+
+.join-button:hover {
+  background-color: rgb(96, 114, 179);
+}
+
+.button-icon {
+    color: white;
+    width: 2em;
+    padding: 0;
+    margin-right: 0.5em;
+}
+
+.member-count {
+    grid-area: h-member-count;
+    max-height: 50px;
+    display: flex;
+    align-items: center;
+    font-size: 19px;
+}
+
+.member-count span {
+  margin-left: 10px;
+}
+
+.subtitle {
+    font-weight: 600;
+}
+
+nav {
+    grid-area: nav;
+    padding:0;
+    background-color: #3E3D3D;
+    width: 100%;
+
+}
+
+.nav-link-holder {
+  width: 50%;
+  margin: auto;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.nav-link-holder a {
+  color: white;
+  font-weight: 500;
+}
+
+main {
+  background: white;
+  width: 100%;
+  grid-area: main;
+  display: grid;
+  grid-template-areas:
+  ". tournaments socials .";
+  grid-auto-columns: 1fr 4fr 4fr 1fr;
+}
+
+main section {
+  text-align: center;
+  margin: 20px 0px;
+}
+
+main section h4 {
+  font-size: 1.5rem;
+  color: var(--text-on-light);
+}
+
+.tournament-section {
+    grid-area: tournaments;
+    padding-right: 40px;
+}
+
+.tournament-section a {
+  color: var(--text-on-light);
+}
+
+.tournament-agenda-image * {
+  padding-top: 10px;
+  margin: auto;
+  border-radius: 20px;
+  max-width: 100%;
+}
+
+.social-section {
+    grid-area: socials;
+    padding-left: 40px;
+    border-left: gray 1px solid;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.social-link-holder {
+  flex-grow: 10;
+  display: flex;
+  flex-direction: column;
+  padding: 9% 0px;
+  max-height: 450px;
+}
+
+.social-link {
+  display: flex;
+  align-items: center;
+  width: 80%;
+  margin: auto;
+}
+
+.social-link img {
+  max-width: 4em;
+  height: auto;
+}
+
+.social-link a {
+  margin-left: 10%;
+  font-size: 1.3em;
+  text-align: left;
+  color: var(--text-on-light);
+}
+
+@media screen and (max-width: 870px) {
+  header {
+    grid-template-areas:
+    '. . . .'
+    '. h-logo h-title .'
+    '. h-logo h-subtitle .'
+    '. h-logo h-login-button .'
+    '. . h-member-count .'
+    'nav nav nav nav';
+    grid-template-columns: 3fr 1fr 4fr 1fr;
+    grid-template-rows: 1fr 1fr 1fr 1fr 2fr 1fr;
+  }
+
+  header h1 {
+    font-size: 1.8rem;
+  }
+
+  main {
+    grid-template-areas:
+    "tournaments"
+    "socials";
+    grid-auto-columns: 1fr;
+  }
+
+  .tournament-section {
+    padding-right: 0px;
+  }
+  .tournament-agenda-image * {
+    max-width: 90%;
+  }
+  .social-section {
+    padding-left: 0px;
+  }
+  .social-link-holder {
+    min-width: 80%;
+    margin: auto;
+  }
+
+  .social-link-holder div {
+    padding: 10px 0px;
+  }
+}
+
+@media screen and (max-width: 700px) {
+  header {
+    grid-template-areas:
+    'h-logo'
+    'h-title'
+    'h-subtitle'
+    'h-login-button'
+    'h-member-count'
+    'nav';
+    grid-template-columns: 1fr;
+    grid-template-rows: 0.4fr 1fr 1fr 2fr 2fr 2fr;
+    text-align: center;
+  }
+
+  header .pgk-logo {
+    height: auto;
+    width: 40%;
+  }
+
+  header h1 {
+    font-size: 1.4rem;
+  }
+
+  .join-button {
+    margin: auto;
+    width: 60%;
+  }
+
+  .member-count {
+    margin: auto;
+  }
+
+  .nav-link-holder {
+    width: 80%;
+  }
+}
+
+@media screen and (max-width: 2000px) {
+  body::before {
+    background: url(img/banner_cr.jpg);
+    background-position: bottom;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+  }
+}
