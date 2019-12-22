@@ -39,6 +39,10 @@ a {
   color: #6B64CC;
 }
 
+a:hover {
+  text-decoration: underline;
+}
+
 abbr {
   text-decoration: none;
 }
@@ -200,19 +204,24 @@ main section h4 {
   max-height: 450px;
 }
 
-.social-link {
-  display: flex;
-  align-items: center;
+.social-link-holder a {
+  display: block;
   width: 80%;
+  color: var(--text-on-light);
   margin: auto;
 }
 
-.social-link img {
+.social-link {
+  display: flex;
+  align-items: center;
+}
+
+.social-link img{
   max-width: 4em;
   height: auto;
 }
 
-.social-link a {
+.social-link span {
   margin-left: 10%;
   font-size: 1.3em;
   text-align: left;
