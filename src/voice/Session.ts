@@ -21,8 +21,8 @@ export default class Session {
     };
   }
 
-  public addVideo(displayName: string, url: string): void {
-    this.queue.push({ displayName, url });
+  public addVideo(url: string, author: Discord.GuildMember): void {
+    this.queue.push({ displayName: author.displayName, url, userIcon: author.user.avatarURL });
   }
 
   public async start() {
@@ -47,7 +47,7 @@ export default class Session {
     const video = this.queue.shift();
     const stream = await ytdlDiscord(video.url, { filter: "audioonly", quality: "highestaudio" });
     // stream.on("info", (info) => this.printInfo(info, video.displayName));
-    ytdl.getInfo(video.url).then((info) => this.printInfo(info, video.displayName));
+    ytdl.getInfo(video.url).then((info) => this.printInfo(info, video.displayName, video.userIcon));
     stream.on("error", (err) => {
       console.error(err);
     });
@@ -73,7 +73,7 @@ export default class Session {
     return;
   }
 
-  private async printInfo(info: ytdl.videoInfo, displayName: string) {
+  private async printInfo(info: ytdl.videoInfo, displayName: string, userIcon: string) {
     let image = "#";
     try {
       image = info.player_response.videoDetails.thumbnail.thumbnails.pop().url;
@@ -86,7 +86,7 @@ export default class Session {
       .setAuthor(info.author.name || "#", info.author.avatar || "#", info.author.channel_url || "#")
       .addField("Playing", `[${info.title || "No Title Found"}](${info.video_url || "#"})`)
       .addField("Duration", formatLength(+info.length_seconds))
-      .setFooter(`Requested by: ${displayName}`)
+      .setFooter(`Requested by: ${displayName}`, userIcon)
       .setThumbnail(image);
 
     this.msgChannel.send(embed);
@@ -96,6 +96,7 @@ export default class Session {
 
 interface IQueueItem {
   displayName: string;
+  userIcon: string;
   url: string;
 }
 type SessionEventName = "end";

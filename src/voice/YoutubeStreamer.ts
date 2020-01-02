@@ -19,11 +19,11 @@ class YoutubeStreamer {
     const member = message.member;
     if (this.sessions.has(guildID)) {
       const session = this.sessions.get(guildID);
-      session.addVideo(member.displayName, url);
+      session.addVideo(url, member);
     } else {
       const session = new Session(message.member.voiceChannel, message.channel as TextChannel);
       this.sessions.set(guildID, session);
-      session.addVideo(member.displayName, url);
+      session.addVideo(url, member);
       session.start();
       session.on("end", () => this.sessions.delete(guildID));
     }
