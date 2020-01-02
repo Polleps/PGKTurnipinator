@@ -15,6 +15,7 @@ export default class Config {
   public static readonly TOURNAMEN_AGENDA_ID: string = process.env.TOURNAMEN_AGENDA_ID;
   public static readonly SERVERURL: string = process.env.SERVERURL;
   public static readonly PUBLIC_INVITE_LINK: string = process.env.PUBLIC_INVITE_LINK;
+  public static readonly BOT_CHANNEL_ID: string = process.env.BOT_CHANNEL_ID;
   private constructor() {
   }
 }
