@@ -16,6 +16,11 @@ export default class Config {
   public static readonly SERVERURL: string = process.env.SERVERURL;
   public static readonly PUBLIC_INVITE_LINK: string = process.env.PUBLIC_INVITE_LINK;
   public static readonly BOT_CHANNEL_ID: string = process.env.BOT_CHANNEL_ID;
+  public static readonly TWITTER_CONSUMER_KEY: string = process.env.TWITTER_CONSUMER_KEY;
+  public static readonly TWITTER_CONSUMER_KEY_SECRET: string = process.env.TWITTER_CONSUMER_KEY_SECRET;
+  public static readonly TWITTER_ACCESS_TOKEN: string = process.env.TWITTER_ACCESS_TOKEN;
+  public static readonly TWITTER_ACCESS_TOKEN_SECRET: string = process.env.TWITTER_ACCESS_TOKEN_SECRET;
+  public static readonly NEWS_CHANNEL_ID: string = process.env.NEWS_CHANNEL_ID;
   private constructor() {
   }
 }
