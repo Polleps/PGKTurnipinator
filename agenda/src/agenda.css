@@ -21,6 +21,7 @@ body {
   margin: 0px;
   padding: 0px;
   background-color: #ececec;
+  height: 100vh;
   overflow-y: hidden;
 }
 
@@ -100,6 +101,9 @@ header .install-btn i {
 .page {
   overflow: auto;
   height: calc(100vh - 1.5rem);
+}
+.card-list {
+  padding-bottom: 2rem;
 }
 .card-list > li {
   margin-top: 2em;

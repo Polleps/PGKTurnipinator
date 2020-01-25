@@ -1,6 +1,6 @@
 {
-  "name": "tsbot",
-  "version": "1.0.0",
+  "name": "pgk-turnipinator",
+  "version": "3.0.1",
   "description": "This repository contains the Discord bot for the Dutch Smash Ultimate Discord.",
   "main": "bot.js",
   "scripts": {
