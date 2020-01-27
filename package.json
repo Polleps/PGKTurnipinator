@@ -23,6 +23,7 @@
     "firebase-admin": "7.2.0",
     "google-gax": "^1.11.1",
     "jsonwebtoken": "8.4.0",
+    "m3u8stream": "^0.6.4",
     "moment": "2.24.0",
     "node-fetch": "2.3.0",
     "node-opus": "^0.3.1",
@@ -32,8 +33,8 @@
     "twit": "^2.2.11",
     "uuid": "3.3.2",
     "uws": "99.0.0",
-    "ytdl-core": "^0.29.5",
-    "ytdl-core-discord": "^1.0.3"
+    "ytdl-core": "^1.0.7",
+    "ytdl-core-discord": "git+https://github.com/amishshah/ytdl-core-discord.git"
   },
   "devDependencies": {
     "@types/dotenv": "6.1.0",
