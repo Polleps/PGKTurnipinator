@@ -27,19 +27,17 @@ export class ActionRouter {
     // ::AUTH MIDDLEWHERE
     this._router.use((async (req: Request, res: Response, next) => {
       const { body } = req;
-
       try {
         let token = await verifyActionRequest(body.token);
-
         if (token.expires <= Date.now()) {
           const userData = await refreshUserToken(token.refresh_token);
           const newToken = await encodeToken(userData);
           token = await verifyActionRequest(newToken);
-          res.cookie("token", newToken, { maxAge: 900000 });
+          const expire = 31536000000; // 1yr in ms.
+          res.cookie("token", newToken, { maxAge: expire, path: "/bot/"});
         }
 
         const userInfo = await UserInfoCache.get(token.access_token);
-        console.log("User Info", userInfo);
         res.locals.userInfo = userInfo;
         next();
 

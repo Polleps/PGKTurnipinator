@@ -29,7 +29,8 @@ export class AuthRouter {
       console.log("Callback received Userdata", userData);
       const token = await encodeToken(userData);
       console.log("Calback encoded token", token);
-      res.cookie("token", token, { maxAge: 900000, path: "/bot/"});
+      const expire = 31536000000; // 1yr in ms.
+      res.cookie("token", token, { maxAge: expire, path: "/bot/"});
       res.redirect("/bot");
     });
   }

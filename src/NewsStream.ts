@@ -19,15 +19,16 @@ export class NewsStreamer {
   ];
 
   constructor(client: Client) {
-    this.client = client;
-    this.twit = new Twit({
-      consumer_key: Config.TWITTER_CONSUMER_KEY,
-      consumer_secret: Config.TWITTER_CONSUMER_KEY_SECRET,
-      access_token: Config.TWITTER_ACCESS_TOKEN,
-      access_token_secret: Config.TWITTER_ACCESS_TOKEN_SECRET,
-    });
-
-    this.setupStream();
+    if (Config.ENABLE_NEWS_CHANNEL) {
+      this.client = client;
+      this.twit = new Twit({
+        consumer_key: Config.TWITTER_CONSUMER_KEY,
+        consumer_secret: Config.TWITTER_CONSUMER_KEY_SECRET,
+        access_token: Config.TWITTER_ACCESS_TOKEN,
+        access_token_secret: Config.TWITTER_ACCESS_TOKEN_SECRET,
+      });
+      this.setupStream();
+    }
   }
 
   private setupStream() {

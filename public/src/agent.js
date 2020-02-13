@@ -1,3 +1,5 @@
+import { saveToken } from "./indentifier";
+
 export const createAgent = (token) => {
   const baseURL = '/actions';
   const tournamentURL = '/actions/tournamentdetails';
@@ -8,7 +10,9 @@ export const createAgent = (token) => {
       const body = { action, token };
       const options = { headers, body: JSON.stringify(body), method: 'POST' };
       console.log(options);
-      return fetch(baseURL + '/run', options).then(res => res.json());
+      const res = await fetch(baseURL + '/run', options).then(res => res.json());
+      saveToken(token);
+      return res;
     },
 
     fetchTournamentDetails: async (slug) => {
@@ -19,7 +23,9 @@ export const createAgent = (token) => {
       const body = { token };
       const options = { headers, body: JSON.stringify(body), method: 'POST' };
       console.log(options);
-      return fetch(`${tournamentURL}/${slug}`, options).then(res => res.json());
+      const res = await fetch(`${tournamentURL}/${slug}`, options).then(res => res.json());
+      saveToken(token);
+      return res;
     }
   }
 }
