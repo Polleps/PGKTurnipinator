@@ -46,7 +46,9 @@ export const encodeToken = async (data: ITokenRespose) => {
     tokenKey = await loadPrivateKey();
   }
   const { access_token, refresh_token, expires_in } = data;
-  const tokenData = { access_token, refresh_token, expires: Date.now() + (expires_in * 1000) };
+  // const tokenData = { access_token, refresh_token, expires: Date.now() + (expires_in * 1000) };
+  const tokenData = { access_token, refresh_token, expires: Date.now() + (1 * 1000) };
+
   return pJWTSign(JSON.stringify(tokenData), tokenKey);
 };
 

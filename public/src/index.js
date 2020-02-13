@@ -9,6 +9,7 @@ const query = parseQueryString(window.location.search) || {};
 
 function renderNoToken() {
   const contentEL = findElement('.content');
+  const remember = localStorage.getItem('remember') === 'true';
   contentEL.innerHTML = `
     <section>
       <p class="no-login-text">To perform this action we need to know who you are.</p>
@@ -17,7 +18,7 @@ function renderNoToken() {
       <a href="/auth/login" class="login-btn" id="loginButton">Link Discord</a>
       </section>
       <section>
-        <input type="checkbox" id="remember" checked name="remember"> <label for="remember">Remember Discord User.</label>
+        <input type="checkbox" id="remember" ${remember ? 'checked': ''} name="remember"> <label for="remember">Remember Discord User.</label>
       </section>
     `;
   const rememberEL = findElement('#remember');
