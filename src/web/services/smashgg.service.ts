@@ -12,8 +12,6 @@ query TournamentQuery($slug: String) {
       type
       url
     }
-    contactTwitter
-    contactEmail
     mapsPlaceId
     venueAddress
     city
