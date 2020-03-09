@@ -13,14 +13,23 @@ export const calendarDay = (day) => {
   const crop = '?auto=compress,format&w=280&h=280&fit=crop'
   const hasTournament = !!day.tournaments.length
   const today = Date.now();
-  
+
   const imageURL = hasTournament ? formatUrl(day.tournaments[0].image) : '#';
-  const style = hasTournament ? `background-image: url(${imageURL + crop})` : '';
+  const buildImageURL = () => {
+    const past = isPast(new Date(today), new Date(day.date));
+    const gradient =  past ? 'linear-gradient(white, white),' : '';
+    const background = `url(${imageURL + crop})`;
+    const blendmode = past ? 'background-blend-mode: saturation;' : ''
+
+    return `background-image: ${gradient}${background};${blendmode}`;
+  }
+  const style = hasTournament ? buildImageURL() : '';
 
   const classes = [
     ...(!day.isSelectedMonth ? ["other-month"] : []),
     ...(hasTournament ? ["has-tournament"] : []),
     ...(isToday(new Date(today), new Date(day.date)) ? ["today"] : []),
+    ...(isPast(new Date(today), new Date(day.date)) ? ["past"] : []),
   ].join(" ");
 
   const pr = hasTournament ? day.tournaments[0].pr : false
@@ -44,3 +53,8 @@ const tournamentItem = (tournament) => html`
 const isToday = (a, b) => a.getDate() === b.getDate() &&
                           a.getMonth() === b.getMonth() &&
                           a.getFullYear() === b.getFullYear();
+const isPast = (a, b) => {
+  const roundedDate = new Date(a.getFullYear(), a.getMonth(), a.getDate());
+  return b < roundedDate;
+};
+

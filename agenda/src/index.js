@@ -1,7 +1,7 @@
 import { render } from 'lit-html';
 import { calendar } from './calendar';
 import { cardList } from './cardList';
-import { header } from './header';
+import { header, View } from './header';
 import './agenda.css';
 
 if ('serviceWorker' in navigator) {
@@ -19,7 +19,12 @@ const viewContainer = document.querySelector('.page');
 const headerContainer = document.querySelector('header');
 
 let date = new Date();
-let view = localStorage.getItem('agenda_view') || 'list';
+let view = +localStorage.getItem('agenda_view') || View.LIST;
+
+// Upgrade old state.
+if (view !== View.CALENDAR || view !== View.LIST) {
+  view = View.LIST;
+}
 
 let showInstallBtn = false;
 let installPrompt = () => null;
@@ -42,15 +47,18 @@ const listView = cardList({
 });
 
 const renderView = (t) => {
-  if (view === 'list') {
+  if (view === View.LIST) {
     render(listView(t, date.getMonth(), date.getFullYear()), viewContainer);
+    renderHeader();
   } else {
     render(calendarView(t, date.getMonth(), date.getFullYear()), viewContainer);
+    renderHeader();
   }
 }
 
 const renderHeader = () => {
   render(header({
+    currentView: view,
     onViewChange: (v) => {
       view = v;
       renderView(tournaments);

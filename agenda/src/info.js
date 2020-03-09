@@ -6,16 +6,23 @@ const formater = (date) => new Intl.DateTimeFormat('default', {
   month: 'long',
   day: '2-digit'
 }).format(date);
-export const info = ({city, startDate, cap, participants}) => {
+
+export const info = ({city, startDate, cap, participants, location, locationID}) => {
   const capText = `${participants ? `${participants}/` : ''}${cap}`;
   const capStyle = participants ? `color: ${colorshift(participants, cap)}` : ''
+
   return html`
   <ul class="tournament-info-list">
-    <li tooltip="Date" tooltip-position="right">
-      <span class="date-row icon-text"><i class="material-icons">calendar_today</i>${formater(startDate)}</span>
+    <li tooltip="Date" tooltip-position="right" class="tournament-date">
+      <span class="date-row icon-text"><i class="material-icons">calendar_today</i><span>${formater(startDate)}</span></span>
     </li>
     <li tooltip="Location" tooltip-position="right">
-      <span class="location-row icon-text"><i class="material-icons">room</i>${city}</span>
+      <span class="location-row icon-text">
+        <i class="material-icons">room</i>
+        <a href=${createGoogleMapsURL(location, locationID)} target="_blank" alt="Location on Google Maps">
+          ${city}
+        </a>
+      </span>
     </li>
     <li tooltip="Player Cap" tooltip-position="right">
       <span class="cap-row icon-text" style=${capStyle}><i class="material-icons">person</i>${capText}</span>
@@ -67,4 +74,9 @@ const ofBetween = (p, n, tr) => {
 
 const toCSSColour = (c) => {
   return `rgb(${c.r},${c.g},${c.b})`;
+};
+
+const createGoogleMapsURL = (location, googleMapsID) => {
+  const url = new URL(`https://www.google.com/maps/search/?api=1&query=${location}&query_place_id=${googleMapsID}`);
+  return url.toString();
 };

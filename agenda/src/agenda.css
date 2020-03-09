@@ -46,7 +46,8 @@ header, footer, .page {
 }
 
 a {
-  color: var(--primary-text-color);
+  /* color: var(--primary-text-color); */
+  color: #c32b3d;
   text-decoration: none;
 }
 
@@ -127,6 +128,7 @@ header .install-btn i {
 .devider-month {
   color: black;
   padding: 0px 10px;
+  text-transform: capitalize;
 }
 
 .card {
@@ -174,7 +176,7 @@ header .install-btn i {
 .pf-image-holder::after {
   display: block;
   position: relative;
-  background-image: linear-gradient(to bottom, transparent 75%, var(--bg-color-alpha) 90%,var(--bg-color) 100%);
+  /* background-image: linear-gradient(to bottom, transparent 75%, var(--bg-color-alpha) 90%,var(--bg-color) 100%); */
   margin-top: -150px;
   height: 150px;
   width: 100%;
@@ -187,10 +189,19 @@ header .install-btn i {
   font-size: 1.3rem;
   padding: 1rem;
 }
+
+.tournament-title i {
+  padding: 5px;
+}
+
 .tournament-info-list {
   grid-area: info;
   padding: 0.5rem;
   padding-left: 1rem;
+}
+
+.date-row span::first-letter {
+  text-transform: uppercase;
 }
 
 .event-list {
@@ -237,6 +248,10 @@ header .install-btn i {
   user-select: none;
 }
 
+.icon-btn.pad {
+  padding: 10px;
+}
+
 .calendar-control-bar {
   margin: auto;
   background: var(--primary-colour);
@@ -268,7 +283,7 @@ header .install-btn i {
   grid-template-rows: 0.5fr repeat(5, minmax(80px, 3fr));
   margin: auto;
   background-color: #c4c4c4;
-  grid-gap: 1px;
+  /* grid-gap: 1px; */
   height: calc(100% - 2.3rem);
 }
 .calendar-item-container[prcount]::before {
@@ -286,11 +301,13 @@ header .install-btn i {
 
 .calendar-item-container {
   height: 100%;
+  border-right: 1px solid lightgray;
+  border-top: 1px solid lightgray;
 }
 .calendar-item {
     /* min-height: 130px; */
     background: white;
-    height:100%;
+    height: 100%;
     text-align: center;
     background-size: cover;
     display: flex;
@@ -298,7 +315,10 @@ header .install-btn i {
     justify-content: space-between;
     background-position: center;
 }
-
+.has-tournament.past {
+  background: none;
+  background-size: cover;
+}
 .date-num {
   width: 100%;
   padding-top: 0px;
@@ -344,10 +364,12 @@ header .install-btn i {
 }
 .calendar-header {
   min-height: 20px;
-  background: white;
+  background-color: #c32b3e;
+  color: white;
   text-align: center;
+  text-transform: capitalize;
   padding: 5px;
-  background-color: #c4c4c4;
+  /* background-color: #c4c4c4; */
 }
 
 .calendar-header:last-of-type {
@@ -431,14 +453,15 @@ header .install-btn i {
   .calendar-control-bar {
     max-width: 1100px;
     margin: auto;
-    margin-top: 10px;
+    margin-top: 3vh;
     background: var(--primary-colour);
     color: white;
     padding: 10px 0px;
-    border-radius: 10px;
+    border-radius: 10px 10px 0px 0px;
     display: flex;
     justify-content: center;
-    box-shadow: 0px 2px 7px -1px black;
+    text-transform: capitalize;
+    /* box-shadow: 0px 2px 7px -1px black; */
   }
   .calendar {
     display: grid;
@@ -446,10 +469,10 @@ header .install-btn i {
     grid-template-rows: 0.5fr repeat(5, 3fr);
     max-width: 1100px;
     margin: auto;
-    margin-top: 10px;
+    /* margin-top: 10px; */
     background-color: #c4c4c4;
-    grid-gap: 1px;
-    box-shadow: 0px 2px 7px -1px black;
+    /* grid-gap: 1px; */
+    /* box-shadow: 0px 2px 7px -1px black; */
     height: calc(90vh - 80px);
   }
 
@@ -460,6 +483,15 @@ header .install-btn i {
     font-size: 1em;
     border-radius: 16px 16px 16px 16px;
     margin: 0.6rem 0.3rem;
+    transition: 200ms;
+  }
+
+  .tournament-holder a:hover {
+    text-decoration: underline;
+  }
+
+  .tournament-holder:hover {
+    transform: scale(1.05);
   }
 
   .has-tournament .tournament-holder {
@@ -584,5 +616,16 @@ header .install-btn i {
     top:50%;
     margin-left:8px;
     transform: translateX(0%)   translateY(-50%);
+  }
+}
+
+@media screen and (max-width: 1100px) {
+  .calendar-control-bar {
+    margin: 0;
+    border-radius: 0px;
+    max-height: 1.5rem;
+  }
+  .calendar {
+    height: calc(100% - 4.5rem);
   }
 }

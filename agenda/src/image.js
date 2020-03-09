@@ -1,7 +1,7 @@
 import { html } from 'lit-html';
 import noImage from './assets/no-image.jpg'
 export const pf = (url) => {
-  const convertedURL = url ? replaceURL(url) : '';
+  const convertedURL = url ? replaceURL(url) : noImage;
   return html`<div class="pf-image-holder"><img src=${convertedURL} alt="" loading="lazy"></div>`;
 }
 

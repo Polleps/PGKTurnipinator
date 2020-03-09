@@ -26,17 +26,39 @@ export const calendar = ({ onDateChange, onViewChange }) => {
     return html`
       ${controlBar(month, year, onDateChange)}
       <div class="calendar">
-        <div class="calendar-header">Ma</div>
+        <!-- <div class="calendar-header">Ma</div>
         <div class="calendar-header">Di</div>
         <div class="calendar-header">Wo</div>
         <div class="calendar-header">Do</div>
         <div class="calendar-header">Vr</div>
         <div class="calendar-header">Za</div>
-        <div class="calendar-header">Zo</div>
+        <div class="calendar-header">Zo</div> -->
+        ${repeat(dayNames(), d => d, dayHeader)}
         ${repeat(calendarArray, d => d.dateNumber + d.key, d => calendarDay(d))}
       </div>
     `;
   }
+}
+
+const dayHeader = (day) => {
+  return html`<div class="calendar-header">${day}</div>`;
+}
+const dayNames = () => {
+  const formatter = Intl.DateTimeFormat(undefined, {
+    weekday: 'short'
+  });
+  const oneDay = 86400000;
+  let startDate = new Date(2020, 2, 2);
+  const days = [];
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(startDate.getTime() + (oneDay * i))
+    const parts = formatter.formatToParts(d);
+    console.log(parts);
+    const short = parts.find(part => part.type === 'weekday').value;
+    days.push(short);
+  }
+  console.log(days);
+  return days;
 }
 
 

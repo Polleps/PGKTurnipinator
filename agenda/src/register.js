@@ -1,6 +1,6 @@
 import { html } from 'lit-html';
 const smashggBase = 'https://smash.gg/tournament/';
-export const registerButton = (url, registrationClosesAt) => html`
+export const registerButton = (url, registrationClosesAt, tournamentDate) => html`
 <div class="button-holder">
   <a
     href="${smashggBase + url}"
@@ -8,11 +8,11 @@ export const registerButton = (url, registrationClosesAt) => html`
   >
     <i class="material-icons">launch</i>Info
   </a>
-  ${registrationWarning(registrationClosesAt)}
+  ${registrationWarning(registrationClosesAt, tournamentDate)}
 </div>`;
 
-const registrationWarning = (registrationClosesAt) => {
-  const warning = formatWarning(registrationClosesAt);
+const registrationWarning = (registrationClosesAt, tournamentDate) => {
+  const warning = formatWarning(registrationClosesAt, tournamentDate);
   if (warning === '') {
     return '';
   }
@@ -20,12 +20,17 @@ const registrationWarning = (registrationClosesAt) => {
     <span class="registration-warning"><i class="material-icons">warning</i>${warning}</span>
   `;
 }
-const formatWarning = (closeDate) => {
+const formatWarning = (closeDate, tournamentDate) => {
   if (!closeDate) {
     return '';
   }
+  const oneDay = 86400000;
   const closeTime = (new Date(closeDate)).getTime() * 1000;
-  // console.log(closeTime, Date.now());
+
+  if (Math.abs(closeTime - tournamentDate) < (oneDay)) {
+    return '';
+  }
+
   if (closeTime < Date.now()) {
     return 'Registration Closed';
   }
