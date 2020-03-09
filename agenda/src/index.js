@@ -22,7 +22,7 @@ let date = new Date();
 let view = +localStorage.getItem('agenda_view') || View.LIST;
 
 // Upgrade old state.
-if (view !== View.CALENDAR || view !== View.LIST) {
+if (view !== View.CALENDAR && view !== View.LIST) {
   view = View.LIST;
 }
 
