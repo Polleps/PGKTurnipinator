@@ -77,7 +77,7 @@ const fetchTournaments = async () => {
 }
 
 const transformTournament = (t) => {
-  const cap = t.events.map(e => e.cap)
+  const cap = t.events?.map(e => e.cap)
               .filter(c => +c === +c)
               .sort((a, b) => b - a)[0] || '?';
   return {

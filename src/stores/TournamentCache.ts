@@ -62,7 +62,7 @@ export class TournamentStoreCache extends StoreCache<ITournament[], number, ITou
   private async updateStatus() {
     const tournaments = this.cache.filter((t) => t.endDate >= new Date() && t.id);
     const status = await Promise.all(tournaments.map((t) => fetchTournamentStatus(`${t.id}`)));
-    status.forEach((p) => {
+    status.filter((p) => p.length > 0).forEach(([p]) => {
       const tournament = this.cache.find((t) => t.id === p.id);
       tournament.participants = p.participants;
       tournament.registrationClosesAt = p.registrationClosesAt;

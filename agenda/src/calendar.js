@@ -26,13 +26,6 @@ export const calendar = ({ onDateChange, onViewChange }) => {
     return html`
       ${controlBar(month, year, onDateChange)}
       <div class="calendar">
-        <!-- <div class="calendar-header">Ma</div>
-        <div class="calendar-header">Di</div>
-        <div class="calendar-header">Wo</div>
-        <div class="calendar-header">Do</div>
-        <div class="calendar-header">Vr</div>
-        <div class="calendar-header">Za</div>
-        <div class="calendar-header">Zo</div> -->
         ${repeat(dayNames(), d => d, dayHeader)}
         ${repeat(calendarArray, d => d.dateNumber + d.key, d => calendarDay(d))}
       </div>

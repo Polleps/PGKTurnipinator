@@ -1,5 +1,5 @@
 import Config from "../../Config";
-import fetch from "node-fetch";
+import fetch, { FetchError } from "node-fetch";
 
 const baseURL = "https://api.smash.gg/gql/alpha";
 
@@ -62,17 +62,24 @@ export const fetchTournamentDetails = async (slug: string): Promise<ITournamentD
   return tournamentDetails;
 };
 
-export const fetchTournamentStatus = async (id: string): Promise<{
+export type FETCH_ERROR = -1;
+
+export const fetchTournamentStatus = async (id: string): Promise<Array<{
   id: number,
   participants: number,
   registrationClosesAt: Date,
-}> => {
+}>> => {
   const result = (await executeQuery(statusQuery, { id })) as IStatusResult;
-  return {
+  console.log(result);
+  if (!result.data) {
+    return [];
+  }
+
+  return [{
     id: result.data.tournament.id,
     participants: result.data.tournament.participants.pageInfo.total,
     registrationClosesAt: result.data.tournament.registrationClosesAt,
-  };
+  }];
 };
 
 const executeQuery = async (query, variables) => {

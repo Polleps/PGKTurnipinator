@@ -20,12 +20,13 @@ export default abstract class StoreCache<T, I, O> implements ICache {
     return;
   }
 
-  protected async fillCache(): Promise<void> {
-    return Promise.resolve();
-  }
   public abstract async add(x: O): Promise<void>;
 
   public abstract has(index: I): boolean;
+
+  protected async fillCache(): Promise<void> {
+    return Promise.resolve();
+  }
 
   public get data(): T {
     return this.cache;
