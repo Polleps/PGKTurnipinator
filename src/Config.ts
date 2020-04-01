@@ -22,6 +22,7 @@ export default class Config {
   public static readonly TWITTER_ACCESS_TOKEN: string = process.env.TWITTER_ACCESS_TOKEN;
   public static readonly TWITTER_ACCESS_TOKEN_SECRET: string = process.env.TWITTER_ACCESS_TOKEN_SECRET;
   public static readonly NEWS_CHANNEL_ID: string = process.env.NEWS_CHANNEL_ID;
+  public static readonly COLOR_ROLE_ID: string = process.env.COLOR_ROLE_ID;
   private constructor() {
   }
 }
