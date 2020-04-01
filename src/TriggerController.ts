@@ -4,7 +4,7 @@ export default class TriggerController {
   private triggers: ITrigger[] = new Array<ITrigger>(
     // new ShucfixTrigger(),
     new RadioTrigger(),
-    new RainbowTrigger(),
+    // new RainbowTrigger(),
   );
 
   public runTriggers(msg: Discord.Message): boolean {
