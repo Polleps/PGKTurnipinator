@@ -144,12 +144,22 @@ footer a {
   margin: 2px;
   /* background-color: rgb(94, 94, 94); */
   color: white;
+  transition: 100ms;
 }
+
 .form-row textarea {
   border: none;
   border-bottom: 1px rgb(102, 101, 101) solid;
   background-color: #50545c;
   color: white;
+}
+
+input[type=checkbox], label {
+  cursor: pointer;
+}
+
+.form-row input:disabled, textarea:disabled {
+  background-color: #3d3f44;
 }
 
 .form-row input:focus {
@@ -204,6 +214,10 @@ footer a {
 .flex1 img {
   max-width: 100%;
   padding: 1rem;
+}
+
+.btn {
+  transition: 100ms;
 }
 
 .add-btn {

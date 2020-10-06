@@ -1,5 +1,5 @@
 import { Client, TextChannel } from "discord.js";
-import * as Twit from "twit";
+import Twit from "twit";
 
 import Config from "./Config";
 import { createLogger } from "./utils/logger";

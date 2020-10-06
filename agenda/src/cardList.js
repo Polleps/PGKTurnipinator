@@ -9,9 +9,14 @@ export const cardList = ({ onDateChange, onViewChange}) => {
   return (tournaments, month, year) => {
     const today = new Date();
     let lastMonth = undefined;
-    // console.log(tournaments);
+
+    // Sort tournaments by date and only keep upcomming.
+    console.log(JSON.parse(JSON.stringify(tournaments)));
     const sortedTournaments = tournaments.sort((a, b) => a.startDate - b.startDate)
                                           .filter(t => t.endDate >= today);
+
+    console.log(sortedTournaments);
+    // Insert deviders between months.
     const devidedTournaments = sortedTournaments.flatMap((t) => {
       const startDate = new Date(t.startDate);
       if (lastMonth !== startDate.getMonth()) {
@@ -23,7 +28,7 @@ export const cardList = ({ onDateChange, onViewChange}) => {
       }
       return t;
     });
-
+    console.log(devidedTournaments);
     return html`
       <div class="card-holder">
         <ul class="card-list">
@@ -33,3 +38,4 @@ export const cardList = ({ onDateChange, onViewChange}) => {
     `;
   }
 };
+

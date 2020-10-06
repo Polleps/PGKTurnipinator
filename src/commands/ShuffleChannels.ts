@@ -16,16 +16,6 @@ export class ShuffleChannelsCommand extends Command {
     message.reply("Command is disabled.");
     return true;
 
-    console.log(message.guild.channels.filter((c) => c.type === "category").map((c) => c.position).join(", "));
-    const categoryChannels = message.guild.channels.filter((c) => c.type === "category" && c.name !== "adminning");
-    const categoryNames = categoryChannels.map((c) => c.name);
-    const picker = randomPicker<string>(categoryNames);
-    categoryChannels.forEach((c) => c.setName(picker.next().value));
-    const max = message.guild.channels.map((c) => c.position).sort((a, b) => b - a)[0];
-    console.log(max);
-    const channels = message.guild.channels;
-    randomize([...channels.values()], max).then(() => console.log("Done"));
-    return true;
   }
 }
 

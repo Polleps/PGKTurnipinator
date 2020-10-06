@@ -22,7 +22,7 @@ export const createValidators = state => {
     newValidator("Location is empty", empty(state.location)),
     newValidator("The smash.gg page does not contain a City", empty(state.city)),
     newValidator("Tournament needs at least 1 event", () => state.events.length > 0),
-    newValidator("At least one events needs an entry cap", () => state.events.some(e => e.cap && +e.cap > 0)),
+    newValidator("At least one events needs an entry cap", () => state.nocaps || state.events.some(e => e.cap && +e.cap > 0)),
     newValidator("Additional Notes cannot be longer than 250 characters", () => state.description.length < 250),
     newValidator("A price needs a value", () => priceEmpty(state.prices)() || state.prices.every(p => p.amount !== '')),
     newValidator("A price needs a name", () => priceEmpty(state.prices)() || state.prices.every(p => p.name !== '')),

@@ -12,8 +12,14 @@ export class TournamentStoreCache extends StoreCache<ITournament[], number, ITou
     this.cache = new Array<ITournament>();
   }
 
-  public async add(x: ITournament): Promise<void> {
+  public async add(x: ITournament, updateIfExist: boolean = true): Promise<void> {
     try {
+      if (updateIfExist && this.getByID(x.id)) {
+        await this.update(x);
+        this.updateExpire();
+        return;
+      }
+
       await this.ref.add(x);
       this.cache.push(x);
       this.updateExpire();
@@ -47,6 +53,10 @@ export class TournamentStoreCache extends StoreCache<ITournament[], number, ITou
     return !!this.cache[index];
   }
 
+  public getByID(id: string): ITournament {
+    return this.cache.find((x) => x.id === id);
+  }
+
   protected async fillCache(): Promise<void> {
     const snapshot = await this.ref.get();
     this.cache = [];
@@ -57,6 +67,19 @@ export class TournamentStoreCache extends StoreCache<ITournament[], number, ITou
     await this.updateStatus();
     this.updateExpire();
     return;
+  }
+
+  private async update(tournament: ITournament) {
+    const snapshot = await this.ref.where("id", "==", tournament.id).get();
+    if (snapshot.size === 0) {
+      throw new Error("Trying to update tournament that doens't already exsists.");
+    }
+    snapshot.forEach((doc) => {
+      doc.ref.update(tournament);
+    });
+
+    const foundIndex = this.cache.findIndex((x) => x.id === tournament.id);
+    this.cache[foundIndex] = tournament;
   }
 
   private async updateStatus() {
@@ -73,4 +96,5 @@ export class TournamentStoreCache extends StoreCache<ITournament[], number, ITou
   private updateExpire() {
     this.expires = Date.now() + this.expireTime;
   }
+
 }

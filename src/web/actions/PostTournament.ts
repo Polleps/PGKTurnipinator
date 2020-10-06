@@ -4,15 +4,22 @@ import Config from "../../Config";
 import { sClient } from "../../Context";
 import ITournament from "../../models/ITournament";
 import { store } from "../../Store";
-import { Guild, GuildMember, RichEmbed, NewsChannel } from "discord.js";
+import { Guild, GuildMember, RichEmbed, NewsChannel, Message } from "discord.js";
 import { URL } from "url";
-import * as moment from "moment";
+import moment from "moment";
 import { TournamentStoreCache } from "../../stores";
 
 const guildID = Config.GUILD_ID;
 const roleName = Config.POST_TOURNAMENT_ROLE_NAME;
 const tournamentagendaID = Config.TOURNAMEN_AGENDA_ID;
-
+const onlineTournamentAgendaID = Config.ONLINE_TOURNAMEN_AGENDA_ID;
+const cache = store.cache("tournaments") as TournamentStoreCache;
+/**
+ * Perform 'posttournament' action.
+ * TO's fill in details about tournament and the tournament gets posted in the discord channels and the online agenda.
+ * @param userInfo OATH User info.
+ * @param action action parameters.
+ */
 export const postTournament: Performer = async (userInfo: IUserInfo, action: IAction): Promise<string> => {
   const client = sClient.client;
   const guild = client.guilds.get(guildID);
@@ -33,8 +40,13 @@ export const postTournament: Performer = async (userInfo: IUserInfo, action: IAc
 
   try {
     const parsedTournament = JSON.parse(action.args[0]) as ITournament;
+    const existingTournament = cache.getByID(parsedTournament.id);
+    if (existingTournament) {
+      parsedTournament.messageID = existingTournament.messageID;
+    }
     if (action.args[1] !== "saveonly") {
-      postInChannel(guild, user, parsedTournament);
+      const messageID = await postInChannel(guild, user, parsedTournament);
+      parsedTournament.messageID = messageID;
     }
     storeTournament(parsedTournament);
   } catch (err) {
@@ -45,22 +57,56 @@ export const postTournament: Performer = async (userInfo: IUserInfo, action: IAc
   return "Done";
 };
 
-const postInChannel = (guild: Guild, user: GuildMember, tournamentDetails: ITournament): void => {
-  const channel = guild.channels.get(tournamentagendaID) as NewsChannel;
+/**
+ * Post tournament details as embed in a discord server or updates message if the tournament is already in the channel.
+ * @param guild The Discord server to send the message in
+ * @param user Discord member that posted the tournament.
+ * @param tournamentDetails The tournament details to be posted.
+ * @returns id of the posted message.
+ */
+const postInChannel = async (guild: Guild, user: GuildMember, tournamentDetails: ITournament): Promise<string> => {
+  const { isOnline } = tournamentDetails;
+
+  const channel = guild.channels.get(isOnline ? onlineTournamentAgendaID : tournamentagendaID) as NewsChannel;
   const embed = buildEmbed(user, tournamentDetails);
-  channel.send(embed);
+
+  // Update message if it already exists.
+  if (tournamentDetails.messageID) {
+    const prevMessage = await channel.fetchMessage(tournamentDetails.messageID);
+    prevMessage.edit(embed);
+    return tournamentDetails.messageID;
+  }
+
+  const message = await channel.send(embed);
+  return (message as Message).id;
 };
 
+/**
+ * Create the message embed.
+ * @param user User that posted the tournament
+ * @param tournamentDetails tournament details used to build the embed.
+ */
 const buildEmbed = (user: GuildMember, tournamentDetails: ITournament): RichEmbed => {
+  const localColor = 0xc01f1f;
+  const onlineColor = 0x0b92e0;
   let embed = new RichEmbed();
-  // embed.setAuthor(`${user.user.username}#${user.user.discriminator}`, user.user.avatarURL);
-  embed.setColor(3552822);
+  embed.setColor(tournamentDetails.isOnline ? onlineColor : localColor);
   embed.setThumbnail(tournamentDetails.image);
-  embed.addField(tournamentDetails.title, "\u200B");
-  embed = buildLocation(embed, tournamentDetails);
-  embed = buildDateField(embed, tournamentDetails);
+  embed.setFooter(`${user.user.username}#${user.user.discriminator}`, user.user.avatarURL);
+
+  const title = tournamentDetails.isOnline ? `🌐 ${tournamentDetails.title}` : tournamentDetails.title;
+  embed.addField(title, "\u200B");
+
+  if (tournamentDetails.isOnline) {
+    embed = buildDateField(embed, tournamentDetails);
+    embed = buildTimeField(embed, tournamentDetails);
+  } else {
+    embed = buildLocation(embed, tournamentDetails);
+    embed = buildDateField(embed, tournamentDetails);
+  }
+
   embed = buildEvents(embed, tournamentDetails);
-  embed = buildPrices(embed, tournamentDetails);
+  // embed = buildPrices(embed, tournamentDetails);
   embed = buildDescription(embed, tournamentDetails);
   embed = buildLink(embed, tournamentDetails);
   return embed;
@@ -117,6 +163,11 @@ const buildLink = (embed: RichEmbed, tD: ITournament): RichEmbed => {
   return embed.addField("More Info/Register", `[Smash.gg](${"https://smash.gg/tournament/" + tD.url})`);
 };
 
+const buildTimeField = (embed: RichEmbed, tD: ITournament): RichEmbed => {
+  const { startDate } = tD;
+  return embed.addField("⏰ Time", moment(startDate).format("HH:mm"));
+}
+
 const buildDateField = (embed: RichEmbed, tD: ITournament): RichEmbed => {
   const startDate = new Date(tD.startDate);
   const endDate = new Date(tD.endDate);
@@ -148,7 +199,10 @@ const padNumber = (x: number): string => {
   return x < 10 ? `0${x}` : `${x}`;
 };
 
+/**
+ * Stores a tournament in the database.
+ * @param t tournament details to be inserted in the Object store.
+ */
 const storeTournament = (t: ITournament) => {
-  const cache = store.cache("tournaments") as TournamentStoreCache;
   cache.add(t);
 };

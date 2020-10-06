@@ -6,6 +6,7 @@ import { input } from '../templates/input.js';
 import { eventInput } from '../templates/event.js';
 import { priceInput } from '../templates/price.js';
 import { textarea } from '../templates/textarea.js';
+import { checkbox } from '../templates/checkbox.js';
 import { createValidators, validate } from '../validateTournament.js';
 
 export default class PostTournament extends Action {
@@ -15,7 +16,9 @@ export default class PostTournament extends Action {
     this.state = {
       url: '',
       title: '',
-      id: 0,
+      id: '0',
+      nocap:false,
+      isOnline: false,
       startDate: '',
       endDate: '',
       location: '',
@@ -69,9 +72,9 @@ export default class PostTournament extends Action {
           bind: (val) => {
             this.extractSlug(val);
           },
-          placeholder: 'Smash.gg link (or slug)'
+          placeholder: 'Smash.gg link'
         })}
-        ${html`<a href="#" class="fill-btn flex-auto" @click=${() => this.fetchTournament(this.state.url).then(() => this.render())}>Fill</a>`}
+        ${html`<a href="#" class="btn fill-btn flex-auto" @click=${() => this.fetchTournament(this.state.url).then(() => this.render())}>Fill</a>`}
       </div>
       ${this.state.error ? html`<span class="fetch-error">${this.state.error}</span>` : ''}
       <div class="form-row gap"></div>
@@ -94,8 +97,8 @@ export default class PostTournament extends Action {
       <div class="form-row">
       ${input({
           name: "location",
-          value: this.state.location,
-          disabled: this.detailControllsHidden,
+          value: this.state.isOnline ? 'Online' : this.state.location,
+          disabled: this.detailControllsHidden || this.state.isOnline,
           classes: "flex1 icon-input ta-location",
           placeholder: "Location",
           bind: (val) => this.state.location = val,
@@ -121,7 +124,17 @@ export default class PostTournament extends Action {
         })}
       </div>
       <div class="form-row"><span class="icon-label"><i class="material-icons">games</i>Events/Games</span></div>
-        ${this.mapEvents(this.detailControllsHidden)}
+        ${checkbox({
+          name: "nocap",
+          value: false,
+          classes: "",
+          label: "No player caps",
+          bind: (val) => {
+            this.state.nocap = val;
+            this.render();
+          },
+        })}
+        ${this.mapEvents(this.detailControllsHidden, this.detailControllsHidden || this.state.nocap)}
         <div class="form-row">
         <span class="icon-label">
           <i class="material-icons">speaker_notes</i>
@@ -150,10 +163,10 @@ export default class PostTournament extends Action {
         </div>`
         : ''}
       </div>
-      <div class="form-row"><span class="icon-label"><i class="material-icons">euro_symbol</i>Prices</span></div>
-      ${this.mapPrices(this.detailControllsHidden)}
+     <!-- <div class="form-row"><span class="icon-label"><i class="material-icons">euro_symbol</i>Prices</span></div>
+      ${this.mapPrices(this.detailControllsHidden)}-->
       <div class="form-row">
-        <a href="#" class="post-btn" @click=${createClick(this.submitTournament)}>Post</a>
+        <a href="#" class="btn post-btn" @click=${createClick(this.submitTournament)}>Post</a>
       </div>
       ${this.postMessage ? html`
         <div class="form-row">
@@ -164,12 +177,13 @@ export default class PostTournament extends Action {
     render(ui, contentEL);
   }
 
-  mapEvents(disabled) {
+  mapEvents(disabled, capdisabled) {
     return repeat(this.state.events, (evt) => evt.key, (evt, index) => eventInput({
       key: evt.key,
       name: evt.name,
       cap: evt.cap,
       disabled,
+      capdisabled,
       onNew: () => {
         this.state.events.push({name: '', cap: '', key: randomID()});
         this.render();
@@ -239,6 +253,7 @@ export default class PostTournament extends Action {
     const { data } = result;
     this.state.error = '';
     this.state.id = data.id;
+    this.state.isOnline = data.isOnline;
     this.state.title = data.name;
     this.state.location = data.address;
     this.state.startDate = parseDate(new Date(data.startAt * 1000));

@@ -1,10 +1,10 @@
 import { html } from 'lit-html';
 const smashggBase = 'https://smash.gg/tournament/';
-export const registerButton = (url, registrationClosesAt, tournamentDate) => html`
+export const registerButton = (url, registrationClosesAt, tournamentDate, isOnline) => html`
 <div class="button-holder">
   <a
     href="${smashggBase + url}"
-    class="register-button icon-text icon-center"
+    class=${`register-button icon-text icon-center ${isOnline? 'online' : ''}`}
   >
     <i class="material-icons">launch</i>Info
   </a>

@@ -44,13 +44,12 @@ query TournamentQuery($id: ID) {
 export const fetchTournamentDetails = async (slug: string): Promise<ITournamentDetails> => {
   const result = await executeQuery(detailsQuery, { slug });
   const { name, id, mapsPlaceId, startAt, endAt, isOnline, images, venueAddress, events, city } = result.data.tournament;
-  if (isOnline) {
-    throw new Error("Online Tournaments are not supported.");
-  }
+
   const img = images.find((img) => img.type === "profile");
   const tournamentDetails: ITournamentDetails = {
     name,
     id,
+    isOnline,
     mapsPlaceId,
     address: venueAddress,
     city,
@@ -65,7 +64,7 @@ export const fetchTournamentDetails = async (slug: string): Promise<ITournamentD
 export type FETCH_ERROR = -1;
 
 export const fetchTournamentStatus = async (id: string): Promise<Array<{
-  id: number,
+  id: string,
   participants: number,
   registrationClosesAt: Date,
 }>> => {
@@ -99,7 +98,8 @@ const executeQuery = async (query, variables) => {
 
 interface ITournamentDetails {
   name: string;
-  id: number;
+  id: string;
+  isOnline: boolean;
   image: string;
   mapsPlaceId: string;
   address: string;
@@ -112,7 +112,7 @@ interface ITournamentDetails {
 interface IStatusResult {
   data: {
     tournament: {
-      id: number;
+      id: string;
       registrationClosesAt: Date;
       participants: {
         pageInfo: {

@@ -4,10 +4,13 @@ const formater = (date) => new Intl.DateTimeFormat('default', {
   weekday: 'short',
   year: 'numeric',
   month: 'long',
-  day: '2-digit'
+  day: '2-digit',
 }).format(date);
 
-export const info = ({city, startDate, cap, participants, location, locationID}) => {
+const timeFormatter = (date) => new Intl.DateTimeFormat('default', {
+  hour: 'numeric', minute: 'numeric',
+}).format(date);
+export const info = ({city, startDate, cap, participants, location, locationID, isOnline}) => {
   const capText = `${participants ? `${participants}/` : ''}${cap}`;
   const capStyle = participants ? `color: ${colorshift(participants, cap)}` : ''
 
@@ -16,11 +19,19 @@ export const info = ({city, startDate, cap, participants, location, locationID})
     <li tooltip="Date" tooltip-position="right" class="tournament-date">
       <span class="date-row icon-text"><i class="material-icons">calendar_today</i><span>${formater(startDate)}</span></span>
     </li>
+    ${isOnline ? renderTime(startDate) : ''}
     <li tooltip="Location" tooltip-position="right">
       <span class="location-row icon-text">
-        <i class="material-icons">room</i>
-        <a href=${createGoogleMapsURL(location, locationID)} target="_blank" alt="Location on Google Maps">
-          ${city}
+        <i class="material-icons">
+          ${isOnline ? 'language' : 'room'}
+        </i>
+        <a
+          class=${isOnline ? 'online' : ''}
+          href=${createURL(isOnline, location, locationID)}
+          target="_blank"
+          alt="Location on Google Maps"
+        >
+          ${isOnline ? 'Online' : city}
         </a>
       </span>
     </li>
@@ -30,6 +41,17 @@ export const info = ({city, startDate, cap, participants, location, locationID})
   </ul>
   `
 };
+
+const renderTime = (date) => {
+  return html`
+      <li class="tournament-time" tooltip="Time" tooltip-position="right">
+        <span class="time-row icon-text">
+          <i class="material-icons">schedule</i>
+          ${timeFormatter(date)}
+        </span>
+      </li>
+    `
+}
 
 const colorshift = (p, cap) => {
   const percentage = percentageOf(p, cap);
@@ -76,7 +98,11 @@ const toCSSColour = (c) => {
   return `rgb(${c.r},${c.g},${c.b})`;
 };
 
-const createGoogleMapsURL = (location, googleMapsID) => {
+const createURL = (isOnline, location, googleMapsID) => {
+  if (isOnline) {
+    const url = new URL('https://www.bol.com/nl/p/hori-nintendo-switch-lan-adapter/9200000073064061/?bltgh=r4itZodht932tkiAcVdCfw.1_11.13.ProductTitle');
+    return url.toString();
+  }
   const url = new URL(`https://www.google.com/maps/search/?api=1&query=${location}&query_place_id=${googleMapsID}`);
   return url.toString();
 };

@@ -13,6 +13,7 @@ export default class Config {
   public static readonly GUILD_ID: string = process.env.GUILD_ID;
   public static readonly POST_TOURNAMENT_ROLE_NAME: string = process.env.POST_TOURNAMENT_ROLE_NAME;
   public static readonly TOURNAMEN_AGENDA_ID: string = process.env.TOURNAMEN_AGENDA_ID;
+  public static readonly ONLINE_TOURNAMEN_AGENDA_ID: string = process.env.ONLINE_TOURNAMEN_AGENDA_ID;
   public static readonly SERVERURL: string = process.env.SERVERURL;
   public static readonly PUBLIC_INVITE_LINK: string = process.env.PUBLIC_INVITE_LINK;
   public static readonly BOT_CHANNEL_ID: string = process.env.BOT_CHANNEL_ID;
@@ -23,6 +24,7 @@ export default class Config {
   public static readonly TWITTER_ACCESS_TOKEN_SECRET: string = process.env.TWITTER_ACCESS_TOKEN_SECRET;
   public static readonly NEWS_CHANNEL_ID: string = process.env.NEWS_CHANNEL_ID;
   public static readonly COLOR_ROLE_ID: string = process.env.COLOR_ROLE_ID;
+  public static readonly TOURNAMENT_COLLECTION_NAME = process.env.TOURNAMENT_COLLECTION_NAME;
   private constructor() {
   }
 }

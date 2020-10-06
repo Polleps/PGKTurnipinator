@@ -1,7 +1,7 @@
 import { html } from 'lit-html';
 import { input } from './input.js';
 
-export const eventInput = ({ key, name = '', cap = '', isLast, onNew, onDelete, bind, disabled }) => {
+export const eventInput = ({ key, name = '', cap = '', isLast, onNew, onDelete, bind, disabled, capdisabled }) => {
   const state = {name, cap, key};
   const onClick = () => {
     if (isLast) {
@@ -30,7 +30,7 @@ export const eventInput = ({ key, name = '', cap = '', isLast, onNew, onDelete, 
       value: state.cap,
       classes: 'flex1',
       placeholder: 'Player Cap',
-      disabled,
+      disabled: disabled || capdisabled,
       bind: (val) => {
         state.cap = val;
         bind(state);

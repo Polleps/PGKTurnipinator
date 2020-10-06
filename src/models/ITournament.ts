@@ -11,13 +11,15 @@ export default interface ITournament {
   endDate: Date;
   type: "smashgg" | "other";
   smashggID?: string;
-  id?: number;
+  id?: string;
   prices?: IPrice[];
   pr?: boolean;
   lng?: number;
   lat?: number;
   participants?: number;
   registrationClosesAt?: Date;
+  isOnline: boolean;
+  messageID?: string;
 }
 
 interface IEvent {

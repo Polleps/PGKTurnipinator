@@ -1,6 +1,6 @@
 import * as Discord from "discord.js";
 import * as ytdl from "ytdl-core";
-import * as ytdlDiscord from "ytdl-core-discord";
+import ytdlDiscord from "ytdl-core-discord";
 import * as moment from "moment";
 
 export default class Session {

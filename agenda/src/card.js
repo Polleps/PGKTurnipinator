@@ -6,13 +6,13 @@ import { eventList } from './events';
 import { registerButton } from './register';
 
 export const card = (t) => html`
-<li class="card-list-item" ?prcount=${t.pr}>
+<li class="card-list-item" ?prcount=${t.pr} ?online=${t.isOnline}>
   <div class="card">
     ${pf(t.image)}
     ${title(t.title)}
     ${info(t)}
     ${eventList(t.events)}
-    ${registerButton(t.url, t.registrationClosesAt, t.startDate)}
+    ${registerButton(t.url, t.registrationClosesAt, t.startDate, t.isOnline)}
   </div>
 </li>
 `;

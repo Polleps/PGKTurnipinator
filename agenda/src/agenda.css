@@ -51,6 +51,10 @@ a {
   text-decoration: none;
 }
 
+.online {
+  color: rgb(38, 122, 231);
+}
+
 a:hover {
   text-decoration: none;
 }
@@ -221,6 +225,14 @@ header .install-btn i {
   color: var(--secondary-text-color);
   padding: 10px 3rem;
   border-radius: 10px;
+}
+
+.register-button {
+  color: white;
+}
+
+.register-button img {
+  padding: 5px;
 }
 
 .register-button:hover {
@@ -446,6 +458,7 @@ header .install-btn i {
     background-repeat: no-repeat;
     background-attachment: fixed;
     /* filter: blur(10px); */
+    filter: brightness(0.6);
   }
   .webp body::before {
     background-image: url("./assets/banner.webp");
@@ -508,7 +521,7 @@ header .install-btn i {
     grid-template-areas:
     "pf title title register"
     "pf info events register";
-    grid-template-rows: 1fr 2fr;
+    grid-template-rows: 1fr 2.3fr;
     grid-template-columns: 1.2fr 2.5fr 2.8fr 1fr;
     justify-items: start;
     max-height: 200px;

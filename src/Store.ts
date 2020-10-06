@@ -3,6 +3,7 @@ import * as serviceAccount from "../firebasekey.json";
 import { Firestore } from "@google-cloud/firestore";
 import { ICache } from "./stores/StoreCache.js";
 import { BasicSetCache, JoinableRoleCache, TournamentStoreCache } from "./stores/index.js";
+import Config from "./Config";
 
 class Store {
   private static instance: Store;
@@ -22,7 +23,7 @@ class Store {
       ["joinableroles", new JoinableRoleCache(this.db.collection("joinableroles"))],
       ["shucfixes", new BasicSetCache(this.db.collection("shucfixes"), "prefix")],
       ["botadmins", new BasicSetCache(this.db.collection("botadmins"), "id")],
-      ["tournaments", new TournamentStoreCache(this.db.collection("tournaments"))],
+      ["tournaments", new TournamentStoreCache(this.db.collection(Config.TOURNAMENT_COLLECTION_NAME))],
     ]);
   }
 
