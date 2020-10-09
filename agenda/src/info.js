@@ -10,8 +10,8 @@ const formater = (date) => new Intl.DateTimeFormat('default', {
 const timeFormatter = (date) => new Intl.DateTimeFormat('default', {
   hour: 'numeric', minute: 'numeric',
 }).format(date);
-export const info = ({city, startDate, cap, participants, location, locationID, isOnline}) => {
-  const capText = `${participants ? `${participants}/` : ''}${cap}`;
+export const info = ({city, startDate, cap, participants, location, locationID, isOnline, nocap}) => {
+  const capText = `${participants ? `${participants}/` : ''}${nocap ? '-' : cap}`;
   const capStyle = participants ? `color: ${colorshift(participants, cap)}` : ''
 
   return html`
