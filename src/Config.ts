@@ -12,8 +12,8 @@ export default class Config {
   public static readonly SMASHGG_API_KEY: string = process.env.SMASHGG_API_KEY;
   public static readonly GUILD_ID: string = process.env.GUILD_ID;
   public static readonly POST_TOURNAMENT_ROLE_NAME: string = process.env.POST_TOURNAMENT_ROLE_NAME;
-  public static readonly TOURNAMEN_AGENDA_ID: string = process.env.TOURNAMEN_AGENDA_ID;
-  public static readonly ONLINE_TOURNAMEN_AGENDA_ID: string = process.env.ONLINE_TOURNAMEN_AGENDA_ID;
+  public static readonly TOURNAMENT_AGENDA_ID: string = process.env.TOURNAMENT_AGENDA_ID;
+  public static readonly ONLINE_TOURNAMENT_AGENDA_ID: string = process.env.ONLINE_TOURNAMENT_AGENDA_ID;
   public static readonly SERVERURL: string = process.env.SERVERURL;
   public static readonly PUBLIC_INVITE_LINK: string = process.env.PUBLIC_INVITE_LINK;
   public static readonly BOT_CHANNEL_ID: string = process.env.BOT_CHANNEL_ID;

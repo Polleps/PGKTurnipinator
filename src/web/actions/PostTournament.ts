@@ -6,13 +6,13 @@ import ITournament from "../../models/ITournament";
 import { store } from "../../Store";
 import { Guild, GuildMember, RichEmbed, NewsChannel, Message } from "discord.js";
 import { URL } from "url";
-import moment from "moment";
+import moment from "moment-timezone";
 import { TournamentStoreCache } from "../../stores";
 
 const guildID = Config.GUILD_ID;
 const roleName = Config.POST_TOURNAMENT_ROLE_NAME;
-const tournamentagendaID = Config.TOURNAMEN_AGENDA_ID;
-const onlineTournamentAgendaID = Config.ONLINE_TOURNAMEN_AGENDA_ID;
+const tournamentagendaID = Config.TOURNAMENT_AGENDA_ID;
+const onlineTournamentAgendaID = Config.ONLINE_TOURNAMENT_AGENDA_ID;
 const cache = store.cache("tournaments") as TournamentStoreCache;
 /**
  * Perform 'posttournament' action.
@@ -165,7 +165,7 @@ const buildLink = (embed: RichEmbed, tD: ITournament): RichEmbed => {
 
 const buildTimeField = (embed: RichEmbed, tD: ITournament): RichEmbed => {
   const { startDate } = tD;
-  return embed.addField("⏰ Time", moment(startDate).format("HH:mm"));
+  return embed.addField("⏰ Time", moment(startDate).tz("Europe/Amsterdam").format("HH:mm"));
 }
 
 const buildDateField = (embed: RichEmbed, tD: ITournament): RichEmbed => {
