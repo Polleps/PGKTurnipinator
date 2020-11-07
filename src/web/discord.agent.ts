@@ -1,5 +1,5 @@
 import fetch from "node-fetch";
-const baseURL: string = "https://discordapp.com/api/v6";
+const baseURL: string = "https://discord.com/api/v6";
 
 export const fetchUserInfo = async (accessToken: string): Promise<IUserInfo> => {
   const headers = {

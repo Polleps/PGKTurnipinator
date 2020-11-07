@@ -3,7 +3,7 @@ import * as jwt from "jsonwebtoken";
 import Config from "../../Config";
 import * as fs from "fs";
 
-const APIURL = "https://discordapp.com/api/v6";
+const APIURL = "https://discord.com/api/v6";
 const TOKENURL = "/oauth2/token";
 const baseDir = process.cwd();
 let tokenKey: Buffer | undefined;
