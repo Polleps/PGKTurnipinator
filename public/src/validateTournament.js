@@ -1,5 +1,8 @@
 const newValidator = (errorMsg, condition) => {
   return () => new Promise((resolve, reject) => {
+    if (typeof condition === "boolean" && condition) {
+      resolve(true);
+    }
     if (condition()) {
       resolve(true);
     } else {
@@ -28,7 +31,6 @@ export const createValidators = state => {
     newValidator("A price needs a name", () => priceEmpty(state.prices)() || state.prices.every(p => p.name !== '')),
   ]
 }
-
 
 export const validate = (validators) => {
   return new Promise((resolve, reject) => {

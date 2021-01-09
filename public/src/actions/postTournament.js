@@ -280,14 +280,14 @@ export default class PostTournament extends Action {
       })
       .then((res) => {
         if (res.error) {
-          this.showMessage(res.message, true);
+          this.showMessage(`Server Error: ${res.message}`, true);
         }
         else {
           this.showMessage("Tournament Posted", false);
         }
       });
     } catch (err) {
-      this.showMessage(err, true);
+      this.showMessage(`Validation Error: ${err}`, true);
     }
 
   }

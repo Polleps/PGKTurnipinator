@@ -19,7 +19,7 @@ const buildEvent = (tournament: ITournament): string => {
     ["DTSTART", formatUTC(new Date(tournament.startDate))],
     ["DTEND", formatUTC(new Date(tournament.endDate))],
     ["DTSTAMP", formatUTC(new Date())],
-    ["LOCATION", tournament.location.replace(/,/g, "\\,")],
+    ...(tournament.location ? ["LOCATION", tournament.location.replace(/,/g, "\\,")] : []),
     ...(tournament.lat ? [["GEO", `${tournament.lat};${tournament.lng}`]] : []),
     ["DESCRIPTION", "https://smash.gg/tournament/" + tournament.url],
     ["IMAGE", `IMAGE;VALUE=URI;DISPLAY=BADGE;FMTTYPE=image/png:${tournament.image}`],
