@@ -58,10 +58,10 @@ export default class CommandController {
         message.delete().catch((err) => log(err));
       }
     } else {
-      message.reply(
-        `${commandTag} is not a command.\nType \`${
-        Config.CommandPrefix}help\` to see a list of available commands.`);
-      message.delete().catch((err) => log(err));
+      // message.reply(
+      //   `${commandTag} is not a command.\nType \`${
+      //   Config.CommandPrefix}help\` to see a list of available commands.`);
+      // message.delete().catch((err) => log(err));
     }
   }
 
