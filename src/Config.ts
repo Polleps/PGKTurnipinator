@@ -25,6 +25,8 @@ export default class Config {
   public static readonly NEWS_CHANNEL_ID: string = process.env.NEWS_CHANNEL_ID;
   public static readonly COLOR_ROLE_ID: string = process.env.COLOR_ROLE_ID;
   public static readonly TOURNAMENT_COLLECTION_NAME = process.env.TOURNAMENT_COLLECTION_NAME;
-  private constructor() {
-  }
+  public static readonly NEE_ROLE_IDS: string[] = JSON.parse(process.env.NEE_ROLE_IDS);
+  public static readonly MUTE_ROLES: Map<string, string> = new Map<string, string>(JSON.parse(process.env.MUTE_ROLES));
+  public static readonly SHUCFIX_GUILD_IDS: string[] = JSON.parse(process.env.SHUCFIX_GUILD_IDS);
+  private constructor() {}
 }

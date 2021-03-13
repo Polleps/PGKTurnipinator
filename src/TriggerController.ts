@@ -1,8 +1,15 @@
 import * as Discord from "discord.js";
-import { ITrigger, ShucfixTrigger, RadioTrigger, RainbowTrigger } from "./triggers";
+import {
+  ITrigger,
+  ShucfixTrigger,
+  RadioTrigger,
+  RainbowTrigger,
+  NeeTrigger,
+} from "./triggers";
 export default class TriggerController {
   private triggers: ITrigger[] = new Array<ITrigger>(
-    // new ShucfixTrigger(),
+    new NeeTrigger(),
+    new ShucfixTrigger(),
     new RadioTrigger(),
     // new RainbowTrigger(),
   );

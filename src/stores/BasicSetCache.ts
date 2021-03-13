@@ -39,6 +39,10 @@ export class BasicSetCache extends StoreCache<Set<string>, string, string> {
     return this.cache.has(index);
   }
 
+  public async seed(data: string[]) {
+    return Promise.all(data.map((item) => this.add(item)));
+  }
+
   protected async fillCache(): Promise<void> {
     const snapshot = await this.ref.get();
     snapshot.forEach((doc) => {

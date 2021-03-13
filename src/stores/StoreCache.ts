@@ -20,7 +20,7 @@ export default abstract class StoreCache<T, I, O> implements ICache {
     return;
   }
 
-  public abstract async add(x: O): Promise<void>;
+  public abstract add(x: O): Promise<void>;
 
   public abstract has(index: I): boolean;
 

@@ -1,20 +1,26 @@
-import { Message } from "discord.js";
+import { Message, RichEmbed } from "discord.js";
 import { Command } from "./Command";
 import { BasicSetCache } from "../stores";
 import { store } from "../Store";
 
 export class ShucfixCommand extends Command {
   private shucfixCache: BasicSetCache;
+  private shucfixBans: BasicSetCache;
 
   constructor() {
     super();
     this._tag = "shucfix";
-    this._usage = `\`${this._prefix}${this._tag} [add/remove] [text]\``;
-    this._description = "Add or remove shucfixes.";
+    this._usage = `\`${this._prefix}${this._tag} [text]\``;
+    this._description = "Add a shucfix.";
     this.shucfixCache = store.cache("shucfixes") as BasicSetCache;
+    this.shucfixBans = store.cache("shucfixbans") as BasicSetCache;
   }
 
   public run(message: Message, args?: string[]): boolean {
+    if (this.shucfixBans.has(message.author.id)) {
+      return true;
+    }
+
     // Command may not be used by ShuC himself.
     if (message.author.id === "164482857702522881") {
       message.reply(":P");
@@ -26,14 +32,13 @@ export class ShucfixCommand extends Command {
       return true;
     }
 
-    const order = args.shift();
-    const prefix = args.join(" ");
-
-    if (order.toLowerCase() === "add") {
-      this.addPrefix(message, prefix);
-    } else if (order.toLowerCase() === "remove") {
-      this.removePrefix(message, prefix);
+    const prefix = args.join(" ").trim();
+    if (prefix.length > 27) {
+      message.reply("This shucfix is to long. Shucfixes can't be longer than 27 characters.");
+      return false;
     }
+
+    this.addPrefix(message, prefix);
 
     return true;
   }
@@ -44,22 +49,20 @@ export class ShucfixCommand extends Command {
       return;
     }
     this.shucfixCache.add(prefix)
-      .then(() => msg.reply(`${prefix} is now a shucfix`));
-  }
-
-  private removePrefix(msg: Message, prefix: string): void {
-    if (!this.shucfixCache.has(prefix)) {
-      msg.reply(`${prefix} is not a shucfix`);
-      return;
-    }
-    this.shucfixCache.delete(prefix)
-      .then(() => msg.reply(`removed ${prefix} from shucfixes`));
+      .then(() => {
+        const embed = new RichEmbed();
+        embed
+          .setAuthor(msg.member.displayName, msg.author.avatarURL)
+          .setDescription(`Added ${prefix} to the list of shucfixes`)
+          .setThumbnail("https://cdn.discordapp.com/emojis/362934801935630339.png?v=1");
+        msg.channel.sendEmbed(embed);
+      });
   }
 
   private verify(args?: string[]): boolean {
     if (!args) { return false; }
-    if (args.length < 2) { return false; }
-    if (args[0].toLowerCase() !== "add" && args[0].toLowerCase() !== "remove") { return false; }
+    if (args.length === 0) { return false; }
+    // if (args.join(" ").trim().length > 27) { return false; }
     return true;
   }
 }
