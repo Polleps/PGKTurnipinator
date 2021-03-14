@@ -3,6 +3,12 @@ import { Command } from "./Command";
 import { BasicSetCache } from "../stores";
 import { store } from "../Store";
 
+const shucImages = [
+  "https://cdn.discordapp.com/emojis/362934801935630339.png?v=1",
+  "https://cdn.discordapp.com/emojis/587207975954022410.png?v=1",
+  "https://cdn.discordapp.com/emojis/818897146412793887.png?v=1",
+];
+
 export class ShucfixCommand extends Command {
   private shucfixCache: BasicSetCache;
   private shucfixBans: BasicSetCache;
@@ -53,8 +59,8 @@ export class ShucfixCommand extends Command {
         const embed = new RichEmbed();
         embed
           .setAuthor(msg.member.displayName, msg.author.avatarURL)
-          .setDescription(`Added ${prefix} to the list of shucfixes`)
-          .setThumbnail("https://cdn.discordapp.com/emojis/362934801935630339.png?v=1")
+          .setDescription(`Added **${prefix}** to the list of shucfixes`)
+          .setThumbnail(shucImages[Math.floor(Math.random() * shucImages.length)])
           .setFooter("!shucfix [text]");
         msg.channel.sendEmbed(embed);
       });
