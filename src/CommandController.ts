@@ -36,7 +36,7 @@ export default class CommandController {
 
     const commandMessage = message.content.substring(1);
     const messageArr = commandMessage.split(" ");
-    const commandTag = messageArr.shift();
+    const commandTag = messageArr.shift().toLowerCase();
 
     if (commandTag.toLowerCase() === "help") {
       message.reply(this._help.getHelp(message.author, messageArr));

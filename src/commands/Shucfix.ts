@@ -54,7 +54,8 @@ export class ShucfixCommand extends Command {
         embed
           .setAuthor(msg.member.displayName, msg.author.avatarURL)
           .setDescription(`Added ${prefix} to the list of shucfixes`)
-          .setThumbnail("https://cdn.discordapp.com/emojis/362934801935630339.png?v=1");
+          .setThumbnail("https://cdn.discordapp.com/emojis/362934801935630339.png?v=1")
+          .setFooter("!shucfix [text]");
         msg.channel.sendEmbed(embed);
       });
   }
