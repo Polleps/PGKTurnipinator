@@ -68,17 +68,24 @@ export const fetchTournamentStatus = async (id: string): Promise<Array<{
   participants: number,
   registrationClosesAt: Date,
 }>> => {
-  const result = (await executeQuery(statusQuery, { id })) as IStatusResult;
-  console.log(result);
-  if (!result.data) {
+  try {
+    const result = (await executeQuery(statusQuery, { id })) as IStatusResult;
+    console.log(result);
+    if (!result.data || !result.data.tournament) {
+      return [];
+    }
+  
+    return [{
+      id: result.data.tournament.id,
+      participants: result.data.tournament.participants.pageInfo.total,
+      registrationClosesAt: result.data.tournament.registrationClosesAt,
+    }];
+  }
+  catch (e) {
+    console.error(e);
+
     return [];
   }
-
-  return [{
-    id: result.data.tournament.id,
-    participants: result.data.tournament.participants.pageInfo.total,
-    registrationClosesAt: result.data.tournament.registrationClosesAt,
-  }];
 };
 
 const executeQuery = async (query, variables) => {
