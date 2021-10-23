@@ -12,9 +12,10 @@ export class FixbotCommand extends Command {
   }
 
   public run(message: Discord.Message, args?: string[]): boolean {
-    message.reply("Restarting... please wait 10 seconds.");
-    message.delete();
-    process.exit();
+    message.reply("Restarting... please wait 10 seconds.").then(() => {
+      message.delete();
+      process.exit();
+    });
     return true;
   }
 }

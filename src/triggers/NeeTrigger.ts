@@ -13,10 +13,10 @@ export class NeeTrigger implements ITrigger {
     const { NEE_ROLE_IDS } = Config;
     const { member, author, guild } = msg;
 
-    if (NEE_ROLE_IDS.some((roleId) => member.roles.has(roleId))) {
+    if (NEE_ROLE_IDS.some((roleId) => member.roles.cache.has(roleId))) {
       if (!this.neeUsers.has([ guild.id, author.id ])) {
         this.handleMuteRole(guild, member);
-        msg.reply("Nee");
+        msg.channel.send(`${msg.author.toString()} Nee!`);
       }
       // tslint:disable-next-line:no-console
       msg.delete().catch(console.error);
@@ -30,10 +30,10 @@ export class NeeTrigger implements ITrigger {
     if (MUTE_ROLES.has(guild.id)) {
       const muteRole = MUTE_ROLES.get(guild.id);
 
-      await member.addRole(muteRole);
+      await member.roles.add(muteRole);
 
       const timeoutID = setTimeout(() => {
-        member.removeRole(muteRole);
+        member.roles.remove(muteRole);
         this.neeUsers.delete([ guild.id, member.id ]);
       }, 10000);
 

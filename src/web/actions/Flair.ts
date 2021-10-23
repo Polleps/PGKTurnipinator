@@ -21,10 +21,10 @@ export const flair: Performer = async (userInfo: IUserInfo, action: IAction) => 
   }
 
   const client = sClient.client;
-  const guild = client.guilds.get(PGK);
+  const guild = await client.guilds.fetch(PGK);
   // console.log("Guild", guild);
-  const user = guild.members.get(userInfo.id);
-  const role = guild.roles.find((x) => x.name === roleName);
+  const user = await guild.members.fetch(userInfo.id);
+  const role = guild.roles.cache.find((x) => x.name === roleName);
 
   if (!user || !role) {
     console.log("User", user.displayName);
@@ -40,16 +40,16 @@ export const flair: Performer = async (userInfo: IUserInfo, action: IAction) => 
 };
 
 const addRole = (user: GuildMember, role: Role): string => {
-  if (!user.roles.has(role.id)) {
-    user.addRole(role);
+  if (!user.roles.cache.has(role.id)) {
+    user.roles.add(role);
     return `Added role: ${role.name}`;
   }
   return "You already have this role.";
 };
 
 const removeRole = (user: GuildMember, role: Role): string => {
-  if (user.roles.has(role.id)) {
-    user.removeRole(role);
+  if (user.roles.cache.has(role.id)) {
+    user.roles.remove(role);
     return `Removed role: ${role.name}`;
   }
   return "You don't have this role.";

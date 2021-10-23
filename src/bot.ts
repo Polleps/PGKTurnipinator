@@ -1,4 +1,4 @@
-import * as Discord from "discord.js";
+import { Client, Intents, Message } from "discord.js";
 import "./env";
 import Config from "./Config";
 import { sClient } from "./Context";
@@ -9,6 +9,13 @@ import { store } from "./Store";
 import { NewsStreamer } from "./NewsStream";
 
 const log = createLogger("Main");
+const intents = [
+  Intents.FLAGS.GUILDS,
+  Intents.FLAGS.GUILD_EMOJIS_AND_STICKERS,
+  Intents.FLAGS.GUILD_MEMBERS,
+  Intents.FLAGS.GUILD_MESSAGES,
+  Intents.FLAGS.GUILD_MESSAGE_REACTIONS,
+]
 class Main {
 
   private args: string[];
@@ -17,7 +24,7 @@ class Main {
   }
 
   public async main() {
-    const client = new Discord.Client();
+    const client = new Client({ intents });
     sClient.client = client;
     await store.init();
     log("Caches Loaded.");
@@ -28,11 +35,11 @@ class Main {
       await server.start(+process.env.PORT || Config.ServerPort);
     }
 
-    client.on("ready", (): void => {
+    client.once("ready", (): void => {
       log("Bot is ready");
     });
 
-    client.on("message", (message: Discord.Message): void => {
+    client.on("messageCreate", (message: Message): void => {
       messageHandler.processMessage(message);
     });
 
@@ -47,7 +54,7 @@ class Main {
     });
 
     try {
-      await client.login(Config.TestToken);
+      await client.login(Config.DiscordApplicationToken);
     } catch (e) {
       console.error(e);
     }

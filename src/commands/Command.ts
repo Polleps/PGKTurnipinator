@@ -39,6 +39,10 @@ export class Command {
   }
 
   protected sendUsage(msg: Discord.Message) {
-    msg.reply(this._usage).then((m: Discord.Message) => m.delete(60000));
+    msg.reply(this._usage).then((m: Discord.Message) => {
+      setTimeout(() => {
+        m.delete()
+      }, 60000);
+    });
   }
 }

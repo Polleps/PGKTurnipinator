@@ -1,4 +1,4 @@
-import { Message, RichEmbed } from "discord.js";
+import { Message, MessageEmbed } from "discord.js";
 import { Command } from "./Command";
 import { BasicSetCache } from "../stores";
 import { store } from "../Store";
@@ -56,13 +56,15 @@ export class ShucfixCommand extends Command {
     }
     this.shucfixCache.add(prefix)
       .then(() => {
-        const embed = new RichEmbed();
+        const embed = new MessageEmbed();
+
         embed
-          .setAuthor(msg.member.displayName, msg.author.avatarURL)
+          .setAuthor(msg.member.displayName, msg.author.avatarURL())
           .setDescription(`Added **${prefix}** to the list of shucfixes`)
           .setThumbnail(shucImages[Math.floor(Math.random() * shucImages.length)])
           .setFooter("!shucfix [text]");
-        msg.channel.sendEmbed(embed);
+
+        msg.channel.send({ embeds: [embed] });
       });
   }
 

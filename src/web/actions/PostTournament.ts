@@ -4,7 +4,7 @@ import Config from "../../Config";
 import { sClient } from "../../Context";
 import ITournament from "../../models/ITournament";
 import { store } from "../../Store";
-import { Guild, GuildMember, RichEmbed, NewsChannel, Message } from "discord.js";
+import { Guild, GuildMember, MessageEmbed, NewsChannel, Message } from "discord.js";
 import { URL } from "url";
 import moment from "moment-timezone";
 import { TournamentStoreCache } from "../../stores";
@@ -22,9 +22,11 @@ const cache = store.cache("tournaments") as TournamentStoreCache;
  */
 export const postTournament: Performer = async (userInfo: IUserInfo, action: IAction): Promise<string> => {
   const client = sClient.client;
-  const guild = client.guilds.get(guildID);
-  const user = guild.members.get(userInfo.id);
-  const role = guild.roles.find((x) => x.name === roleName);
+  const guild = await client.guilds.fetch(guildID);
+  const user = await guild.members.fetch(userInfo.id);
+
+  await guild.roles.fetch();
+  const role = guild.roles.cache.find((x) => x.name === roleName);
 
   if (!action.args || action.args.length < 1) {
     throw new Error("Invalid Action.");
@@ -34,7 +36,7 @@ export const postTournament: Performer = async (userInfo: IUserInfo, action: IAc
     throw new Error("You're not in the Discord.");
   }
 
-  if (!user.roles.has(role.id)) {
+  if (!user.roles.cache.has(role.id)) {
     throw new Error("You are not allowed to post tournaments.");
   }
 
@@ -67,17 +69,17 @@ export const postTournament: Performer = async (userInfo: IUserInfo, action: IAc
 const postInChannel = async (guild: Guild, user: GuildMember, tournamentDetails: ITournament): Promise<string> => {
   const { isOnline } = tournamentDetails;
 
-  const channel = guild.channels.get(isOnline ? onlineTournamentAgendaID : tournamentagendaID) as NewsChannel;
+  const channel = await guild.channels.fetch(isOnline ? onlineTournamentAgendaID : tournamentagendaID) as NewsChannel;
   const embed = buildEmbed(user, tournamentDetails);
 
   // Update message if it already exists.
   if (tournamentDetails.messageID) {
-    const prevMessage = await channel.fetchMessage(tournamentDetails.messageID);
-    prevMessage.edit(embed);
+    const prevMessage = await channel.messages.fetch(tournamentDetails.messageID);
+    prevMessage.edit({ embeds: [embed]});
     return tournamentDetails.messageID;
   }
 
-  const message = await channel.send(embed);
+  const message = await channel.send({ embeds: [embed]});
   return (message as Message).id;
 };
 
@@ -86,13 +88,13 @@ const postInChannel = async (guild: Guild, user: GuildMember, tournamentDetails:
  * @param user User that posted the tournament
  * @param tournamentDetails tournament details used to build the embed.
  */
-const buildEmbed = (user: GuildMember, tournamentDetails: ITournament): RichEmbed => {
+const buildEmbed = (user: GuildMember, tournamentDetails: ITournament): MessageEmbed => {
   const localColor = 0xc01f1f;
   const onlineColor = 0x0b92e0;
-  let embed = new RichEmbed();
+  let embed = new MessageEmbed();
   embed.setColor(tournamentDetails.isOnline ? onlineColor : localColor);
   embed.setThumbnail(tournamentDetails.image);
-  embed.setFooter(`${user.user.username}#${user.user.discriminator}`, user.user.avatarURL);
+  embed.setFooter(`${user.user.username}#${user.user.discriminator}`, user.user.avatarURL());
 
   const title = tournamentDetails.isOnline ? `🌐 ${tournamentDetails.title}` : tournamentDetails.title;
   embed.addField(title, "\u200B");
@@ -106,18 +108,17 @@ const buildEmbed = (user: GuildMember, tournamentDetails: ITournament): RichEmbe
   }
 
   embed = buildEvents(embed, tournamentDetails);
-  // embed = buildPrices(embed, tournamentDetails);
   embed = buildDescription(embed, tournamentDetails);
   embed = buildLink(embed, tournamentDetails);
   return embed;
 };
 
-const buildLocation = (embed: RichEmbed, tD: ITournament): RichEmbed => {
+const buildLocation = (embed: MessageEmbed, tD: ITournament): MessageEmbed => {
   const gUrl = createGoogleMapsURL(tD.location, tD.locationID);
   return embed.addField("🗺 Location", `[${tD.location}](${gUrl})`);
 };
 
-const buildEvents = (embed: RichEmbed, tD: ITournament): RichEmbed => {
+const buildEvents = (embed: MessageEmbed, tD: ITournament): MessageEmbed => {
   const events = tD.events.filter((x) => !!x.name);
 
   if (events.length === 0) {
@@ -134,22 +135,7 @@ const buildEvents = (embed: RichEmbed, tD: ITournament): RichEmbed => {
   return embed;
 };
 
-const buildPrices = (embed: RichEmbed, tD: ITournament): RichEmbed => {
-  if (!tD.prices) {
-    return embed;
-  }
-  const prices = tD.prices.filter((x) => !!x.name);
-  if (prices.length === 0) {
-    return embed;
-  }
-  const names = prices.map((x) => `- ${x.name}`).join("\n");
-  const amounts = prices.map((x) => `€${(+x.amount).toFixed(2)}`).join("\n");
-  embed.addField("💰 Price", names, true);
-  embed.addField("Amount", amounts, true);
-  return embed;
-};
-
-const buildDescription = (embed: RichEmbed, tD: ITournament): RichEmbed => {
+const buildDescription = (embed: MessageEmbed, tD: ITournament): MessageEmbed => {
   if (!tD.description || tD.description.trim().length === 0) {
     return embed;
   }
@@ -159,16 +145,16 @@ const buildDescription = (embed: RichEmbed, tD: ITournament): RichEmbed => {
   return embed.addField("Additional Info", tD.description);
 };
 
-const buildLink = (embed: RichEmbed, tD: ITournament): RichEmbed => {
+const buildLink = (embed: MessageEmbed, tD: ITournament): MessageEmbed => {
   return embed.addField("More Info/Register", `[Smash.gg](${"https://smash.gg/tournament/" + tD.url})`);
 };
 
-const buildTimeField = (embed: RichEmbed, tD: ITournament): RichEmbed => {
+const buildTimeField = (embed: MessageEmbed, tD: ITournament): MessageEmbed => {
   const { startDate } = tD;
   return embed.addField("⏰ Time", moment(startDate).tz("Europe/Amsterdam").format("HH:mm"));
 }
 
-const buildDateField = (embed: RichEmbed, tD: ITournament): RichEmbed => {
+const buildDateField = (embed: MessageEmbed, tD: ITournament): MessageEmbed => {
   const startDate = new Date(tD.startDate);
   const endDate = new Date(tD.endDate);
   const spansSingleDay = compareDay(startDate, endDate);

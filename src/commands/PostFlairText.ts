@@ -1,4 +1,4 @@
-import { RichEmbed, Message } from "discord.js";
+import { Message, MessageEmbed } from "discord.js";
 import { Command } from "./Command";
 import Config from "../Config";
 import { IJoinableRole, JoinableRoleCache } from "../stores";
@@ -21,16 +21,16 @@ export class PostFlairTextCommand extends Command {
     const provinceRoles = roles.filter((r) => r.description === "provincie");
     const normalRoles = roles.filter((r) => r.description !== "provincie");
     normalRoles.forEach((role) => {
-      message.channel.send(formattedMessage(role));
+      message.channel.send({ embeds: [formattedMessage(role)] });
     });
-    message.channel.send(formatProvinceMessage(provinceRoles));
+    message.channel.send({ embeds: [formatProvinceMessage(provinceRoles)] });
     return true;
   }
 
 }
 
-const formattedMessage = (role: IJoinableRole): RichEmbed => {
-  const embed = new RichEmbed();
+const formattedMessage = (role: IJoinableRole): MessageEmbed => {
+  const embed = new MessageEmbed();
   const formatControls = controlLinkBuilder(embed, { useRoleTitle: false, inline: false });
   embed.title = role.name;
   embed.setColor(11931720);
@@ -43,8 +43,8 @@ const formattedMessage = (role: IJoinableRole): RichEmbed => {
   return embed;
 }
 
-const formatProvinceMessage = (roles: IJoinableRole[]): RichEmbed => {
-  const embed = new RichEmbed();
+const formatProvinceMessage = (roles: IJoinableRole[]): MessageEmbed => {
+  const embed = new MessageEmbed();
   const formatControls = controlLinkBuilder(embed, { useRoleTitle: true, inline: true });
   embed.title = "Province Roles";
   embed.setColor(11931720);
@@ -53,7 +53,7 @@ const formatProvinceMessage = (roles: IJoinableRole[]): RichEmbed => {
   return embed;
 }
 
-const controlLinkBuilder = (embed: RichEmbed, options: { useRoleTitle: boolean, inline: boolean }) => {
+const controlLinkBuilder = (embed: MessageEmbed, options: { useRoleTitle: boolean, inline: boolean }) => {
   return (role: IJoinableRole) => {
     embed.addField(
       options.useRoleTitle ? role.name : "\u200B",
