@@ -2,8 +2,11 @@ import * as admin from "firebase-admin";
 import * as serviceAccount from "../firebasekey.json";
 import { Firestore } from "@google-cloud/firestore";
 import { ICache } from "./stores/StoreCache.js";
-import { BasicSetCache, JoinableRoleCache, TournamentStoreCache } from "./stores/index.js";
+import { BasicSetCache, TournamentStoreCache } from "./stores/index.js";
 import Config from "./Config";
+import { BasicMapCache } from "./stores/BasicMapCache";
+import { IJoinableRole } from "./models/IJoinableRole";
+import { IRoleCategory } from "./models/IRoleCategory";
 
 class Store {
   private static instance: Store;
@@ -20,7 +23,8 @@ class Store {
     this.db = admin.firestore();
 
     this.caches = new Map<string, ICache>([
-      ["joinableroles", new JoinableRoleCache(this.db.collection("joinableroles"))],
+      ["joinableroles", new BasicMapCache<IJoinableRole>(this.db.collection("joinableroles"), 'name')],
+      ["role_categories", new BasicMapCache<IRoleCategory>(this.db.collection("role_categories"), 'name')],
       ["shucfixes", new BasicSetCache(this.db.collection("shucfixes"), "prefix")],
       ["shucfixbans", new BasicSetCache(this.db.collection("shucfixbans"), "id")],
       ["botadmins", new BasicSetCache(this.db.collection("botadmins"), "id")],

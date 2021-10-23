@@ -1,11 +1,15 @@
-import { Message, MessageEmbed } from "discord.js";
+import { Message, MessageActionRow, MessageButton, MessageEmbed, MessageSelectMenu } from "discord.js";
 import { Command } from "./Command";
 import Config from "../Config";
-import { IJoinableRole, JoinableRoleCache } from "../stores";
 import { store } from "../Store";
+import { BasicMapCache } from "../stores/BasicMapCache";
+import { IJoinableRole } from "../models/IJoinableRole";
+import { IRoleCategory } from "../models/IRoleCategory";
 
 export class PostFlairTextCommand extends Command {
-  private roles: JoinableRoleCache;
+  private roles: BasicMapCache<IJoinableRole>;
+  private categories: BasicMapCache<IRoleCategory>;
+
   constructor() {
     super();
     this._tag = "postflairtext";
@@ -13,55 +17,55 @@ export class PostFlairTextCommand extends Command {
     this._description = "It's just ping";
     this._isPublic = false;
     this._isAdminCommand = true;
-    this.roles = store.cache("joinableroles") as JoinableRoleCache;
+    this.roles = store.cache("joinableroles") as BasicMapCache<IJoinableRole>;
+    this.categories = store.cache("role_categories") as BasicMapCache<IRoleCategory>;
   }
 
   public run(message: Message, args?: string[]): boolean {
-    const roles = Array.from(this.roles.data.values());
-    const provinceRoles = roles.filter((r) => r.description === "provincie");
-    const normalRoles = roles.filter((r) => r.description !== "provincie");
-    normalRoles.forEach((role) => {
-      message.channel.send({ embeds: [formattedMessage(role)] });
-    });
-    message.channel.send({ embeds: [formatProvinceMessage(provinceRoles)] });
+    this.runAsync(message)
+
     return true;
   }
 
-}
+  private async runAsync(message: Message) {
+    const roles = Array.from(this.roles.data.values());
 
-const formattedMessage = (role: IJoinableRole): MessageEmbed => {
-  const embed = new MessageEmbed();
-  const formatControls = controlLinkBuilder(embed, { useRoleTitle: false, inline: false });
-  embed.title = role.name;
-  embed.setColor(11931720);
-  if (role.description) {
-    embed.setDescription(role.description);
+    await message.channel.send('In dit kanaal kan je rollen toevoegen en verwijderen.\nKlik op een dropdown om rollen te kiezen.').then;
+
+    for (const category of this.categories.data.values()) {
+      const filteredRoles = roles.filter((role) => role.category === category.name);
+
+      const [embed, components] = this.buildCategoryEmbed(category, filteredRoles);
+
+      message.channel.send({ content: '᲼᲼᲼᲼᲼᲼', embeds: [embed], components });
+    }
   }
 
-  formatControls(role);
+  private buildCategoryEmbed(category: IRoleCategory, roles: IJoinableRole[]): [MessageEmbed, MessageActionRow[]] {
+    const embed = new MessageEmbed()
+      .setColor('#E5C07B')
+      .setTitle(`${category.name} rollen`)
+      .setDescription(category.description ?? '');
 
-  return embed;
+    const options = roles.map((role) => ({
+      label: role.name,
+      value: role.ID,
+      ...(role.description ? {
+        description: role.description.slice(0, 100),
+      } : {})
+    }))
+
+    const categoryId = category.name.toLowerCase().replace(/\-/g, '');
+
+    const select = new MessageSelectMenu()
+      .setCustomId(`roles-set-${categoryId}`)
+      .setPlaceholder("Kies één of meerdere rollen")
+      .setMinValues(1)
+      .setMaxValues(roles.length)
+      .addOptions(...options);
+
+    const rows = [ new MessageActionRow().addComponents(select) ];
+
+    return [embed, rows];
+  }
 }
-
-const formatProvinceMessage = (roles: IJoinableRole[]): MessageEmbed => {
-  const embed = new MessageEmbed();
-  const formatControls = controlLinkBuilder(embed, { useRoleTitle: true, inline: true });
-  embed.title = "Province Roles";
-  embed.setColor(11931720);
-  embed.setDescription("Give your self a province role so you can be notified when something smash related is happening in your area.");
-  roles.forEach((role) => formatControls(role));
-  return embed;
-}
-
-const controlLinkBuilder = (embed: MessageEmbed, options: { useRoleTitle: boolean, inline: boolean }) => {
-  return (role: IJoinableRole) => {
-    embed.addField(
-      options.useRoleTitle ? role.name : "\u200B",
-      `[Add](${formatActionURL(role, true)}) | [Remove](${formatActionURL(role, false)})`,
-      options.inline,
-    );
-  };
-};
-
-const formatActionURL = (role: IJoinableRole, join: boolean): URL =>
-  new URL(`${Config.SERVERURL}/bot?action=flair&perform=${join ? "add" : "remove"}&role=${role.name}`);
