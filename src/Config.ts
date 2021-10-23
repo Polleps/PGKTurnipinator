@@ -1,6 +1,6 @@
 export default class Config {
   public static readonly CommandPrefix: string = process.env.COMMAND_PREFIX;
-  public static readonly TestToken: string = process.env.TOKEN;
+  public static readonly DiscordApplicationToken: string = process.env.TOKEN;
   public static readonly BotAdmins: string[] = JSON.parse(process.env.BOT_ADMINS);
   public static readonly EnableWebServer: boolean = (process.env.ENABLE_WEBSERVER === "true");
   public static readonly ServerPort: number = +process.env.SERVERPORT;

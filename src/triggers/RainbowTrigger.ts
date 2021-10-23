@@ -9,20 +9,15 @@ export class RainbowTrigger implements ITrigger {
     if (message.guild.id !== Config.GUILD_ID) {
       return false;
     }
-    const role = message.guild.roles.get(Config.COLOR_ROLE_ID);
-    role.setColor(randomColor());
+
+    const role = message.guild.roles.cache.get(Config.COLOR_ROLE_ID);
+    if (role) {
+      role.setColor('RANDOM');
+      return false;
+    }
+
+    message.guild.roles.fetch(Config.COLOR_ROLE_ID).then((fetchedRole) => {
+      fetchedRole.setColor('RANDOM');
+    });
   }
 }
-
-const randomColor = () => {
-  const randomNum = () => Math.round(Math.random() * 255);
-  return `#${rgbToHex(randomNum())}${rgbToHex(randomNum())}${rgbToHex(randomNum())}`;
-};
-
-const rgbToHex = (rgb) => {
-  let hex = Number(rgb).toString(16);
-  if (hex.length < 2) {
-       hex = "0" + hex;
-  }
-  return hex;
-};

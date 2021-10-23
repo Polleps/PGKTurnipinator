@@ -39,8 +39,9 @@ export default class CommandController {
     const commandTag = messageArr.shift().toLowerCase();
 
     if (commandTag.toLowerCase() === "help") {
-      message.reply(this._help.getHelp(message.author, messageArr));
-      message.delete();
+      message.reply(this._help.getHelp(message.author, messageArr)).then(() => {
+        message.delete();
+      });
       return;
     }
 
@@ -48,14 +49,18 @@ export default class CommandController {
       const command = this._commands.get(commandTag);
       // Admin commands should only be able to be used by botadmins.
       if (command.isAdminCommand && !this.isBotAdmin(message.author)) {
-        message.reply("This command can only be used by the staff.");
-        message.delete().catch((err) => log(err));
+        message.reply("This command can only be used by the staff.")
+          .then(() => {
+            message.delete().catch((err) => log(err));
+          });
         return;
       }
       // If excecuting the command returns true the users message should be removed.
       const shouldRemoveMessage = command.run(message, messageArr);
       if (shouldRemoveMessage) {
-        message.delete().catch((err) => log(err));
+        setTimeout(() => {
+          message.delete().catch((err) => log(err));
+        }, 1000);
       }
     } else {
       // message.reply(

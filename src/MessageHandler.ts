@@ -1,4 +1,4 @@
-import * as Discord from "discord.js";
+import { Message } from "discord.js";
 import CommandController from "./CommandController";
 import { sClient } from "./Context";
 import TriggerController from "./TriggerController";
@@ -11,7 +11,7 @@ export default class MessageHandler {
     this.commandController = new CommandController();
   }
 
-  public processMessage(message: Discord.Message): void {
+  public processMessage(message: Message): void {
     // Message should not be processed if it was posted by the bot.
     if (message.author.id === sClient.client.user.id) {
       return;
