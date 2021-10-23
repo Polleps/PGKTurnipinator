@@ -3,7 +3,7 @@
     "outDir": "./built",
     "allowJs": true,
     "target": "es6",
-    "module": "commonjs",
+    "module": "CommonJS",
     "moduleResolution": "node",
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
