@@ -47,9 +47,9 @@ export class NewsStreamer {
     this.twitterStream.on("tweet", (tweet) => this.onTweet(tweet as Tweet));
   }
 
-  private onTweet(tweet: Tweet) {
+  private async onTweet(tweet: Tweet) {
     if (this.shouldPost(tweet)) {
-      const channel = this.client.channels.get(Config.NEWS_CHANNEL_ID) as TextChannel;
+      const channel = await this.client.channels.fetch(Config.NEWS_CHANNEL_ID) as TextChannel;
       channel.send(createLink(tweet)).catch((err) => console.error(err));
     }
   }
