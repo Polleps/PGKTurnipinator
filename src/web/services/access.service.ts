@@ -15,6 +15,8 @@ export const userCanFetchTournament = async (userInfo: IUserInfo) => {
     return false;
   }
 
+  await user.roles.fetch();
+
   if (!user.roles.cache.has(role.id)) {
     return false;
   }
