@@ -64,7 +64,7 @@ export class ActionRouter {
       if (userCanFetchTournament(res.locals.userInfo as IUserInfo)) {
         next();
       } else {
-        res.status(400).send({error: true, message: "User is not permitted"});
+        res.status(400).send({error: true, message: "Invalid User. Please logout and try again."});
       }
     });
 
