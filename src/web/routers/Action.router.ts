@@ -56,6 +56,7 @@ export class ActionRouter {
         const message = await this.actionService.run(userInfo, action);
         res.status(200).json({ message });
       } catch (e) {
+        console.error(e);
         res.status(200).json({error: true, message: e.message});
       }
     });

@@ -11,6 +11,8 @@ export default interface ITournament {
   endDate: Date;
   type: "smashgg" | "other";
   smashggID?: string;
+  streamURL?: string;
+  streamStartDate: Date;
   id?: string;
   prices?: IPrice[];
   pr?: boolean;
@@ -20,6 +22,7 @@ export default interface ITournament {
   registrationClosesAt?: Date;
   isOnline: boolean;
   messageID?: string;
+  guildEventID?: string;
 }
 
 interface IEvent {
