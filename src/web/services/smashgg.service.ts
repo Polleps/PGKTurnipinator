@@ -2,6 +2,7 @@ import Config from "../../Config";
 import fetch, { FetchError } from "node-fetch";
 
 const baseURL = "https://api.smash.gg/gql/alpha";
+const TWITCH_BASE_URL = "https://twitch.tv/";
 
 const detailsQuery = `
 query TournamentQuery($slug: String) {
@@ -13,6 +14,10 @@ query TournamentQuery($slug: String) {
       url
     }
     mapsPlaceId
+    streams {
+      streamName
+      streamSource
+    }
     venueAddress
     city
     isOnline
@@ -43,7 +48,19 @@ query TournamentQuery($id: ID) {
 
 export const fetchTournamentDetails = async (slug: string): Promise<ITournamentDetails> => {
   const result = await executeQuery(detailsQuery, { slug });
-  const { name, id, mapsPlaceId, startAt, endAt, isOnline, images, venueAddress, events, city } = result.data.tournament;
+  const { 
+    name,
+    id,
+    mapsPlaceId,
+    startAt,
+    endAt,
+    isOnline,
+    images,
+    venueAddress,
+    events,
+    city,
+    streams,
+  } = result.data.tournament;
 
   const img = images.find((img) => img.type === "profile");
   const tournamentDetails: ITournamentDetails = {
@@ -57,7 +74,9 @@ export const fetchTournamentDetails = async (slug: string): Promise<ITournamentD
     endAt,
     events: events.map((evt) => evt.name),
     image: img ? img.url : "",
+    streams,
   };
+
   return tournamentDetails;
 };
 
@@ -114,6 +133,10 @@ interface ITournamentDetails {
   startAt: Date;
   endAt: Date;
   events: string[];
+  streams: Array<{
+    streamName: string,
+    streamSource: string,
+  }> | undefined;
 }
 
 interface IStatusResult {
