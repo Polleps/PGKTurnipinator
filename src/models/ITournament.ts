@@ -12,7 +12,7 @@ export default interface ITournament {
   type: "smashgg" | "other";
   smashggID?: string;
   streamURL?: string;
-  streamStartDate: Date;
+  streamStartDate?: Date;
   id?: string;
   prices?: IPrice[];
   pr?: boolean;

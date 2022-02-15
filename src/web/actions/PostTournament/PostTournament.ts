@@ -56,10 +56,14 @@ export const postTournament: Performer = async (userInfo: IUserInfo, action: IAc
 
     if (action.args[ 1 ] !== "saveonly") {
       const messageID = await postEmbed(guild, user, parsedTournament);
-      const guildEventID = await scheduleEvent(guild, parsedTournament);
-
       parsedTournament.messageID = messageID;
-      parsedTournament.guildEventID = guildEventID;
+
+      const tournamentHasStream = !!parsedTournament.streamURL?.trim() && !!parsedTournament.streamStartDate;
+
+      if (tournamentHasStream) {
+        const guildEventID = await scheduleEvent(guild, parsedTournament);
+        parsedTournament.guildEventID = guildEventID;
+      }
     }
 
     storeTournament(parsedTournament);
