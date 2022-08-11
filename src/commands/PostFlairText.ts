@@ -9,6 +9,8 @@ import { IRoleCategory } from "../models/IRoleCategory";
 export class PostFlairTextCommand extends Command {
   private roles: BasicMapCache<IJoinableRole>;
   private categories: BasicMapCache<IRoleCategory>;
+  private readonly optionChunkSize = 25;
+  private readonly maxComponents = 5;
 
   constructor() {
     super();
@@ -22,7 +24,7 @@ export class PostFlairTextCommand extends Command {
   }
 
   public run(message: Message, args?: string[]): boolean {
-    this.runAsync(message)
+    this.runAsync(message);
 
     return true;
   }
@@ -35,37 +37,61 @@ export class PostFlairTextCommand extends Command {
     for (const category of this.categories.data.values()) {
       const filteredRoles = roles.filter((role) => role.category === category.name);
 
-      const [embed, components] = this.buildCategoryEmbed(category, filteredRoles);
+      const embed = this.buildCategoryEmbed(category);
+      const components = this.buildComponents(category, filteredRoles);
 
       message.channel.send({ content: '᲼᲼᲼᲼᲼᲼', embeds: [embed], components });
     }
   }
 
-  private buildCategoryEmbed(category: IRoleCategory, roles: IJoinableRole[]): [MessageEmbed, MessageActionRow[]] {
+  private buildCategoryEmbed(category: IRoleCategory) {
     const embed = new MessageEmbed()
       .setColor('#E5C07B')
-      .setTitle(`${category.name} rollen`)
+      .setTitle(`${category.name}`)
       .setDescription(category.description ?? '');
 
+    return embed;
+  }
+
+  private buildComponents(category: IRoleCategory, roles: IJoinableRole[]): MessageActionRow[] {
     const options = roles.map((role) => ({
       label: role.name,
       value: role.ID,
       ...(role.description ? {
         description: role.description.slice(0, 100),
       } : {})
-    }))
+    }));
+
+    const chunks = this.splitToChunks(options, this.optionChunkSize);
 
     const categoryId = category.name.toLowerCase().replace(/\-/g, '');
 
-    const select = new MessageSelectMenu()
-      .setCustomId(`roles-set-${categoryId}`)
-      .setPlaceholder("Kies één of meerdere rollen")
+    const isIcons = category.name.toLowerCase() === 'icons';
+
+    const menus = chunks.map((chunk, i) => new MessageSelectMenu()
+      .setCustomId(`roles-set-${categoryId}-${i}`)
+      .setPlaceholder(isIcons ? "Kies een character icon" : "Kies één of meerdere rollen")
       .setMinValues(1)
-      .setMaxValues(roles.length)
-      .addOptions(...options);
+      .setMaxValues(isIcons ? 1 : chunk.length)
+      .addOptions(...chunk));
 
-    const rows = [ new MessageActionRow().addComponents(select) ];
+    if (menus.length > this.maxComponents) {
+      throw new Error(`Too many components (${menus.length}) for category ${category.name}`);
+    };
 
-    return [embed, rows];
+    const rows = menus.map((menu) => new MessageActionRow().addComponents(menu));
+
+    return rows;
+  }
+
+  private splitToChunks<T>(arr: T[], maxSize: number): Array<T[]> {
+    const collection = [];
+
+    for (let i = 0; i < arr.length; i += maxSize) {
+      const chunk = arr.slice(i, i + maxSize);
+      collection.push(chunk);
+    }
+
+    return collection;
   }
 }
