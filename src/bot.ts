@@ -6,7 +6,7 @@ import MessageHandler from "./MessageHandler";
 import Server from "./web/Server";
 import { createLogger } from "./utils/logger";
 import { store } from "./Store";
-import { NewsStreamer } from "./NewsStream";
+// import { NewsStreamer } from "./NewsStream";
 import { InteractionHandler } from "./InteractionHandler";
 
 const log = createLogger("Main");
@@ -16,9 +16,8 @@ const intents = [
   Intents.FLAGS.GUILD_MEMBERS,
   Intents.FLAGS.GUILD_MESSAGES,
   Intents.FLAGS.GUILD_MESSAGE_REACTIONS,
-]
+];
 class Main {
-
   private args: string[];
   constructor(args: string[]) {
     this.args = args;
@@ -31,7 +30,7 @@ class Main {
     log("Caches Loaded.");
     const messageHandler = new MessageHandler();
     const interactionHandler = new InteractionHandler(client);
-    const newsStreamer = new NewsStreamer(client);
+    // const newsStreamer = new NewsStreamer(client);
     const server = new Server(client);
     if (Config.EnableWebServer) {
       await server.start(+process.env.PORT || Config.ServerPort);
@@ -55,9 +54,9 @@ class Main {
       process.exit();
     });
 
-    client.on('interactionCreate', (interaction) => {
+    client.on("interactionCreate", (interaction) => {
       interactionHandler.handle(interaction);
-    })
+    });
 
     try {
       await client.login(Config.DiscordApplicationToken);

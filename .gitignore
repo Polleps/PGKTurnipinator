@@ -72,3 +72,5 @@ public/dist/*
 token.key
 .DS_Store
 firebasekey.json
+
+.DS_Store
