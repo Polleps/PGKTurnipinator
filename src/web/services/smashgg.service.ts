@@ -1,7 +1,7 @@
 import Config from "../../Config";
 import fetch, { FetchError } from "node-fetch";
 
-const baseURL = "https://api.smash.gg/gql/alpha";
+const baseURL = "https://api.start.gg/gql/alpha";
 const TWITCH_BASE_URL = "https://twitch.tv/";
 
 const detailsQuery = `
@@ -46,9 +46,11 @@ query TournamentQuery($id: ID) {
 }
 `;
 
-export const fetchTournamentDetails = async (slug: string): Promise<ITournamentDetails> => {
+export const fetchTournamentDetails = async (
+  slug: string
+): Promise<ITournamentDetails> => {
   const result = await executeQuery(detailsQuery, { slug });
-  const { 
+  const {
     name,
     id,
     mapsPlaceId,
@@ -82,25 +84,30 @@ export const fetchTournamentDetails = async (slug: string): Promise<ITournamentD
 
 export type FETCH_ERROR = -1;
 
-export const fetchTournamentStatus = async (id: string): Promise<Array<{
-  id: string,
-  participants: number,
-  registrationClosesAt: Date,
-}>> => {
+export const fetchTournamentStatus = async (
+  id: string
+): Promise<
+  Array<{
+    id: string;
+    participants: number;
+    registrationClosesAt: Date;
+  }>
+> => {
   try {
     const result = (await executeQuery(statusQuery, { id })) as IStatusResult;
     console.log(result);
     if (!result.data || !result.data.tournament) {
       return [];
     }
-  
-    return [{
-      id: result.data.tournament.id,
-      participants: result.data.tournament.participants.pageInfo.total,
-      registrationClosesAt: result.data.tournament.registrationClosesAt,
-    }];
-  }
-  catch (e) {
+
+    return [
+      {
+        id: result.data.tournament.id,
+        participants: result.data.tournament.participants.pageInfo.total,
+        registrationClosesAt: result.data.tournament.registrationClosesAt,
+      },
+    ];
+  } catch (e) {
     console.error(e);
 
     return [];
@@ -110,8 +117,8 @@ export const fetchTournamentStatus = async (id: string): Promise<Array<{
 const executeQuery = async (query, variables) => {
   const headers = {
     "Content-Type": "application/json",
-    "Accept": "application/json",
-    "Authorization": `Bearer ${Config.SMASHGG_API_KEY}`,
+    Accept: "application/json",
+    Authorization: `Bearer ${Config.SMASHGG_API_KEY}`,
   };
   const body = { query, variables };
   const options = {
@@ -133,10 +140,12 @@ interface ITournamentDetails {
   startAt: Date;
   endAt: Date;
   events: string[];
-  streams: Array<{
-    streamName: string,
-    streamSource: string,
-  }> | undefined;
+  streams:
+    | Array<{
+        streamName: string;
+        streamSource: string;
+      }>
+    | undefined;
 }
 
 interface IStatusResult {
@@ -151,4 +160,4 @@ interface IStatusResult {
       };
     };
   };
-};
+}

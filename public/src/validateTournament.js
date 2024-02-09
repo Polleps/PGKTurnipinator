@@ -18,7 +18,7 @@ const priceEmpty = (x) => () =>
 
 export const createValidators = (state) => {
   return [
-    newValidator("Smash.gg link is empty", empty(state.url)),
+    newValidator("Start.gg link is empty", empty(state.url)),
     newValidator("Title is empty", empty(state.title)),
     newValidator("Start Date is empty", empty(state.startDate)),
     newValidator("End Date is empty", empty(state.endDate)),
@@ -32,7 +32,7 @@ export const createValidators = (state) => {
     ),
     newValidator("Location is empty", state.isOnline || empty(state.location)),
     newValidator(
-      "The smash.gg page does not contain a City",
+      "The start.gg page does not contain a City",
       state.isOnline || empty(state.city)
     ),
     newValidator(

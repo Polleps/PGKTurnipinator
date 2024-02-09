@@ -83,22 +83,22 @@ export default class PostTournament extends Action {
     const contentEL = document.querySelector(".content");
     const ui = html` <form action="post" class="tournament-form">
       <h4>Enter Tournament Details</h4>
-      <div class="form-row"><span>Smash.gg</span></div>
+      <div class="form-row"><span>Start.gg</span></div>
       <div class="form-row">
         ${input({
-          name: "smashgg",
-          value: this.state.url,
-          classes: ["flex1 icon-input ta-link"],
-          bind: (val) => {
-            this.extractSlug(val);
-          },
-          placeholder: "Smash.gg link",
-        })}
+      name: "smashgg",
+      value: this.state.url,
+      classes: ["flex1 icon-input ta-link"],
+      bind: (val) => {
+        this.extractSlug(val);
+      },
+      placeholder: "Start.gg link",
+    })}
         ${html`<a
           href="#"
           class="btn fill-btn flex-auto"
           @click=${() =>
-            this.fetchTournament(this.state.url).then(() => this.render())}
+          this.fetchTournament(this.state.url).then(() => this.render())}
           >Fill</a
         >`}
       </div>
@@ -157,28 +157,28 @@ export default class PostTournament extends Action {
         >
       </div>
       ${checkbox({
-        name: "nocap",
-        value: false,
-        classes: "",
-        label: "No player caps",
-        bind: (val) => {
-          this.state.nocap = val;
-          this.render();
-        },
-      })}
+          name: "nocap",
+          value: false,
+          classes: "",
+          label: "No player caps",
+          bind: (val) => {
+            this.state.nocap = val;
+            this.render();
+          },
+        })}
       ${this.mapEvents(
-        this.detailControlsHidden,
-        this.detailControlsHidden || this.state.nocap
-      )}
+          this.detailControlsHidden,
+          this.detailControlsHidden || this.state.nocap
+        )}
       <div class="form-row">
         <span class="icon-label">
           <i class="material-icons">speaker_notes</i>
           Additional Notes
           ${this.state.description.length > 0
-            ? html`<span class="counter"
+        ? html`<span class="counter"
                 >(${this.state.description.length}/250)</span
               >`
-            : ""}
+        : ""}
         </span>
       </div>
       <div class="form-row">
@@ -194,10 +194,10 @@ export default class PostTournament extends Action {
           maxLength: 250,
         })}
         ${this.state.image
-          ? html` <div class="flex1 logo-holder">
+        ? html` <div class="flex1 logo-holder">
               <img src="${this.state.image}" />
             </div>`
-          : ""}
+        : ""}
       </div>
       <div class="form-row">
         <span class="icon-label">
@@ -433,8 +433,8 @@ const convertToITournament = (x) => ({
   type: "smashgg",
   ...(x.streams
     ? {
-        streamURL: x.streamURL,
-        streamStartDate: new Date(x.streamStartDate).getTime(),
-      }
+      streamURL: x.streamURL,
+      streamStartDate: new Date(x.streamStartDate).getTime(),
+    }
     : {}),
 });

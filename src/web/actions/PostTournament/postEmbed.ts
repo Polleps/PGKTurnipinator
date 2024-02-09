@@ -1,9 +1,4 @@
-import {
-  Guild,
-  GuildMember,
-  MessageEmbed,
-  NewsChannel,
-} from "discord.js";
+import { Guild, GuildMember, MessageEmbed, NewsChannel } from "discord.js";
 import moment from "moment-timezone";
 
 import Config from "../../../Config";
@@ -38,7 +33,10 @@ const buildEvents = (embed: MessageEmbed, tD: ITournament): MessageEmbed => {
   return embed;
 };
 
-const buildDescription = (embed: MessageEmbed, tD: ITournament): MessageEmbed => {
+const buildDescription = (
+  embed: MessageEmbed,
+  tD: ITournament
+): MessageEmbed => {
   if (!tD.description || tD.description.trim().length === 0) {
     return embed;
   }
@@ -51,13 +49,19 @@ const buildDescription = (embed: MessageEmbed, tD: ITournament): MessageEmbed =>
 };
 
 const buildLink = (embed: MessageEmbed, tD: ITournament): MessageEmbed =>
-  embed.addField("More Info/Register", `[Smash.gg](${"https://smash.gg/tournament/" + tD.url})`);
+  embed.addField(
+    "More Info/Register",
+    `[Start.gg](${"https://start.gg/tournament/" + tD.url})`
+  );
 
 const buildTimeField = (embed: MessageEmbed, tD: ITournament): MessageEmbed => {
   const { startDate } = tD;
 
-  return embed.addField("⏰ Time", moment(startDate).tz("Europe/Amsterdam").format("HH:mm"));
-}
+  return embed.addField(
+    "⏰ Time",
+    moment(startDate).tz("Europe/Amsterdam").format("HH:mm")
+  );
+};
 
 const buildDateField = (embed: MessageEmbed, tD: ITournament): MessageEmbed => {
   const startDate = new Date(tD.startDate);
@@ -66,26 +70,34 @@ const buildDateField = (embed: MessageEmbed, tD: ITournament): MessageEmbed => {
 
   return embed.addField(
     "📅 Date",
-    spansSingleDay ? formatDate(startDate) : `${formatDate(startDate)} - ${formatDate(endDate)}`,
+    spansSingleDay
+      ? formatDate(startDate)
+      : `${formatDate(startDate)} - ${formatDate(endDate)}`
   );
 };
 
-const compareDay = (a: Date, b: Date): boolean => (
+const compareDay = (a: Date, b: Date): boolean =>
   a.getDate() === b.getDate() &&
   a.getMonth() === b.getMonth() &&
-  a.getFullYear() === b.getFullYear()
-);
+  a.getFullYear() === b.getFullYear();
 
-const createGoogleMapsURL = (location: string, googleMapsID: string): string => {
-  const url = new URL(`https://www.google.com/maps/search/?api=1&query=${location}&query_place_id=${googleMapsID}`);
+const createGoogleMapsURL = (
+  location: string,
+  googleMapsID: string
+): string => {
+  const url = new URL(
+    `https://www.google.com/maps/search/?api=1&query=${location}&query_place_id=${googleMapsID}`
+  );
 
   return url.toString();
 };
 
-const formatDate = (x: Date): string =>
-  moment(x).format("MMMM Do YYYY");
+const formatDate = (x: Date): string => moment(x).format("MMMM Do YYYY");
 
-const buildEmbed = (user: GuildMember, tournamentDetails: ITournament): MessageEmbed => {
+const buildEmbed = (
+  user: GuildMember,
+  tournamentDetails: ITournament
+): MessageEmbed => {
   const localColor = 0xc01f1f;
   const onlineColor = 0x0b92e0;
 
@@ -97,7 +109,9 @@ const buildEmbed = (user: GuildMember, tournamentDetails: ITournament): MessageE
     iconURL: user.user.avatarURL(),
   });
 
-  const title = tournamentDetails.isOnline ? `🌐 ${tournamentDetails.title}` : tournamentDetails.title;
+  const title = tournamentDetails.isOnline
+    ? `🌐 ${tournamentDetails.title}`
+    : tournamentDetails.title;
   embed.addField(title, "\u200B");
 
   if (tournamentDetails.isOnline) {
@@ -115,13 +129,20 @@ const buildEmbed = (user: GuildMember, tournamentDetails: ITournament): MessageE
   return embed;
 };
 
-const postMessage = async (channel: NewsChannel, embed: MessageEmbed): Promise<string> => {
+const postMessage = async (
+  channel: NewsChannel,
+  embed: MessageEmbed
+): Promise<string> => {
   const message = await channel.send({ embeds: [embed] });
 
   return message.id;
 };
 
-const editExistingPost = async (channel: NewsChannel, tournament: ITournament, embed: MessageEmbed) => {
+const editExistingPost = async (
+  channel: NewsChannel,
+  tournament: ITournament,
+  embed: MessageEmbed
+) => {
   try {
     const prevMessage = await channel.messages.fetch(tournament.messageID);
     prevMessage.edit({ embeds: [embed] });
@@ -142,10 +163,16 @@ const editExistingPost = async (channel: NewsChannel, tournament: ITournament, e
  * @param tournamentDetails The tournament details to be posted.
  * @returns id of the posted message.
  */
-export const postEmbed = async (guild: Guild, user: GuildMember, tournamentDetails: ITournament): Promise<string> => {
+export const postEmbed = async (
+  guild: Guild,
+  user: GuildMember,
+  tournamentDetails: ITournament
+): Promise<string> => {
   const { isOnline } = tournamentDetails;
 
-  const channel = await guild.channels.fetch(isOnline ? onlineTournamentAgendaID : tournamentagendaID) as NewsChannel;
+  const channel = (await guild.channels.fetch(
+    isOnline ? onlineTournamentAgendaID : tournamentagendaID
+  )) as NewsChannel;
   const embed = buildEmbed(user, tournamentDetails);
 
   if (tournamentDetails.messageID) {
