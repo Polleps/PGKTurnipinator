@@ -431,10 +431,8 @@ const convertToITournament = (x) => ({
     amount: +p.amount,
   })),
   type: "smashgg",
-  ...(x.streams
-    ? {
-      streamURL: x.streamURL,
-      streamStartDate: new Date(x.streamStartDate).getTime(),
-    }
-    : {}),
+  ...(!!x.streamURL && !!streamStartDate && {
+    streamURL: x.streamURL,
+    streamStartDate: new Date(x.streamStartDate).getTime(),
+  }),
 });
