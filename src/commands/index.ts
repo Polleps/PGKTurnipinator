@@ -5,3 +5,4 @@ export * from "./Shucfix";
 export * from "./PostFlairText";
 export * from "./SeedDB";
 export * from "./ShucfixManage";
+export * from "./ReloadTournamentCache";

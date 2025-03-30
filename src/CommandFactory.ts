@@ -6,10 +6,10 @@ import {
   PostFlairTextCommand,
   ShucfixManageCommand,
   SeedDBCommand,
+  ReloadTournamentCacheCommand,
 } from "./commands";
 
 export default class CommandFactory {
-
   private commands: Map<string, () => Command>;
 
   constructor() {
@@ -19,6 +19,7 @@ export default class CommandFactory {
       ["shucfix", () => new ShucfixCommand()],
       ["shucfix-manage", () => new ShucfixManageCommand()],
       ["postflairtext", () => new PostFlairTextCommand()],
+      ["reloadcache", () => new ReloadTournamentCacheCommand()],
       // ["seeddb", () => new SeedDBCommand()],
     ]);
   }

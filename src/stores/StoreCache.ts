@@ -24,7 +24,7 @@ export default abstract class StoreCache<T, I, O> implements ICache {
 
   public abstract has(index: I): boolean;
 
-  protected async fillCache(): Promise<void> {
+  protected async fillCache(force: boolean = false): Promise<void> {
     return Promise.resolve();
   }
 
