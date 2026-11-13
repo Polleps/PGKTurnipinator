@@ -14,14 +14,16 @@ import type { TournamentCursor, TournamentFilter, TournamentRepository } from ".
  *   cursor     opaque, the previous response's nextCursor
  *
  * Items are ordered by (start_date, id) and carry public fields only, dates in ms; NULL
- * columns are left out. Bad parameters get `400 { error }`.
+ * columns are left out. Invalid or repeated values of these parameters get `400 { error }`;
+ * other parameters are ignored.
  */
 
 export const DEFAULT_LIMIT = 20;
 export const MAX_LIMIT = 100;
 export const CACHE_CONTROL = "public, max-age=60";
 
-const PARAMS = new Set(["from", "to", "online", "url", "limit", "cursor"]);
+const PARAMS = ["from", "to", "online", "url", "limit", "cursor"] as const;
+type Param = (typeof PARAMS)[number];
 
 export type PublicTournament = Partial<Omit<Tournament, "messageID" | "guildEventID">>;
 
@@ -65,11 +67,14 @@ export type TournamentQuery =
 
 /** Validates the query string. Throws BadRequest with a message meant for the client. */
 export const parseTournamentQuery = (query: Request["query"], now: number): TournamentQuery => {
-  const values: Record<string, string> = {};
-  for (const [name, value] of Object.entries(query)) {
-    if (!PARAMS.has(name)) {
-      throw new BadRequest(`Unknown parameter "${name}". Allowed: ${[...PARAMS].join(", ")}.`);
+  // Only the known names are read, as own properties into a prototype-less map: other
+  // parameters (cache busters, utm_*, __proto__, constructor, ...) are ignored.
+  const values: Partial<Record<Param, string>> = Object.create(null);
+  for (const name of PARAMS) {
+    if (!Object.hasOwn(query, name)) {
+      continue;
     }
+    const value: unknown = query[name];
     if (typeof value !== "string") {
       throw new BadRequest(`Parameter "${name}" must be given once, as a plain value.`);
     }

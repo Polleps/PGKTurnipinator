@@ -233,6 +233,27 @@ describe("cursor pagination", () => {
   });
 });
 
+describe("unknown parameters are ignored", () => {
+  test.each([
+    "?_=1700000000000",
+    "?utm_source=newsletter&utm_medium=email",
+    "?page=2",
+    "?__proto__=x",
+    "?__proto__[limit]=1",
+    "?constructor=x&hasOwnProperty=1",
+    "?toString=1&valueOf=2",
+  ])("%s", async (query) => {
+    const r = await get(query);
+    expect(r.status).toBe(200);
+    expect(ids(r)).toEqual(ids(await get()));
+  });
+
+  test("known parameters still apply next to unknown ones, and __proto__ can't inject them", async () => {
+    expect(ids(await get("?online=true&utm_source=x"))).toEqual(["301"]);
+    expect((await get("?__proto__[online]=true&__proto__[limit]=1")).body.items).toHaveLength(5);
+  });
+});
+
 describe("parameter validation", () => {
   test.each([
     ["?from=yesterday", /"from" must be a time in epoch milliseconds/],
@@ -246,7 +267,6 @@ describe("parameter validation", () => {
     [`?cursor=${Buffer.from('["x","1"]').toString("base64url")}`, /"cursor" is not valid/],
     ["?url=", /"url" must not be empty/],
     [`?url=fixture-reused&cursor=${encodeCursor({ startDate: 1, id: "1" })}`, /can't be combined/],
-    ["?page=2", /Unknown parameter "page"/],
     ["?limit=5&limit=6", /given once/],
     ["?from[x]=1", /given once/],
   ])("%s → 400", async (query, message) => {
