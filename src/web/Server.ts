@@ -10,6 +10,9 @@ import {
   ServerInfoRouter,
 } from "./routers";
 
+/** `GET /` goes to the community site; the bot's own home page is gone. */
+export const HOME_REDIRECT_URL = "https://smash-nederland.nl";
+
 export default class Server {
   private app!: express.Application;
   private client: Discord.Client;
@@ -17,6 +20,11 @@ export default class Server {
   constructor(discordClient: Discord.Client) {
     this.client = discordClient;
     this.init();
+  }
+
+  /** The express app, for tests that mount the real routes without starting the bot. */
+  public get handler(): express.Application {
+    return this.app;
   }
 
   public start(port: number): Promise<void> {
@@ -61,6 +69,7 @@ export default class Server {
     this.app.use("/tournaments", tournamentRouter.router);
     this.app.use("/api/tournaments", tournamentApiRouter.router);
     this.app.use("/serverinfo", serverInfoRouter.router);
-    this.app.use("/", express.static("home"));
+    // 302, not 301: browsers cache a 301 indefinitely, and the target may still change.
+    this.app.get("/", (_req, res) => res.redirect(302, HOME_REDIRECT_URL));
   }
 }
