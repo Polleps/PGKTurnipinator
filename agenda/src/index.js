@@ -3,10 +3,17 @@ import { calendar } from './calendar';
 import { cardList } from './cardList';
 import { header, View } from './header';
 import './agenda.css';
-import { registerSW } from 'virtual:pwa-register';
 
-// Registers /agenda/service-worker.js (scope /agenda/) and reloads once a new version takes over.
-registerSW({ immediate: true });
+// Same URL and scope as the old webpack worker. A new version activates right away and
+// reloads open pages itself (see service-worker.js).
+if ('serviceWorker' in navigator) {
+  const base = import.meta.env.BASE_URL;
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register(`${base}service-worker.js`, { scope: base }).catch((err) => {
+      console.error('Service worker registration failed.', err);
+    });
+  });
+}
 
 let tournaments = [];
 

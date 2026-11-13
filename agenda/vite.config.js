@@ -21,8 +21,7 @@ export default defineConfig({
       srcDir: 'src',
       // Same URL as the old webpack worker, so installed PWAs update in place.
       filename: 'service-worker.js',
-      registerType: 'autoUpdate',
-      // Registered from src/index.js via virtual:pwa-register.
+      // Registered by src/index.js; the worker activates and reloads pages itself.
       injectRegister: false,
       injectManifest: {
         // Everything in dist (the manifest is added by the plugin).

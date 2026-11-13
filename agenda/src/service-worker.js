@@ -15,18 +15,20 @@ const LEGACY_CACHES = ['app-cache', 'css-cache', 'js-cache', 'html-cache', 'smas
 self.addEventListener('install', () => self.skipWaiting());
 
 self.addEventListener('activate', (event) => {
-  event.waitUntil(
-    (async () => {
-      const deleted = await Promise.all(LEGACY_CACHES.map((name) => caches.delete(name)));
-      await self.clients.claim();
-      // Coming from the old worker: open pages still run the old bundle it served, which never
-      // reloads itself. Reload them once so they get the new app right away.
-      if (deleted.some(Boolean)) {
-        const windows = await self.clients.matchAll({ type: 'window' });
-        await Promise.all(windows.map((client) => client.navigate(client.url).catch(() => undefined)));
-      }
-    })(),
-  );
+  const activation = (async () => {
+    // Pages controlled by the previous worker run the previous bundle (the old webpack app
+    // never reloads itself). A first install has no controlled pages.
+    const outdated = await self.clients.matchAll({ type: 'window' });
+    await Promise.all(LEGACY_CACHES.map((name) => caches.delete(name)));
+    await self.clients.claim();
+    return outdated;
+  })();
+  event.waitUntil(activation);
+  // Reload them once into this version. Not inside waitUntil: a reload's navigation request
+  // waits for activation to finish, so awaiting it there would deadlock.
+  void activation.then((outdated) => {
+    for (const client of outdated) client.navigate(client.url).catch(() => undefined);
+  });
 });
 
 // The precache keeps Workbox's `workbox-precache-v2-<scope>` cache name, so the old worker's
