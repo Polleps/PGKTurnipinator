@@ -150,8 +150,9 @@ export const parseAmsterdamLocalDateTime = (value: string): number | undefined =
 };
 
 /**
- * An http(s) URL, or a scheme-less one like `twitch.tv/name` with https:// added.
- * Returns undefined for anything that isn't a URL (a bare word, a sentence).
+ * An http(s) URL, or a scheme-less (`twitch.tv/name`) or protocol-relative (`//twitch.tv/name`)
+ * one with https:// added. Returns undefined for anything that isn't a public web URL: a bare
+ * word, a sentence, another scheme, or a URL with a user name or password in it.
  */
 export const normalizeStreamURL = (value: string): { url: string; prefixed: boolean } | undefined => {
   const v = value.trim();
@@ -159,10 +160,15 @@ export const normalizeStreamURL = (value: string): { url: string; prefixed: bool
     return undefined;
   }
   const hasScheme = /^https?:\/\//i.test(v);
-  const candidate = hasScheme ? v : `https://${v}`;
+  const candidate = hasScheme ? v : `https://${v.replace(/^\/\//, "")}`;
   try {
     const parsed = new URL(candidate);
-    if (!/^https?:$/.test(parsed.protocol) || !/\.[a-z]{2,}$/i.test(parsed.hostname)) {
+    if (
+      !/^https?:$/.test(parsed.protocol) ||
+      parsed.username !== "" ||
+      parsed.password !== "" ||
+      !/\.[a-z]{2,}$/i.test(parsed.hostname)
+    ) {
       return undefined;
     }
   } catch {
