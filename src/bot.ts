@@ -1,5 +1,4 @@
 import { Client, Intents, Message } from "discord.js";
-import "./env";
 import Config from "./Config";
 import { sClient } from "./Context";
 import MessageHandler from "./MessageHandler";

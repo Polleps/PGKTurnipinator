@@ -1,5 +1,4 @@
 import Config from "../../Config";
-import fetch, { FetchError } from "node-fetch";
 
 const baseURL = "https://api.start.gg/gql/alpha";
 const TWITCH_BASE_URL = "https://twitch.tv/";

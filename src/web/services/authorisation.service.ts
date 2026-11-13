@@ -1,7 +1,5 @@
-import fetch from "node-fetch";
 import * as jwt from "jsonwebtoken";
 import Config from "../../Config";
-import * as fs from "fs";
 import { createSecretKey, KeyObject } from "crypto";
 
 const APIURL = "https://discord.com/api/v10";
@@ -86,16 +84,14 @@ export const pJWTSign = (payload: string, key: KeyObject): Promise<string> => {
   });
 };
 
-function loadPrivateKey(): Promise<Buffer> {
-  return new Promise((resolve, reject) => {
-    fs.readFile(`${baseDir}/token.key`, (err, data) => {
-      if (err) {
-        console.log(err);
-        throw new Error("Could not read token.key, make sure it exists.");
-      }
-      resolve(data);
-    });
-  });
+// Read as raw bytes, not text: the HMAC key is the file's exact bytes (see toSigningKey).
+async function loadPrivateKey(): Promise<Buffer> {
+  try {
+    return Buffer.from(await Bun.file(`${baseDir}/token.key`).bytes());
+  } catch (err) {
+    console.log(err);
+    throw new Error("Could not read token.key, make sure it exists.");
+  }
 }
 
 const callTokenEndpoint = async (body: Record<string, string>) => {

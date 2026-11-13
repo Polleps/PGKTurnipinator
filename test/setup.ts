@@ -13,11 +13,10 @@ const forbidden = (name: string) => () => {
 
 mock.module("firebase-admin", forbidden("firebase-admin"));
 mock.module("@google-cloud/firestore", forbidden("@google-cloud/firestore"));
-// node-fetch is imported (not called) by the start.gg service; any actual call fails.
-mock.module("node-fetch", () => {
-  const fetch = () => Promise.reject(new Error("Network access is disabled in tests."));
-  return { default: fetch, FetchError: Error };
-});
+// The start.gg/Discord services use the global fetch; any actual call fails.
+globalThis.fetch = Object.assign(() => Promise.reject(new Error("Network access is disabled in tests.")), {
+  preconnect: () => {},
+}) as unknown as typeof fetch;
 
 // Config parses these at import time; give tests harmless defaults.
 process.env.BOT_ADMINS ??= "[]";
