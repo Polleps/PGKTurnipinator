@@ -1,5 +1,6 @@
 import { defineConfig } from 'vite';
 import { VitePWA } from 'vite-plugin-pwa';
+import solid from 'vite-plugin-solid';
 
 // Served by the bot's express app: `/agenda` -> agenda/dist (src/web/Server.ts).
 export default defineConfig({
@@ -11,6 +12,8 @@ export default defineConfig({
     target: 'baseline-widely-available',
   },
   plugins: [
+    // Solid components live in .jsx/.tsx files; the lit-html .js files are left alone.
+    solid({ include: /\.[jt]sx$/ }),
     VitePWA({
       // Keep our own worker (legacy cache cleanup, runtime caching rules); Workbox injects
       // the precache manifest into it.

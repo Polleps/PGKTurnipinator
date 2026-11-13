@@ -13,7 +13,9 @@
       "public"
     ],
     "catalog": {
-      "vite": "8.3.8"
+      "solid-js": "1.9.19",
+      "vite": "8.3.8",
+      "vite-plugin-solid": "2.11.16"
     }
   },
   "scripts": {
@@ -23,7 +25,7 @@
     "prod": "NODE_ENV=production bun --no-env-file src/bot.ts",
     "debug": "bun --inspect --no-env-file src/bot.ts",
     "build": "bun run --filter agenda_src --filter public build",
-    "typecheck": "tsc",
+    "typecheck": "tsc && tsc -p agenda && tsc -p public",
     "lint": "oxlint",
     "lint:fix": "oxlint --fix",
     "fmt:check": "bun fmt --check",

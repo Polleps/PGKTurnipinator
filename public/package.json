@@ -13,9 +13,11 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "vite": "catalog:"
+    "vite": "catalog:",
+    "vite-plugin-solid": "catalog:"
   },
   "dependencies": {
-    "lit-html": "1.1.0"
+    "lit-html": "1.1.0",
+    "solid-js": "catalog:"
   }
 }
