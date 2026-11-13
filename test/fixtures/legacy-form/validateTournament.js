@@ -1,3 +1,5 @@
+// Frozen copy of public/src/validateTournament.js from the lit-html form (before the Phase 5
+// Solid port). test/formValidation.test.ts compares the new validation against it.
 const newValidator = (errorMsg, condition) => {
   return () =>
     new Promise((resolve, reject) => {

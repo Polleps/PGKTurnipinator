@@ -1,3 +1,5 @@
+// Frozen copy of public/src/tournamentFormat.js from the lit-html form (before the Phase 5
+// Solid port). test/formModel.test.ts compares the new form's request body against it.
 // Pure helpers for the tournament form, kept free of DOM/lit-html imports so they can be unit-tested.
 
 const TWITCH_BASE_URL = "https://twitch.tv/";

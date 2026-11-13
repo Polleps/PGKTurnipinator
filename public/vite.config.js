@@ -10,8 +10,5 @@ export default defineConfig({
     // Vite's default, spelled out: Chrome/Edge 111+, Firefox 114+, Safari 16.4+.
     target: 'baseline-widely-available',
   },
-  plugins: [
-    // Solid components live in .jsx/.tsx files; the lit-html .js files are left alone.
-    solid({ include: /\.[jt]sx$/ }),
-  ],
+  plugins: [solid({ include: /\.[jt]sx$/ })],
 });
