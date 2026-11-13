@@ -6,29 +6,29 @@
   "browserslist": "> 0.25%, not dead",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "webpack",
-    "watch": "webpack --watch"
+    "build": "NODE_OPTIONS=--openssl-legacy-provider webpack",
+    "watch": "NODE_OPTIONS=--openssl-legacy-provider webpack --watch"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "@babel/core": "^7.4.5",
-    "@babel/plugin-proposal-optional-chaining": "^7.8.3",
-    "@babel/preset-env": "^7.4.5",
-    "babel-loader": "^8.0.6",
-    "clean-webpack-plugin": "^2.0.2",
-    "css-loader": "^2.1.1",
-    "file-loader": "^3.0.1",
-    "html-webpack-plugin": "^3.2.0",
-    "style-loader": "^0.23.1",
-    "webpack": "^4.31.0",
-    "webpack-cli": "^3.3.12",
-    "webpack-pwa-manifest": "^4.2.0",
-    "workbox-webpack-plugin": "^4.3.1"
+    "@babel/core": "catalog:",
+    "@babel/plugin-proposal-optional-chaining": "7.8.3",
+    "@babel/preset-env": "catalog:",
+    "babel-loader": "catalog:",
+    "clean-webpack-plugin": "catalog:",
+    "css-loader": "catalog:",
+    "file-loader": "catalog:",
+    "html-webpack-plugin": "3.2.0",
+    "style-loader": "catalog:",
+    "webpack": "4.31.0",
+    "webpack-cli": "3.3.12",
+    "webpack-pwa-manifest": "4.2.0",
+    "workbox-webpack-plugin": "4.3.1"
   },
   "dependencies": {
-    "lit-html": "^1.3.0",
-    "@babel/polyfill": "^7.4.4"
+    "lit-html": "1.3.0",
+    "@babel/polyfill": "catalog:"
   }
 }

@@ -1,3 +1,7 @@
+[install]
+# npm-style node_modules layout: webpack 4/5 loaders resolve their peers from the hoisted tree.
+linker = "hoisted"
+
 [test]
 root = "./test"
 preload = ["./test/setup.ts"]

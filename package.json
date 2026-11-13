@@ -7,14 +7,30 @@
   "engines": {
     "bun": "1.4.4"
   },
+  "workspaces": {
+    "packages": [
+      "agenda",
+      "public"
+    ],
+    "catalog": {
+      "@babel/core": "7.4.5",
+      "@babel/polyfill": "7.4.4",
+      "@babel/preset-env": "7.4.5",
+      "babel-loader": "8.0.6",
+      "clean-webpack-plugin": "2.0.2",
+      "css-loader": "2.1.1",
+      "file-loader": "3.0.1",
+      "style-loader": "0.23.1"
+    }
+  },
   "scripts": {
     "test": "bun --no-env-file test",
     "dev": "bun --watch --env-file=.env.dev src/bot.ts",
     "start": "NODE_ENV=production bun --env-file=.env.prod src/bot.ts",
     "prod": "NODE_ENV=production bun --env-file=.env.prod src/bot.ts",
     "debug": "bun --inspect --env-file=.env.dev src/bot.ts",
-    "build": "tsc --noEmit",
-    "buildall": "./build.sh",
+    "build": "bun run --filter agenda_src --filter public build",
+    "typecheck": "tsc --noEmit",
     "lint": "oxlint",
     "lint:fix": "oxlint --fix",
     "export:firestore": "tsc -p scripts && node ./built-scripts/scripts/export-firestore.js"

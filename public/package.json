@@ -13,19 +13,19 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "@babel/core": "^7.4.5",
-    "@babel/preset-env": "^7.4.5",
-    "babel-loader": "^8.0.6",
-    "clean-webpack-plugin": "^2.0.2",
-    "css-loader": "^2.1.1",
-    "file-loader": "^3.0.1",
-    "html-webpack-plugin": "^5.5.0",
-    "style-loader": "^0.23.1",
-    "webpack": "^5.68.0",
-    "webpack-cli": "^4.9.2"
+    "@babel/core": "catalog:",
+    "@babel/preset-env": "catalog:",
+    "babel-loader": "catalog:",
+    "clean-webpack-plugin": "catalog:",
+    "css-loader": "catalog:",
+    "file-loader": "catalog:",
+    "html-webpack-plugin": "5.5.0",
+    "style-loader": "catalog:",
+    "webpack": "5.68.0",
+    "webpack-cli": "4.9.2"
   },
   "dependencies": {
-    "@babel/polyfill": "^7.4.4",
-    "lit-html": "^1.0.0"
+    "@babel/polyfill": "catalog:",
+    "lit-html": "1.1.0"
   }
 }
