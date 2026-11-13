@@ -58,8 +58,17 @@ export default class Server {
     const calendarRouter = new CalendarRouter();
     const serverInfoRouter = new ServerInfoRouter(this.client);
 
-    this.app.use("/bot", express.static("public/dist"));
-    this.app.use("/agenda", express.static("agenda/dist"));
+    // Vite's hashed bundles never change, so they can be cached for a year.
+    // index.html, the manifest and the service worker keep the default (revalidate).
+    const staticOptions = {
+      setHeaders: (res: express.Response, filePath: string) => {
+        if (/[\\/]assets[\\/]/.test(filePath)) {
+          res.setHeader("Cache-Control", "public, max-age=31536000, immutable");
+        }
+      },
+    };
+    this.app.use("/bot", express.static("public/dist", staticOptions));
+    this.app.use("/agenda", express.static("agenda/dist", staticOptions));
 
     this.app.use("/calendar", calendarRouter.router);
     this.app.use("/auth", authRouter.router);

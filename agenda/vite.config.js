@@ -37,7 +37,6 @@ export default defineConfig({
         start_url: '/agenda/',
         scope: '/agenda/',
         display: 'standalone',
-        orientation: 'portrait',
         background_color: '#ececec',
         theme_color: '#c32b3e',
         icons: [
