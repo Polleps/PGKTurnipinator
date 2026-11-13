@@ -1,5 +1,5 @@
 import StoreCache from "./StoreCache";
-import { CollectionReference } from "@google-cloud/firestore";
+import type { CollectionReference } from "firebase-admin/firestore";
 
 export class BasicMapCache<T> extends StoreCache<Map<string, T>, string, T> {
   private mapIndex: string;

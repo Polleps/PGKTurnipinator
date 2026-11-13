@@ -1,5 +1,5 @@
 import StoreCache from "./StoreCache";
-import { CollectionReference } from "@google-cloud/firestore";
+import type { CollectionReference } from "firebase-admin/firestore";
 
 export class BasicSetCache extends StoreCache<Set<string>, string, string> {
   private prop: string;

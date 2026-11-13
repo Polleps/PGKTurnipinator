@@ -11,8 +11,10 @@ const forbidden = (name: string) => () => {
   throw new Error(`${name} must not be loaded in tests (no live Firestore / network). Use a fake.`);
 };
 
-mock.module("firebase-admin", forbidden("firebase-admin"));
-mock.module("@google-cloud/firestore", forbidden("@google-cloud/firestore"));
+void mock.module("firebase-admin", forbidden("firebase-admin"));
+void mock.module("@google-cloud/firestore", forbidden("@google-cloud/firestore"));
+void mock.module("firebase-admin/app", forbidden("firebase-admin/app"));
+void mock.module("firebase-admin/firestore", forbidden("firebase-admin/firestore"));
 // The start.gg/Discord services use the global fetch; any actual call fails.
 globalThis.fetch = Object.assign(() => Promise.reject(new Error("Network access is disabled in tests.")), {
   preconnect: () => {},

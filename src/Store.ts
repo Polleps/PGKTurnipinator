@@ -1,4 +1,4 @@
-import type { CollectionReference } from "@google-cloud/firestore";
+import type { CollectionReference } from "firebase-admin/firestore";
 import { ICache } from "./stores/StoreCache.js";
 import { BasicSetCache, TournamentStoreCache, isCollectionWritable } from "./stores/index.js";
 import Config from "./Config";

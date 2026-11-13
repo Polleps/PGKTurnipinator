@@ -19,10 +19,7 @@
     "paths": {
       "discord-api-types/v9": ["./node_modules/discord-api-types/v9.d.ts"],
       "@discordjs/collection": ["./node_modules/@discordjs/collection/dist/index.d.ts"],
-      "@discordjs/builders": ["./node_modules/@discordjs/builders/dist/index.d.ts"],
-      // Same for firebase-admin 10's subpath exports (fixed upstream in 11+).
-      "firebase-admin/app": ["./node_modules/firebase-admin/lib/app/index.d.ts"],
-      "firebase-admin/firestore": ["./node_modules/firebase-admin/lib/firestore/index.d.ts"]
+      "@discordjs/builders": ["./node_modules/@discordjs/builders/dist/index.d.ts"]
     }
   },
   "include": ["./src/**/*", "./scripts/**/*", "./test/**/*"]

@@ -1,4 +1,4 @@
-import type { CollectionReference } from "@google-cloud/firestore";
+import type { CollectionReference } from "firebase-admin/firestore";
 
 export interface FakeCollection {
   ref: CollectionReference;

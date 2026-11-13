@@ -1,5 +1,5 @@
 import StoreCache from "./StoreCache";
-import { CollectionReference } from "@google-cloud/firestore";
+import type { CollectionReference } from "firebase-admin/firestore";
 import ITournament from "../models/ITournament";
 import { fetchTournamentStatus } from "../web/services/smashgg.service";
 

@@ -1,4 +1,4 @@
-import { CollectionReference } from "@google-cloud/firestore";
+import type { CollectionReference } from "firebase-admin/firestore";
 import { isCollectionWritable, ReadOnlyCollectionError } from "./writeGuard";
 
 export interface ICache {
