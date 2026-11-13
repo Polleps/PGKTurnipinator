@@ -26,7 +26,7 @@
   "scripts": {
     "test": "bun --no-env-file test",
     "dev": "bun --watch --no-env-file src/bot.ts",
-    "start": "NODE_ENV=production bun --no-env-file src/bot.ts",
+    "start": "bun --no-env-file src/bot.ts",
     "prod": "NODE_ENV=production bun --no-env-file src/bot.ts",
     "debug": "bun --inspect --no-env-file src/bot.ts",
     "build": "bun run --filter agenda_src --filter public build",
