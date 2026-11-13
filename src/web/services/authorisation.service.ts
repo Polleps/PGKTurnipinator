@@ -66,7 +66,6 @@ export const pJWTVerify = (token: string, secret: KeyObject): Promise<IDecodedTo
       if (err) {
         reject(err);
       } else {
-        console.log("DATA", data);
         resolve(data as unknown as IDecodedToken);
       }
     });
@@ -78,8 +77,9 @@ export const pJWTSign = (payload: string, key: KeyObject): Promise<string> => {
     jwt.sign(payload, key, { algorithm: ALGORITHM }, (err, token) => {
       if (err) {
         reject(err);
+      } else {
+        resolve(token as string);
       }
-      resolve(token as string);
     });
   });
 };
@@ -101,11 +101,26 @@ const callTokenEndpoint = async (body: Record<string, string>) => {
     "Content-Type": "application/x-www-form-urlencoded",
   };
 
-  return fetch(APIURL + TOKENURL, {
+  const res = await fetch(APIURL + TOKENURL, {
     method: "POST",
     headers,
     body: urlencoded,
-  }).then((res) => res.json());
+  });
+  return parseTokenResponse(res.status, await res.json().catch(() => undefined));
+};
+
+/**
+ * Discord answers a failed exchange (bad code, redirect_uri mismatch, wrong secret) with a
+ * 4xx and `{ error, error_description }`. Throw instead of passing that on to be signed
+ * into a session cookie. The message names only Discord's error fields, never tokens.
+ */
+export const parseTokenResponse = (status: number, data: unknown): ITokenRespose => {
+  const body = (data ?? {}) as Partial<ITokenRespose> & { error?: string; error_description?: string };
+  if (status < 200 || status >= 300 || typeof body.access_token !== "string") {
+    const reason = [body.error, body.error_description].filter(Boolean).join(": ") || "no access_token";
+    throw new Error(`Discord token exchange failed (HTTP ${status}): ${reason}`);
+  }
+  return body as ITokenRespose;
 };
 
 interface IDecodedToken {
@@ -114,7 +129,7 @@ interface IDecodedToken {
   expires: number;
 }
 
-interface ITokenRespose {
+export interface ITokenRespose {
   access_token: string;
   token_type: string;
   expires_in: number;

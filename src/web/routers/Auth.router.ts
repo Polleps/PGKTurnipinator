@@ -2,9 +2,14 @@ import { Request, Response, Router } from "express";
 import Config from "../../Config";
 import { fetchUserToken, encodeToken } from "../services/authorisation.service";
 
+export interface AuthDeps {
+  fetchUserToken: typeof fetchUserToken;
+  encodeToken: typeof encodeToken;
+}
+
 export class AuthRouter {
   private _router: Router;
-  constructor() {
+  constructor(private deps: AuthDeps = { fetchUserToken, encodeToken }) {
     this._router = Router();
     this.setupRoutes();
   }
@@ -19,19 +24,23 @@ export class AuthRouter {
       res.redirect(url);
     });
 
+    // Express 4 ignores a rejected promise from an async handler, so every failure must be
+    // caught here and answered; otherwise the browser waits forever after "Authorize".
     this._router.get("/callback", async (req: Request, res: Response) => {
       const code = req.query.code;
       if (typeof code !== "string" || !code) {
-        return res.send("Error Something went wrong");
+        return res.status(400).send("Error Something went wrong");
       }
-      console.log("callback called");
-      const userData = await fetchUserToken(code);
-      console.log("Callback received Userdata", userData);
-      const token = await encodeToken(userData);
-      console.log("Calback encoded token", token);
-      const expire = 31536000000; // 1yr in ms.
-      res.cookie("token", token, { maxAge: expire, path: "/bot/"});
-      res.redirect("/bot");
+      try {
+        const userData = await this.deps.fetchUserToken(code);
+        const token = await this.deps.encodeToken(userData);
+        const expire = 31536000000; // 1yr in ms.
+        res.cookie("token", token, { maxAge: expire, path: "/bot/" });
+        res.redirect("/bot");
+      } catch (e) {
+        console.error("OAuth callback failed:", (e as Error).message);
+        res.status(502).send("Login with Discord failed. Please try again later.");
+      }
     });
   }
 }
