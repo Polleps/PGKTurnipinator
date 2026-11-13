@@ -62,11 +62,9 @@ typings/
 # next.js build output
 .next
 
-#Build output dir
-agenda/dist/*
-!agenda/dist/.gitkeep
-public/dist/*
-!public/dist/.gitkeep
+# Vite build output
+agenda/dist/
+public/dist/
 token.key
 .DS_Store
 firebasekey.json

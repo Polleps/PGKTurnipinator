@@ -13,14 +13,7 @@
       "public"
     ],
     "catalog": {
-      "@babel/core": "7.4.5",
-      "@babel/polyfill": "7.4.4",
-      "@babel/preset-env": "7.4.5",
-      "babel-loader": "8.0.6",
-      "clean-webpack-plugin": "2.0.2",
-      "css-loader": "2.1.1",
-      "file-loader": "3.0.1",
-      "style-loader": "0.23.1"
+      "vite": "8.3.8"
     }
   },
   "scripts": {

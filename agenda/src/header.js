@@ -33,7 +33,7 @@ export const header = ({ onViewChange, showInstallBtn, installPrompt, currentVie
   }
   return html`
     <div class="header-container">
-      <h2 class="${titleClasses}"><a href="/">PGK Tournament Agenda</a></h2>
+      <h2 class="${titleClasses}"><a href="/agenda/">PGK Tournament Agenda</a></h2>
       ${showInstallBtn ?
         html`<span class="install-btn" @click=${click(installPrompt, null)}>
             <i class="material-icons icon-btn">add_circle</i> Install

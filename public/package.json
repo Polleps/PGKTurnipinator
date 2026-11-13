@@ -3,29 +3,19 @@
   "version": "1.0.0",
   "description": "",
   "private": true,
-  "browserslist": "> 0.25%, not dead",
+  "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "webpack",
-    "watch": "webpack --watch"
+    "build": "bunx --bun vite build",
+    "watch": "bunx --bun vite build --watch",
+    "dev": "bunx --bun vite"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "@babel/core": "catalog:",
-    "@babel/preset-env": "catalog:",
-    "babel-loader": "catalog:",
-    "clean-webpack-plugin": "catalog:",
-    "css-loader": "catalog:",
-    "file-loader": "catalog:",
-    "html-webpack-plugin": "5.5.0",
-    "style-loader": "catalog:",
-    "webpack": "5.68.0",
-    "webpack-cli": "4.9.2"
+    "vite": "catalog:"
   },
   "dependencies": {
-    "@babel/polyfill": "catalog:",
     "lit-html": "1.1.0"
   }
 }

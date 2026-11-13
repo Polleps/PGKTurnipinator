@@ -3,7 +3,7 @@
 env = false
 
 [install]
-# npm-style node_modules layout: webpack 4/5 loaders resolve their peers from the hoisted tree.
+# npm-style node_modules layout (one hoisted tree for the bot and both Vite apps).
 linker = "hoisted"
 
 [test]

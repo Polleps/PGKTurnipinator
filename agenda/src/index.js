@@ -3,15 +3,10 @@ import { calendar } from './calendar';
 import { cardList } from './cardList';
 import { header, View } from './header';
 import './agenda.css';
+import { registerSW } from 'virtual:pwa-register';
 
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('./service-worker.js')
-        .then((reg) => {
-          console.log('Service worker registered.', reg);
-        });
-  });
-}
+// Registers /agenda/service-worker.js (scope /agenda/) and reloads once a new version takes over.
+registerSW({ immediate: true });
 
 let tournaments = [];
 
