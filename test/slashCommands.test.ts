@@ -3,6 +3,7 @@ import { PermissionFlagsBits } from "discord.js";
 import { commandDefinitions, commandsJSON, findCommand } from "../src/commands/definitions";
 import { canRunCommand } from "../src/commands/permissions";
 import { buildHelpText } from "../src/Help";
+import { hasNeeRole } from "../src/triggers/NeeTrigger";
 
 const ADMIN_ID = "200000000000000001";
 const admins = new Set([ADMIN_ID]);
@@ -57,5 +58,20 @@ describe("/help", () => {
     expect(buildHelpText(commandDefinitions, false, "fixbot")).toBe("fixbot is not a command.");
     expect(buildHelpText(commandDefinitions, true, "fixbot")).toContain("**Description**: Restarts the bot.");
     expect(buildHelpText(commandDefinitions, true, "nope")).toBe("nope is not a command.");
+  });
+});
+
+describe("NEE role members (blocked from commands, as in v13)", () => {
+  const nee = ["300000000000000001"];
+
+  test("a member with a NEE role is blocked", () => {
+    expect(hasNeeRole(["1", "300000000000000001"], nee)).toBe(true);
+    expect(hasNeeRole(new Map([["300000000000000001", {}]]).keys(), nee)).toBe(true);
+  });
+
+  test("other members, or no NEE roles configured, are not", () => {
+    expect(hasNeeRole(["1", "2"], nee)).toBe(false);
+    expect(hasNeeRole([], nee)).toBe(false);
+    expect(hasNeeRole(["300000000000000001"], [])).toBe(false);
   });
 });

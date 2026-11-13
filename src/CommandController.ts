@@ -1,4 +1,4 @@
-import { ChatInputCommandInteraction, MessageFlags } from "discord.js";
+import { ChatInputCommandInteraction, GuildMember, MessageFlags } from "discord.js";
 import {
   canRunCommand,
   CommandHandler,
@@ -13,8 +13,18 @@ import {
 import { BasicSetCache } from "./stores";
 import { store } from "./Store";
 import { createLogger } from "./utils/logger";
+import { hasNeeRole, NEE_COMMAND_REPLY } from "./triggers";
 
 const log = createLogger("CommandController");
+
+/** Role IDs of the invoking member (a cached GuildMember, or the raw API member). */
+const memberRoleIds = (interaction: ChatInputCommandInteraction): Iterable<string> => {
+  const { member } = interaction;
+  if (member instanceof GuildMember) {
+    return member.roles.cache.keys();
+  }
+  return member?.roles ?? [];
+};
 
 /** Dispatches slash commands. Construct after store.init(). */
 export default class CommandController {
@@ -39,6 +49,12 @@ export default class CommandController {
     if (!command || !handler) {
       // Registered in Discord but not known to this build (stale registration).
       await interaction.reply({ content: "Unknown command.", flags: MessageFlags.Ephemeral });
+      return;
+    }
+
+    // As in v13, where NeeTrigger answered these members before any command ran.
+    if (hasNeeRole(memberRoleIds(interaction))) {
+      await interaction.reply({ content: NEE_COMMAND_REPLY, flags: MessageFlags.Ephemeral });
       return;
     }
 
