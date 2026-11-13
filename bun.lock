@@ -30,7 +30,6 @@
       "name": "agenda_src",
       "version": "1.0.0",
       "dependencies": {
-        "lit-html": "1.3.0",
         "solid-js": "catalog:",
       },
       "devDependencies": {
@@ -49,7 +48,6 @@
       "name": "public",
       "version": "1.0.0",
       "dependencies": {
-        "lit-html": "1.1.0",
         "solid-js": "catalog:",
       },
       "devDependencies": {
@@ -1066,8 +1064,6 @@
 
     "limiter": ["limiter@1.1.5", "", {}, "sha512-FWWMIEOxz3GwUI4Ts/IvgVy6LPvoMPgjMdQ185nN6psJyBJ4yOpzqm695/h5umdLJg2vW3GR5iG11MAkR2AzJA=="],
 
-    "lit-html": ["lit-html@1.3.0", "", {}, "sha512-0Q1bwmaFH9O14vycPHw8C/IeHMk/uSDldVLIefu/kfbTBGIc44KGH6A8p1bDfxUfHdc8q6Ct7kQklWoHgr4t1Q=="],
-
     "lodash": ["lodash@4.18.1", "", {}, "sha512-dMInicTPVE8d1e5otfwmmjlxkZoUpiVLwyeTdUsi/Caj/gfzzblBcCE5sRHV/AsjuCmxWrte2TNGSYuCeCq+0Q=="],
 
     "lodash.camelcase": ["lodash.camelcase@4.3.0", "", {}, "sha1-soqmKIorn8ZRA1x3EfZathkDMaY="],
@@ -1523,8 +1519,6 @@
     "https-proxy-agent/debug": ["debug@4.3.2", "", { "dependencies": { "ms": "2.1.2" } }, "sha512-mOp8wKcvj7XxC78zLgw/ZA+6TSgkoE2C/ienthhRD298T7UNwAg9diBpLRxC0mOezLl4B0xV7M0cCO6P/O0Xhw=="],
 
     "jwks-rsa/debug": ["debug@4.4.3", "", { "dependencies": { "ms": "^2.1.3" }, "peerDependencies": { "supports-color": "*" }, "optionalPeers": ["supports-color"] }, "sha512-RGwwWnwQvkVfavKVt22FGLw+xYSdzARwm0ru6DhTVA3umU5hZc28V3kO4stgYryrTlLpuvgI9GiijltAjNbcqA=="],
-
-    "public/lit-html": ["lit-html@1.1.0", "", {}, "sha512-ZDJHpJi09yknMpjwPI8fuSl5sUG7+pF+eE5WciFtgyX7zebvgMDBgSLq4knXa7grxM00RkQ7PBd7UZQiruA78Q=="],
 
     "readable-stream/inherits": ["inherits@2.0.3", "", {}, "sha1-Yzwsg+PaQqUC9SRmAiSA9CCCYd4="],
 
