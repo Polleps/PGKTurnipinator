@@ -34,7 +34,8 @@
     "lint": "oxlint",
     "lint:fix": "oxlint --fix",
     "fmt:check": "bun fmt --check",
-    "export:firestore": "node scripts/export-firestore.ts"
+    "export:firestore": "node scripts/export-firestore.ts",
+    "commands": "bun --no-env-file scripts/register-commands.ts"
   },
   "author": "Polle Pas",
   "license": "ISC",

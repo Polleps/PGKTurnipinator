@@ -21,7 +21,6 @@ globalThis.fetch = Object.assign(() => Promise.reject(new Error("Network access 
 }) as unknown as typeof fetch;
 
 // Config parses these at import time; give tests harmless defaults.
-process.env.BOT_ADMINS ??= "[]";
 process.env.NEE_ROLE_IDS ??= "[]";
 // The write guard reads NODE_ENV; tests pass it explicitly or assert the default.
 process.env.NODE_ENV = "test";
