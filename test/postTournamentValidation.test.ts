@@ -2,7 +2,7 @@ import { describe, expect, test } from "bun:test";
 import { ActionError, actionErrorResponse } from "../src/web/actions/ActionError";
 import { MISSING_START_GG_ID, postTournament } from "../src/web/actions/PostTournament/PostTournament";
 
-// A post as public/src/tournamentFormat.js sends it, before a start.gg lookup set the id.
+// A post as the old lit-html form sent it, before a start.gg lookup set the id.
 const form = (overrides: Record<string, unknown> = {}) => ({
   url: "fixture-cup",
   title: "Fixture Cup",
