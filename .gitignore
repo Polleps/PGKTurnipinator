@@ -73,8 +73,12 @@ firebasekey.json
 
 .DS_Store
 
-# Firestore JSON exports (scripts/export-firestore.ts)
-data/firestore-export/
+# Local data: Firestore JSON exports, SQLite DBs, import reports
+data/
+*.db
+*.db-wal
+*.db-shm
+*.db.importing
 
 # Internal planning notes (kept out of the public repo)
 planning/
