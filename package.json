@@ -12,7 +12,8 @@
     "build": "tsc",
     "buildall": "./build.sh",
     "lint": "oxlint",
-    "lint:fix": "oxlint --fix"
+    "lint:fix": "oxlint --fix",
+    "export:firestore": "tsc -p scripts && node ./built-scripts/scripts/export-firestore.js"
   },
   "author": "Polle Pas",
   "license": "ISC",

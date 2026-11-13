@@ -74,3 +74,7 @@ token.key
 firebasekey.json
 
 .DS_Store
+
+# Firestore JSON exports (scripts/export-firestore.ts) and compiled scripts
+data/firestore-export/
+built-scripts/
