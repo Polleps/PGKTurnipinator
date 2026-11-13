@@ -69,13 +69,13 @@ describe("legacy GET /tournaments", () => {
 
     // Every exported doc but the quarantined ones, sorted by start date.
     expect(items).toHaveLength(oldRoute.length - quarantined.size);
-    expect(new Set(items.map((t) => t.id))).toEqual(new Set(sourceDocs.keys()));
+    expect(new Set(items.map((t) => String(t.id)))).toEqual(new Set(sourceDocs.keys()));
     const starts = items.map((t) => t.startDate as number);
     expect(starts).toEqual([...starts].sort((a, b) => a - b));
 
     for (const item of items) {
-      const old = sourceDocs.get(item.id as string)!;
-      const defaulted = defaultedById.get(item.id as string) ?? new Set();
+      const old = sourceDocs.get(String(item.id))!;
+      const defaulted = defaultedById.get(String(item.id)) ?? new Set();
 
       for (const key of ALWAYS) {
         expect(item).toHaveProperty(key);
@@ -84,8 +84,9 @@ describe("legacy GET /tournaments", () => {
         expect([...ALWAYS, ...OPTIONAL]).toContain(key);
         expect(item[key]).not.toBeNull();
       }
-      // The old id was start.gg's number; the same value as a string now.
-      expect(item.id).toBe(String(old.id));
+      // start.gg's number, exactly as the old route sent it.
+      expect(typeof item.id).toBe("number");
+      expect(item.id).toBe(old.id);
       // A value the import didn't need to repair is exactly what the old route sent.
       for (const [key, value] of Object.entries(item)) {
         if (key !== "id" && !defaulted.has(key) && !["startDate", "endDate"].includes(key)) {
@@ -106,15 +107,15 @@ describe("legacy GET /tournaments", () => {
     }
 
     // Plain ms dates were sent unchanged; Firestore Timestamps become ms.
-    const plain = items.find((t) => t.id === "900002")!;
+    const plain = items.find((t) => t.id === 900002)!;
     expect([plain.startDate, plain.endDate]).toEqual([sourceDocs.get("900002")!.startDate, sourceDocs.get("900002")!.endDate]);
-    expect(items.find((t) => t.id === "900007")?.startDate).toBe(1546344000500);
+    expect(items.find((t) => t.id === 900007)?.startDate).toBe(1546344000500);
   });
 
   test("registrationClosesAt goes out in seconds, as start.gg sends it", async () => {
     repo.setStatus("900001", { participants: 12, registrationClosesAt: 4070900000000 });
     const items = JSON.parse((await get("/tournaments")).body) as Array<Record<string, unknown>>;
-    expect(items.find((t) => t.id === "900001")).toMatchObject({ participants: 12, registrationClosesAt: 4070900000 });
+    expect(items.find((t) => t.id === 900001)).toMatchObject({ participants: 12, registrationClosesAt: 4070900000 });
     repo.setStatus("900001", { participants: null, registrationClosesAt: null });
   });
 });
