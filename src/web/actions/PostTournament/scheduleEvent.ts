@@ -22,7 +22,7 @@ export const buildEvent = (
   entityType: GuildScheduledEventEntityType.External,
   description: buildDescription(tournament.url),
   entityMetadata: {
-    location: tournament.streamURL,
+    location: tournament.streamURL ?? undefined,
   },
 });
 

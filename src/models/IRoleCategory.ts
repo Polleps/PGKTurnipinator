@@ -1,4 +1,1 @@
-export interface IRoleCategory {
-  name: string;
-  description: string;
-}
+export type { RoleCategory as IRoleCategory } from "../db/schema";

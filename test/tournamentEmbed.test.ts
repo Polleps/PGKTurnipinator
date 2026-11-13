@@ -15,33 +15,41 @@ const poster: EmbedPoster = {
 
 // Midday UTC, so the local-time date formatting gives the same day in any test timezone.
 const offline: ITournament = {
+  id: "900100",
   url: "fixture-cup",
   title: "Fixture Cup",
   image: "https://images.start.gg/fixture.png",
   events: [
     { name: "Singles", cap: "64" },
     { name: "Doubles", cap: "32" },
-    { name: "" },
+    { name: "", cap: "" },
   ],
   description: "Bring a switch",
   location: "Teststraat 1, Utrecht",
   city: "Utrecht",
   locationID: "place123",
-  startDate: new Date("2026-03-14T12:00:00Z"),
-  endDate: new Date("2026-03-15T12:00:00Z"),
+  startDate: Date.parse("2026-03-14T12:00:00Z"),
+  endDate: Date.parse("2026-03-15T12:00:00Z"),
   type: "smashgg",
   isOnline: false,
+  nocap: false,
+  pr: false,
+  prices: [],
+  streamURL: null,
+  streamStartDate: null,
+  messageID: null,
+  guildEventID: null,
 };
 
 const online: ITournament = {
   ...offline,
   title: "Fixture Online",
-  image: undefined,
-  events: [{ name: "Singles" }],
+  image: "",
+  events: [{ name: "Singles", cap: "" }],
   description: "   ",
   location: "",
-  startDate: new Date("2026-03-14T11:30:00Z"),
-  endDate: new Date("2026-03-14T13:30:00Z"),
+  startDate: Date.parse("2026-03-14T11:30:00Z"),
+  endDate: Date.parse("2026-03-14T13:30:00Z"),
   isOnline: true,
 };
 
@@ -84,14 +92,14 @@ describe("tournament embed", () => {
   });
 
   test("rejects a tournament without named events or with too long notes", () => {
-    expect(() => buildEmbed(poster, { ...offline, events: [{ name: "" }] })).toThrow("No events found");
+    expect(() => buildEmbed(poster, { ...offline, events: [{ name: "", cap: "" }] })).toThrow("No events found");
     expect(() => buildEmbed(poster, { ...offline, description: "x".repeat(251) })).toThrow("to long");
   });
 });
 
 describe("scheduled event options", () => {
   test("external, guild-only event at the stream URL", () => {
-    const streamStartDate = new Date("2026-03-14T11:00:00Z");
+    const streamStartDate = Date.parse("2026-03-14T11:00:00Z");
     expect(buildEvent({ ...offline, streamURL: "https://twitch.tv/fixture", streamStartDate })).toEqual({
       name: "Kijk Fixture Cup live op Twitch!",
       scheduledStartTime: streamStartDate,

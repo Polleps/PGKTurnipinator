@@ -1,9 +1,13 @@
 import { describe, expect, test } from "bun:test";
+import { mkdtempSync, rmSync } from "fs";
+import { tmpdir } from "os";
+import { join } from "path";
 import { openDatabase } from "../src/db/database";
 import type { NormalizedTournament } from "../src/db/normalizeTournament";
 import { RoleRepository } from "../src/db/RoleRepository";
 import { refreshTournamentStatus } from "../src/db/statusRefresh";
 import { TournamentRepository } from "../src/db/TournamentRepository";
+import { Store } from "../src/Store";
 
 const HOUR = 3600000;
 const NOW = Date.parse("2026-06-01T12:00:00Z");
@@ -123,5 +127,30 @@ describe("RoleRepository", () => {
     expect(roles.rolesInCategory("Regio").map((r) => r.name)).toEqual(["Utrecht", "Amsterdam"]);
     expect(() => roles.addRole({ id: "4", name: "Ghost", category: "Nope", description: "" })).toThrow(/FOREIGN KEY/);
     expect(() => roles.addRole({ id: "5", name: "Mario", category: "Icons", description: "" })).toThrow(/UNIQUE/);
+  });
+});
+
+describe("Store", () => {
+  test("opens the DB once and refuses a missing file unless asked to create it", () => {
+    const s = new Store();
+    expect(() => s.tournaments).toThrow(/not open/);
+    expect(() => s.init({ path: "/nonexistent-dir/turnipinator.db" })).toThrow(/No SQLite database/);
+
+    s.init({ path: ":memory:" });
+    expect(s.tournaments.count()).toBe(0);
+    expect(() => s.init({ path: ":memory:" })).toThrow(/already open/);
+    s.close();
+  });
+
+  test("uses WAL and foreign keys on a file DB", () => {
+    const dir = mkdtempSync(join(tmpdir(), "store-test-"));
+    const path = join(dir, "test.db");
+    const s = new Store();
+    s.init({ path, create: true });
+    const client = s.db.$client;
+    expect(client.query("PRAGMA journal_mode").get()).toEqual({ journal_mode: "wal" });
+    expect(client.query("PRAGMA foreign_keys").get()).toEqual({ foreign_keys: 1 });
+    s.close();
+    rmSync(dir, { recursive: true, force: true });
   });
 });

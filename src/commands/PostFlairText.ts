@@ -7,7 +7,6 @@ import {
 } from "discord.js";
 import { CommandHandler } from "./CommandHandler";
 import { store } from "../Store";
-import { BasicMapCache } from "../stores/BasicMapCache";
 import { IJoinableRole } from "../models/IJoinableRole";
 import { IRoleCategory } from "../models/IRoleCategory";
 
@@ -45,7 +44,7 @@ export const buildRoleSelectRows = (
 ): ActionRowBuilder<StringSelectMenuBuilder>[] => {
   const options = roles.map((role) => ({
     label: role.name,
-    value: role.ID,
+    value: role.id,
     ...(role.description ? { description: role.description.slice(0, 100) } : {}),
   }));
 
@@ -71,14 +70,6 @@ export const buildRoleSelectRows = (
 
 /** Posts the role selector: an intro message, then one message per role category. */
 export class PostFlairTextCommand implements CommandHandler {
-  private roles: BasicMapCache<IJoinableRole>;
-  private categories: BasicMapCache<IRoleCategory>;
-
-  constructor() {
-    this.roles = store.cache("joinableroles") as BasicMapCache<IJoinableRole>;
-    this.categories = store.cache("role_categories") as BasicMapCache<IRoleCategory>;
-  }
-
   public async execute(interaction: ChatInputCommandInteraction) {
     await interaction.deferReply({ flags: MessageFlags.Ephemeral });
 
@@ -88,15 +79,11 @@ export class PostFlairTextCommand implements CommandHandler {
       return;
     }
 
-    const roles = Array.from(this.roles.data.values());
     // Build everything first, so a category that doesn't fit fails before anything is posted.
-    const messages = Array.from(this.categories.data.values(), (category) => ({
+    const messages = store.roles.categories().map((category) => ({
       content: FLAIR_SPACER_TEXT,
       embeds: [buildCategoryEmbed(category)],
-      components: buildRoleSelectRows(
-        category,
-        roles.filter((role) => role.category === category.name),
-      ),
+      components: buildRoleSelectRows(category, store.roles.rolesInCategory(category.name)),
     }));
 
     await channel.send(FLAIR_INTRO_TEXT);

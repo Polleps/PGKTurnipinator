@@ -1,36 +1,8 @@
-export default interface ITournament {
-  url: string;
-  title: string;
-  image?: string;
-  events: IEvent[];
-  description?: string;
-  location: string;
-  city: string;
-  locationID: string;
-  startDate: Date;
-  endDate: Date;
-  type: "smashgg" | "other";
-  smashggID?: string;
-  streamURL?: string;
-  streamStartDate?: Date;
-  id?: string;
-  prices?: IPrice[];
-  pr?: boolean;
-  lng?: number;
-  lat?: number;
-  participants?: number;
-  registrationClosesAt?: Date;
-  isOnline: boolean;
-  messageID?: string;
-  guildEventID?: string;
-}
+import type { NormalizedTournament } from "../db/normalizeTournament";
 
-interface IEvent {
-  name: string;
-  cap?: string;
-}
-
-interface IPrice {
-  name: string;
-  amount: number;
-}
+/**
+ * A tournament as the bot handles it: the `tournaments` row shape (see src/db/schema.ts),
+ * dates as epoch ms. A stored row (`Tournament`) also has the start.gg status fields.
+ */
+type ITournament = NormalizedTournament;
+export default ITournament;

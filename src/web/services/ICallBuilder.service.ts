@@ -15,14 +15,13 @@ const buildEvent = (tournament: ITournament): string => {
   const eventMap = [
     ["BEGIN", "VEVENT"],
     ["SUMMARY", tournament.title],
-    ["UID", `${tournament.smashggID || tournament.id}@pgksmash.nl`],
+    ["UID", `${tournament.id}@pgksmash.nl`],
     ["DTSTART", formatUTC(new Date(tournament.startDate))],
     ["DTEND", formatUTC(new Date(tournament.endDate))],
     ["DTSTAMP", formatUTC(new Date())],
     ...(tournament.location
       ? ["LOCATION", tournament.location.replace(/,/g, "\\,")]
       : []),
-    ...(tournament.lat ? [["GEO", `${tournament.lat};${tournament.lng}`]] : []),
     ["DESCRIPTION", "https://start.gg/tournament/" + tournament.url],
     [
       "IMAGE",

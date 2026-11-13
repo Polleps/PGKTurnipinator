@@ -1,8 +1,7 @@
 import Config from "../../../Config";
 import { sClient } from "../../../Context";
-import ITournament from "../../../models/ITournament";
+import { normalizeTournament } from "../../../db/normalizeTournament";
 import { store } from "../../../Store";
-import { TournamentStoreCache } from "../../../stores";
 import { IUserInfo } from "../../discord.agent";
 import { IAction, Performer } from "../IAction";
 
@@ -11,8 +10,6 @@ import { scheduleEvent } from "./scheduleEvent";
 
 const guildID = Config.GUILD_ID;
 const roleName = Config.POST_TOURNAMENT_ROLE_NAME;
-
-const cache = store.cache("tournaments") as TournamentStoreCache;
 
 /**
  * Perform 'posttournament' action.
@@ -45,49 +42,43 @@ export const postTournament: Performer = async (userInfo: IUserInfo, action: IAc
     throw new Error("You are not allowed to post tournaments.");
   }
 
-  // Local data-safety guard: refuse up front (before posting anything to Discord)
-  // when the tournament collection is read-only in this environment.
-  if (!cache.writable) {
-    throw new Error(
-      `Tournament store "${cache.collectionId}" is read-only in this environment; ` +
-        "set TOURNAMENT_COLLECTION_NAME=tournaments_dev to test posting locally.",
-    );
+  // The same normalizer as the import: e.g. online tournaments arrive with null location
+  // fields, and start.gg ids as numbers.
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(action.args[0]);
+  } catch {
+    throw new Error("Invalid Tournament Details.");
   }
+  const normalized = normalizeTournament(parsed);
+  if (!normalized.ok) {
+    console.log(`Rejected tournament: ${normalized.reason}`);
+    throw new Error("Invalid Tournament Details.");
+  }
+  const tournament = normalized.row;
 
   try {
-    const parsedTournament = JSON.parse(action.args[0]) as ITournament;
-    const existingTournament = cache.getByID(parsedTournament.id);
+    const existing = store.tournaments.getById(tournament.id);
+    // Never taken from the form: the Discord ids come from the stored row, and pr is set elsewhere.
+    tournament.messageID = existing?.messageID ?? null;
+    tournament.guildEventID = existing?.guildEventID ?? null;
+    tournament.pr = existing?.pr ?? false;
 
-    if (existingTournament) {
-      parsedTournament.messageID = existingTournament.messageID;
-      parsedTournament.guildEventID = existingTournament.guildEventID;
-    }
+    if (action.args[1] !== "saveonly") {
+      tournament.messageID = await postEmbed(guild, user, tournament);
 
-    if (action.args[ 1 ] !== "saveonly") {
-      const messageID = await postEmbed(guild, user, parsedTournament);
-      parsedTournament.messageID = messageID;
-
-      const tournamentHasStream = !!parsedTournament.streamURL?.trim() && !!parsedTournament.streamStartDate;
-
-      if (tournamentHasStream) {
-        const guildEventID = await scheduleEvent(guild, parsedTournament);
-        parsedTournament.guildEventID = guildEventID;
+      // The normalizer stores a stream only with both a URL and a start time.
+      if (tournament.streamURL !== null && tournament.streamStartDate !== null) {
+        tournament.guildEventID = await scheduleEvent(guild, tournament);
       }
     }
 
-    storeTournament(parsedTournament);
+    // An existing id updates its row; a new id is a new row, even if its url is reused.
+    store.tournaments.upsert(tournament);
   } catch (err) {
     console.log(err);
     throw new Error("Invalid Tournament Details.");
   }
 
   return "Done";
-};
-
-/**
- * Stores a tournament in the database.
- * @param t tournament details to be inserted in the Object store.
- */
-const storeTournament = (t: ITournament) => {
-  cache.add(t);
 };

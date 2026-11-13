@@ -21,7 +21,6 @@ export default class Config {
   public static readonly ONLINE_TOURNAMENT_AGENDA_ID: string = env("ONLINE_TOURNAMENT_AGENDA_ID");
   public static readonly SERVERURL: string = env("SERVERURL");
   public static readonly PUBLIC_INVITE_LINK: string = env("PUBLIC_INVITE_LINK");
-  public static readonly TOURNAMENT_COLLECTION_NAME: string = env("TOURNAMENT_COLLECTION_NAME");
   public static readonly NEE_ROLE_IDS: string[] = JSON.parse(env("NEE_ROLE_IDS"));
   private constructor() {}
 }

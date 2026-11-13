@@ -1,19 +1,17 @@
-import { Request, Response, Router } from "express";
+import { Router } from "express";
 import { store } from "../../Store";
-import { TournamentStoreCache } from "../../stores";
+import type { TournamentRepository } from "../../db/TournamentRepository";
 import { buildICallFile } from "../services/ICallBuilder.service";
 
 export class CalendarRouter {
   private _router: Router;
-  private cache: TournamentStoreCache;
   private lastUpdated: number = 0;
   private cachedICal!: string;
 
   private readonly expireTime = 18000000;
 
-  constructor() {
+  constructor(private readonly repo: () => TournamentRepository = () => store.tournaments) {
     this._router = Router();
-    this.cache = store.cache("tournaments") as TournamentStoreCache;
     this.setupRoutes();
   }
 
@@ -23,10 +21,10 @@ export class CalendarRouter {
 
   private setupRoutes() {
 
-    // ::GET:: [URL]/calendar/ical
+    // ::GET:: [URL]/calendar/tournaments.ics
     this._router.get("/tournaments.ics", (req, res) => {
       if ((Date.now() - this.lastUpdated) > this.expireTime) {
-        this.cachedICal = buildICallFile(this.cache.getUpcoming());
+        this.cachedICal = buildICallFile(this.repo().upcoming());
         this.lastUpdated = Date.now();
       }
       res.setHeader("Content-Type", "text/calendar;charset=utf-8");

@@ -1,14 +1,14 @@
 /**
  * Preloaded before every test file (see bunfig.toml).
  *
- * Tests must never touch live Firestore: firebasekey.json is the PRODUCTION
- * project. Any runtime import of the Firebase SDKs fails loudly here, and the
- * network client is stubbed out, so tests can only use fakes.
+ * The bot no longer uses Firestore; these guards prove it. Any runtime import of the
+ * Firebase SDKs fails loudly, and the network client is stubbed out, so tests can only
+ * use fakes. Tests open their own in-memory SQLite DBs.
  */
 import { mock } from "bun:test";
 
 const forbidden = (name: string) => () => {
-  throw new Error(`${name} must not be loaded in tests (no live Firestore / network). Use a fake.`);
+  throw new Error(`${name} must not be loaded in tests (no Firestore / network). Use a fake.`);
 };
 
 void mock.module("firebase-admin", forbidden("firebase-admin"));
@@ -22,9 +22,6 @@ globalThis.fetch = Object.assign(() => Promise.reject(new Error("Network access 
 
 // Config parses these at import time; give tests harmless defaults.
 process.env.NEE_ROLE_IDS ??= "[]";
-// The write guard reads NODE_ENV; tests pass it explicitly or assert the default.
 process.env.NODE_ENV = "test";
-// Anything that imports Store gets snapshot mode on the fake fixture export, so the
-// `store` singleton never tries to load firebase-admin.
-process.env.FIRESTORE_SNAPSHOT = new URL("./fixtures/firestore-export", import.meta.url).pathname;
-process.env.TOURNAMENT_COLLECTION_NAME ??= "tournaments";
+// Never the developer's DB file: anything that opens the default store gets an in-memory DB.
+process.env.DATABASE_PATH = ":memory:";

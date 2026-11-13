@@ -7,9 +7,8 @@ import { IJoinableRole } from "../src/models/IJoinableRole";
 const role = (i: number, description?: string): IJoinableRole => ({
   name: `Role ${i}`,
   category: "Regio",
-  categoryID: "rc1",
-  ID: `10000000000000${String(i).padStart(4, "0")}`,
-  ...(description ? { description } : {}),
+  id: `10000000000000${String(i).padStart(4, "0")}`,
+  description: description ?? "",
 });
 
 describe("role category embed", () => {

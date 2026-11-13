@@ -7,15 +7,22 @@ const base: ITournament = {
   url: "pgk-weekly-1",
   title: "PGK Weekly #1",
   image: "https://images.start.gg/profile.png",
+  description: "",
   events: [{ name: "Ultimate Singles", cap: "64" }],
   location: "Stationsplein 1, Utrecht",
   city: "Utrecht",
   locationID: "x",
-  // Firestore stores these as epoch milliseconds (see public/src/tournamentFormat.js).
-  startDate: 1767261600000 as unknown as Date, // 2026-01-01T10:00:00Z
-  endDate: "2026-01-01T20:30:05Z" as unknown as Date,
+  startDate: 1767261600000, // 2026-01-01T10:00:00Z
+  endDate: Date.parse("2026-01-01T20:30:05Z"),
   type: "smashgg",
   isOnline: false,
+  nocap: false,
+  pr: false,
+  prices: [],
+  streamURL: null,
+  streamStartDate: null,
+  messageID: null,
+  guildEventID: null,
 };
 
 const unfold = (ics: string) => ics.replace(/\r\n /g, "");
@@ -29,23 +36,18 @@ describe("buildICallFile", () => {
     expect(ics).toContain("\r\nEND:VEVENT");
   });
 
-  test("formats dates as UTC basic format from numbers and strings", () => {
+  test("formats epoch-ms dates as UTC basic format", () => {
     const ics = buildICallFile([base]);
     expect(ics).toContain("DTSTART:20260101T100000Z");
     expect(ics).toContain("DTEND:20260101T203005Z");
     expect(ics).toMatch(/DTSTAMP:\d{8}T\d{6}Z/);
   });
 
-  test("uses smashggID for the UID when present, else id", () => {
-    expect(buildICallFile([base])).toContain("UID:123@pgksmash.nl");
-    expect(buildICallFile([{ ...base, smashggID: "999" }])).toContain("UID:999@pgksmash.nl");
-  });
-
-  test("includes GEO only with coordinates and links the start.gg page", () => {
-    expect(buildICallFile([base])).not.toContain("GEO:");
-    const ics = buildICallFile([{ ...base, lat: 52.09, lng: 5.11 }]);
-    expect(ics).toContain("GEO:52.09;5.11");
+  test("uses the start.gg id for the UID and links the start.gg page", () => {
+    const ics = buildICallFile([base]);
+    expect(ics).toContain("UID:123@pgksmash.nl");
     expect(ics).toContain("DESCRIPTION:https://start.gg/tournament/pgk-weekly-1");
+    expect(ics).not.toContain("GEO:");
   });
 
   test("folds lines longer than 75 octets per RFC 5545", () => {

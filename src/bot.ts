@@ -8,6 +8,7 @@ import TriggerController from "./TriggerController";
 import Server from "./web/Server";
 import { createLogger } from "./utils/logger";
 import { store } from "./Store";
+import { startStatusRefresh } from "./db/statusRefresh";
 import { InteractionHandler } from "./InteractionHandler";
 
 const log = createLogger("Main");
@@ -28,8 +29,9 @@ class Main {
   public async main() {
     const client = new Client({ intents });
     sClient.client = client;
-    await store.init();
-    log("Caches Loaded.");
+    // Throws if the DB file is missing: build it with `bun run import:firestore`.
+    store.init();
+    startStatusRefresh(store.tournaments);
     const triggerController = new TriggerController();
     const commandController = new CommandController();
     const interactionHandler = new InteractionHandler(client);
@@ -73,4 +75,10 @@ class Main {
 }
 const bot = new Main([]);
 // tslint:disable-next-line:no-console
-bot.main().then(() => log("main done"));
+bot.main().then(
+  () => log("main done"),
+  (e) => {
+    console.error(e instanceof Error ? e.message : e);
+    process.exit(1);
+  },
+);
