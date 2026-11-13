@@ -40,6 +40,13 @@ precacheAndRoute(self.__WB_MANIFEST);
 registerRoute(new NavigationRoute(createHandlerBoundToURL('index.html')));
 
 // Tournament data: fresh when online, the last copy when offline or slow.
+// NetworkFirst rather than stale-while-revalidate: the agenda renders each response once (the list
+// appends pages, the calendar memoizes months), so SWR would show the stale copy and never the
+// revalidated one until the next visit; participant counts, registration warnings and new
+// tournaments would lag a visit behind. The 3 s timeout keeps bad connections usable.
+// Workbox keys on the full URL, so the agenda keeps its URLs stable (see agenda/src/api.ts):
+// `/api/tournaments` for the first upcoming page, `?cursor=` after it, `?from&to&limit=100` per month.
+// `/tournaments` is the legacy route that old agenda bundles still call until they reload.
 // Same cache name as before, so data cached by the old worker stays available offline.
 registerRoute(
   ({ url, sameOrigin }) =>
