@@ -1,5 +1,5 @@
 import fetch from "node-fetch";
-const baseURL: string = "https://discord.com/api/v6";
+const baseURL: string = "https://discord.com/api/v10";
 
 export const fetchUserInfo = async (accessToken: string): Promise<IUserInfo> => {
   const headers = {
@@ -12,11 +12,13 @@ export const fetchUserInfo = async (accessToken: string): Promise<IUserInfo> => 
 export interface IUserInfo {
   id: string;
   username: string;
+  /** "0" for accounts migrated to unique usernames. */
   discriminator: string;
+  global_name?: string | null;
   avatar?: string;
   bot?: boolean;
   mfa_enabled?: boolean;
-  locale?: boolean;
+  locale?: string;
   flags: number;
   premium_type?: number;
 }

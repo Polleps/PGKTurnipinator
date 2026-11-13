@@ -2,11 +2,21 @@ import fetch from "node-fetch";
 import * as jwt from "jsonwebtoken";
 import Config from "../../Config";
 import * as fs from "fs";
+import { createSecretKey, KeyObject } from "crypto";
 
-const APIURL = "https://discord.com/api/v6";
+const APIURL = "https://discord.com/api/v10";
 const TOKENURL = "/oauth2/token";
 const baseDir = process.cwd();
-let tokenKey: Buffer | undefined;
+let tokenKey: KeyObject | undefined;
+
+/**
+ * The session JWT is HS256, keyed with the raw bytes of token.key. jsonwebtoken 9
+ * rejects asymmetric (PEM) keys for HS* algorithms, so wrap the bytes as a secret
+ * KeyObject explicitly: this keeps the exact v8 behavior (HMAC over the file's bytes)
+ * whatever the file contains, so existing cookies stay valid.
+ */
+export const toSigningKey = (raw: Buffer): KeyObject => createSecretKey(raw);
+const ALGORITHM = "HS256";
 
 export const fetchUserToken = async (code: string): Promise<ITokenRespose> => {
   // TODO: State checking in token request.
@@ -36,14 +46,14 @@ export const refreshUserToken = async (refresh_token: string): Promise<ITokenRes
 
 export const verifyActionRequest = async (token: string): Promise<IDecodedToken> => {
   if (!tokenKey) {
-    tokenKey = await loadPrivateKey();
+    tokenKey = toSigningKey(await loadPrivateKey());
   }
   return pJWTVerify(token, tokenKey);
 };
 
 export const encodeToken = async (data: ITokenRespose) => {
   if (!tokenKey) {
-    tokenKey = await loadPrivateKey();
+    tokenKey = toSigningKey(await loadPrivateKey());
   }
   const { access_token, refresh_token, expires_in } = data;
   const tokenData = { access_token, refresh_token, expires: Date.now() + (expires_in * 1000) };
@@ -52,9 +62,9 @@ export const encodeToken = async (data: ITokenRespose) => {
   return pJWTSign(JSON.stringify(tokenData), tokenKey);
 };
 
-export const pJWTVerify = (token: string, secret: Buffer): Promise<IDecodedToken> => {
+export const pJWTVerify = (token: string, secret: KeyObject): Promise<IDecodedToken> => {
   return new Promise((resolve, reject) => {
-    jwt.verify(token, secret, (err, data) => {
+    jwt.verify(token, secret, { algorithms: [ALGORITHM] }, (err, data) => {
       if (err) {
         reject(err);
       } else {
@@ -65,13 +75,13 @@ export const pJWTVerify = (token: string, secret: Buffer): Promise<IDecodedToken
   });
 };
 
-const pJWTSign = (payload: string, key: Buffer): Promise<string> => {
+export const pJWTSign = (payload: string, key: KeyObject): Promise<string> => {
   return new Promise((resolve, reject) => {
-    jwt.sign(payload, key, (err, token) => {
+    jwt.sign(payload, key, { algorithm: ALGORITHM }, (err, token) => {
       if (err) {
         reject(err);
       }
-      resolve(token);
+      resolve(token as string);
     });
   });
 };
