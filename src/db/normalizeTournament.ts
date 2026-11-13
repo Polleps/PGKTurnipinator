@@ -14,7 +14,7 @@ import type { NewTournament, TournamentEvent, TournamentPrice } from "./schema";
  */
 export type NormalizeResult =
   | { ok: true; row: NormalizedTournament; defaulted: DefaultedField[]; droppedKeys: string[] }
-  | { ok: false; reason: string };
+  | { ok: false; reason: string; /** The start.gg id is missing or not a valid id. */ badId?: boolean };
 
 export type NormalizedTournament = Required<Omit<NewTournament, "participants" | "registrationClosesAt">>;
 
@@ -84,11 +84,22 @@ const toMillis = (x: unknown): number | undefined => {
   return undefined;
 };
 
-const parseId = (x: unknown): string | undefined => {
-  if (typeof x === "number") {
-    return Number.isSafeInteger(x) && x > 0 ? String(x) : undefined;
+/**
+ * start.gg tournament ids are positive integers (a JSON number from start.gg, or its string).
+ * The form starts with id "0" until a start.gg lookup succeeds, so "0" (and anything else that
+ * isn't a positive integer) is invalid: storing it would merge unrelated posts into one row.
+ */
+const parseId = (x: unknown): { id: string } | "missing" | "invalid" => {
+  if (x === undefined || x === null || (typeof x === "string" && x.trim() === "")) {
+    return "missing";
   }
-  return nonBlank(x) ? x.trim() : undefined;
+  if (typeof x === "number") {
+    return Number.isSafeInteger(x) && x > 0 ? { id: String(x) } : "invalid";
+  }
+  if (typeof x === "string" && /^[1-9]\d*$/.test(x.trim()) && Number.isSafeInteger(Number(x.trim()))) {
+    return { id: x.trim() };
+  }
+  return "invalid";
 };
 
 const optionalId = (x: unknown): string | null => {
@@ -221,19 +232,24 @@ export const normalizeTournament = (doc: unknown): NormalizeResult => {
     return { ok: false, reason: "not an object" };
   }
 
-  const id = parseId(doc.id);
+  const parsedId = parseId(doc.id);
+  const id = typeof parsedId === "object" ? parsedId.id : undefined;
   const url = nonBlank(doc.url) ? doc.url.trim() : undefined;
   const title = nonBlank(doc.title) ? doc.title : undefined;
   const startDate = toMillis(doc.startDate);
 
   const missing = [
-    id === undefined && "id",
+    parsedId === "missing" && "id",
     url === undefined && "url",
     title === undefined && "title",
     startDate === undefined && "startDate",
   ].filter(Boolean);
   if (id === undefined || url === undefined || title === undefined || startDate === undefined) {
-    return { ok: false, reason: `missing ${missing.join(", ")}` };
+    const problems = [
+      ...(parsedId === "invalid" ? [`invalid id ${JSON.stringify(doc.id)}`] : []),
+      ...(missing.length > 0 ? [`missing ${missing.join(", ")}`] : []),
+    ];
+    return { ok: false, reason: problems.join("; "), ...(id === undefined ? { badId: true } : {}) };
   }
 
   const defaulted: DefaultedField[] = [];

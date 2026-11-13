@@ -3,6 +3,7 @@ import { sClient } from "../../../Context";
 import { normalizeTournament } from "../../../db/normalizeTournament";
 import { store } from "../../../Store";
 import { IUserInfo } from "../../discord.agent";
+import { ActionError } from "../ActionError";
 import { IAction, Performer } from "../IAction";
 
 import { postEmbed } from "./postEmbed";
@@ -18,6 +19,9 @@ const roleName = Config.POST_TOURNAMENT_ROLE_NAME;
  * @param action action parameters.
  */
 export const postTournament: Performer = async (userInfo: IUserInfo, action: IAction): Promise<string> => {
+  // Validate before touching Discord, so a bad post is answered with a clear 400.
+  const tournament = parseTournament(action);
+
   const client = sClient.client;
   const guild = await client.guilds.fetch(guildID);
 
@@ -30,10 +34,6 @@ export const postTournament: Performer = async (userInfo: IUserInfo, action: IAc
   await guild.roles.fetch();
   const role = guild.roles.cache.find((x) => x.name === roleName);
 
-  if (!action.args || action.args.length < 1) {
-    throw new Error("Invalid Action.");
-  }
-
   if (!user) {
     throw new Error("You're not in the Discord.");
   }
@@ -42,20 +42,6 @@ export const postTournament: Performer = async (userInfo: IUserInfo, action: IAc
     throw new Error("You are not allowed to post tournaments.");
   }
 
-  // The same normalizer as the import: e.g. online tournaments arrive with null location
-  // fields, and start.gg ids as numbers.
-  let parsed: unknown;
-  try {
-    parsed = JSON.parse(action.args[0]);
-  } catch {
-    throw new Error("Invalid Tournament Details.");
-  }
-  const normalized = normalizeTournament(parsed);
-  if (!normalized.ok) {
-    console.log(`Rejected tournament: ${normalized.reason}`);
-    throw new Error("Invalid Tournament Details.");
-  }
-  const tournament = normalized.row;
 
   try {
     const existing = store.tournaments.getById(tournament.id);
@@ -64,7 +50,7 @@ export const postTournament: Performer = async (userInfo: IUserInfo, action: IAc
     tournament.guildEventID = existing?.guildEventID ?? null;
     tournament.pr = existing?.pr ?? false;
 
-    if (action.args[1] !== "saveonly") {
+    if (action.args?.[1] !== "saveonly") {
       tournament.messageID = await postEmbed(guild, user, tournament);
 
       // The normalizer stores a stream only with both a URL and a start time.
@@ -81,4 +67,29 @@ export const postTournament: Performer = async (userInfo: IUserInfo, action: IAc
   }
 
   return "Done";
+};
+
+export const MISSING_START_GG_ID =
+  "This tournament has no start.gg id. Fill in its start.gg link and load the details from start.gg before posting.";
+
+/**
+ * Parses the form's JSON with the same normalizer as the import: e.g. online tournaments
+ * arrive with null location fields, and start.gg ids as numbers.
+ */
+export const parseTournament = (action: IAction) => {
+  if (!action.args || action.args.length < 1) {
+    throw new ActionError("Invalid Action.");
+  }
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(action.args[0]);
+  } catch {
+    throw new ActionError("Invalid Tournament Details.");
+  }
+  const normalized = normalizeTournament(parsed);
+  if (!normalized.ok) {
+    console.log(`Rejected tournament: ${normalized.reason}`);
+    throw new ActionError(normalized.badId ? MISSING_START_GG_ID : `Invalid Tournament Details: ${normalized.reason}.`);
+  }
+  return normalized.row;
 };

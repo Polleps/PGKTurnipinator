@@ -6,6 +6,7 @@ import { IAction } from "../actions/IAction";
 import { IUserInfo } from "../discord.agent";
 import { fetchTournamentDetails } from "../services/smashgg.service";
 import { userCanFetchTournament } from "../services/access.service";
+import { actionErrorResponse } from "../actions/ActionError";
 
 export class ActionRouter {
   private _router: Router;
@@ -57,7 +58,8 @@ export class ActionRouter {
         res.status(200).json({ message });
       } catch (e) {
         console.error(e);
-        res.status(200).json({error: true, message: (e as Error).message});
+        const { status, body } = actionErrorResponse(e);
+        res.status(status).json(body);
       }
     });
 

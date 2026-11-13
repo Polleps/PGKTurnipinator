@@ -64,12 +64,29 @@ describe("normalizeTournament: quarantine", () => {
     ["not an object", "x", "not an object"],
     ["no id", without(current(), "id"), "missing id"],
     ["a blank id", current({ id: " " }), "missing id"],
-    ["a non-integer id", current({ id: 1.5 }), "missing id"],
+    ["a null id", current({ id: null }), "missing id"],
+    ["the form's placeholder id \"0\"", current({ id: "0" }), 'invalid id "0"'],
+    ["id 0", current({ id: 0 }), "invalid id 0"],
+    ["a negative id", current({ id: -5 }), "invalid id -5"],
+    ["a negative string id", current({ id: "-5" }), 'invalid id "-5"'],
+    ["a non-integer id", current({ id: 1.5 }), "invalid id 1.5"],
+    ["a non-numeric id", current({ id: "abc" }), 'invalid id "abc"'],
+    ["a zero-padded id", current({ id: "007" }), 'invalid id "007"'],
+    ["an invalid id and a missing url", current({ id: "0", url: "" }), 'invalid id "0"; missing url'],
     ["no url", current({ url: "" }), "missing url"],
     ["no title", without(current(), "title"), "missing title"],
     ["a non-date startDate", current({ startDate: "2026-03-14" }), "missing startDate"],
   ])("%s", (_, doc, reason) => {
-    expect(normalizeTournament(doc)).toEqual({ ok: false, reason });
+    expect(normalizeTournament(doc)).toMatchObject({ ok: false, reason });
+  });
+
+  test("id problems are flagged, so the form can say what to do", () => {
+    expect(normalizeTournament(current({ id: "0" }))).toMatchObject({ ok: false, badId: true });
+    expect(normalizeTournament(current({ url: "" }))).not.toHaveProperty("badId");
+  });
+
+  test.each([900100, "900100", " 900100 ", 1, Number.MAX_SAFE_INTEGER])("valid start.gg id %p", (id) => {
+    expect(ok(current({ id })).row.id).toBe(String(id).trim());
   });
 });
 
