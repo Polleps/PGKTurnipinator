@@ -1,4 +1,4 @@
-// pm2 config for the production bot (see docs/DEPLOY.md).
+// pm2 config for the production bot.
 // Bun runs the TypeScript source directly; there is no build step and no built/.
 // pm2 starts non-Node interpreters in fork mode, which is what a single
 // gateway bot needs. No `watch`: it restarted the bot halfway through deploys.

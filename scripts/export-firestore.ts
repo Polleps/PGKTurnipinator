@@ -1,5 +1,6 @@
 /**
- * One-off, READ-ONLY Firestore export (see docs/UPGRADE_PATH.md).
+ * One-off, READ-ONLY Firestore export: dumps collections to JSON (document IDs kept)
+ * as a backup and as input for FIRESTORE_SNAPSHOT mode.
  *
  *   npm run export:firestore              # dry run: prints the plan, no Firebase, no network
  *   npm run export:firestore -- --yes     # actually reads Firestore (costs reads)

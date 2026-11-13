@@ -75,3 +75,6 @@ firebasekey.json
 
 # Firestore JSON exports (scripts/export-firestore.ts)
 data/firestore-export/
+
+# Internal planning notes (kept out of the public repo)
+planning/

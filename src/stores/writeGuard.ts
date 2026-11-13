@@ -1,5 +1,5 @@
 /**
- * Local data-safety guard (see docs/UPGRADE_PATH.md, "Local testing & data safety").
+ * Local data-safety guard: keeps non-production runs from writing to Firestore.
  *
  * firebasekey.json points at the PRODUCTION Firebase project, so any run that is
  * not the production bot must treat Firestore as read-only. The only exception is
