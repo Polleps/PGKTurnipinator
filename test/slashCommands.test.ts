@@ -17,7 +17,6 @@ describe("slash command definitions", () => {
       ping: undefined,
       help: undefined,
       postflairtext: manageGuild,
-      reloadcache: manageGuild,
       fixbot: manageGuild,
     });
   });

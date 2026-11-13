@@ -6,7 +6,6 @@ import {
   HelpCommand,
   PingCommand,
   PostFlairTextCommand,
-  ReloadTournamentCacheCommand,
 } from "./commands";
 import { createLogger } from "./utils/logger";
 import { hasNeeRole, NEE_COMMAND_REPLY } from "./triggers";
@@ -37,7 +36,6 @@ export default class CommandController {
       ["ping", new PingCommand()],
       ["help", new HelpCommand()],
       ["postflairtext", new PostFlairTextCommand()],
-      ["reloadcache", new ReloadTournamentCacheCommand()],
       ["fixbot", new FixbotCommand()],
     ]);
   }

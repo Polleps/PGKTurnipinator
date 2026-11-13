@@ -76,13 +76,6 @@ export const commandDefinitions: readonly CommandDefinition[] = [
     isPublic: false,
   }),
   define({
-    name: "reloadcache",
-    description: "Clears the cache and fetches all tournament data from the database.",
-    usage: "Type `/reloadcache` to reload the tournament cache",
-    adminOnly: true,
-    isPublic: false,
-  }),
-  define({
     name: "fixbot",
     description: "Restarts the bot.",
     usage: "Type `/fixbot`",
