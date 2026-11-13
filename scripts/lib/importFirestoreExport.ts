@@ -1,4 +1,5 @@
-import { existsSync, mkdirSync, readFileSync, renameSync, rmSync, writeFileSync } from "fs";
+import { Database } from "bun:sqlite";
+import { existsSync, mkdirSync, readFileSync, renameSync, rmSync, statSync, writeFileSync } from "fs";
 import { dirname, join, resolve } from "path";
 import { openDatabase } from "../../src/db/database";
 import { normalizeTournament, type NormalizedTournament } from "../../src/db/normalizeTournament";
@@ -284,6 +285,36 @@ export const prepareImport = ({
 
 const sidecars = (file: string) => [file, `${file}-wal`, `${file}-shm`, `${file}-journal`];
 
+const STOP_THE_BOT = "Stop the bot (and anything else using the DB) first, then run the import again.";
+
+/**
+ * Refuses to replace a DB that is in use: --force would otherwise swap the file under a
+ * running bot and lose whatever is still in its WAL. A non-empty -wal file means
+ * un-checkpointed writes (an open connection, or a crash); an exclusive lock fails while any
+ * other connection has the DB open, because WAL readers hold a shared lock on the file.
+ */
+export const assertNotInUse = (target: string, busyTimeoutMs = 1000): void => {
+  const wal = `${target}-wal`;
+  if (existsSync(wal) && statSync(wal).size > 0) {
+    throw new ImportError(
+      `${wal} holds writes that aren't in ${target} yet. ${STOP_THE_BOT} ` +
+        "(If nothing is running, open the DB once, e.g. by starting and stopping the bot, so SQLite folds them in.)",
+    );
+  }
+  let db: Database | undefined;
+  try {
+    db = new Database(target, { readwrite: true, create: false });
+    db.run(`PRAGMA busy_timeout = ${busyTimeoutMs}`);
+    db.run("PRAGMA locking_mode = EXCLUSIVE");
+    db.run("BEGIN EXCLUSIVE");
+    db.run("ROLLBACK");
+  } catch (e) {
+    throw new ImportError(`${target} is in use (${(e as Error).message}). ${STOP_THE_BOT}`);
+  } finally {
+    db?.close();
+  }
+};
+
 /**
  * Runs the import. Everything is inserted into an in-memory DB first (one transaction) and
  * checked; a real import then writes it out with VACUUM INTO `<db>.importing` and renames
@@ -294,8 +325,12 @@ export const runImport = (options: ImportOptions): ImportResult => {
   const { report } = prepared;
   const target = report.db;
 
-  if (!options.dryRun && existsSync(target) && !options.force) {
-    throw new ImportError(`${target} already exists. Pass --force to replace it.`);
+  if (!options.dryRun && existsSync(target)) {
+    if (!options.force) {
+      throw new ImportError(`${target} already exists. Pass --force to replace it.`);
+    }
+    // Fail before the work, and check again right before the swap.
+    assertNotInUse(target);
   }
 
   const db = openDatabase({ path: ":memory:" });
@@ -328,7 +363,8 @@ export const runImport = (options: ImportOptions): ImportResult => {
       sidecars(work).forEach((f) => rmSync(f, { force: true }));
       mkdirSync(dirname(target), { recursive: true });
       db.$client.query("VACUUM INTO ?").run(work);
-      if (options.force) {
+      if (existsSync(target)) {
+        assertNotInUse(target);
         sidecars(target).forEach((f) => rmSync(f, { force: true }));
       }
       renameSync(work, target);

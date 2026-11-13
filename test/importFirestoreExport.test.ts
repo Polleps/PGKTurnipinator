@@ -102,6 +102,48 @@ describe("import of the fixture export", () => {
     again.close();
   });
 
+  test("--force refuses to replace a DB that is open elsewhere or has un-checkpointed WAL writes", () => {
+    const dir = tempDir();
+    const dbPath = join(dir, "busy.db");
+    runImport({ exportDir: FIXTURE, dbPath });
+
+    // A running bot: another process keeps the DB open in WAL mode, with a write in its WAL.
+    const holder = Bun.spawn(
+      [
+        "bun",
+        "-e",
+        `const { Database } = require("bun:sqlite");
+         const d = new Database(${JSON.stringify(dbPath)});
+         d.run("PRAGMA journal_mode = WAL");
+         d.run("UPDATE tournaments SET title = 'posted while importing' WHERE id = '900001'");
+         console.log("ready");
+         setTimeout(() => d.close(), 3000);`,
+      ],
+      { stdout: "pipe" },
+    );
+    const waitReady = async () => {
+      const reader = holder.stdout.getReader();
+      const { value } = await reader.read();
+      reader.releaseLock();
+      return new TextDecoder().decode(value);
+    };
+    return waitReady().then(async (ready) => {
+      expect(ready).toContain("ready");
+      expect(() => runImport({ exportDir: FIXTURE, dbPath, force: true })).toThrow(/Stop the bot/);
+      await holder.exited;
+
+      // The holder is gone and its WAL was folded in on close: now --force may replace it.
+      const before = new Database(dbPath, { readonly: true });
+      expect(before.query("SELECT title FROM tournaments WHERE id = '900001'").get()).toEqual({ title: "posted while importing" });
+      before.close();
+      runImport({ exportDir: FIXTURE, dbPath, force: true });
+
+      // Leftover WAL data with no process (e.g. after a crash) is refused too.
+      writeFileSync(`${dbPath}-wal`, "not empty");
+      expect(() => runImport({ exportDir: FIXTURE, dbPath, force: true })).toThrow(/holds writes/);
+    });
+  }, 15000);
+
   test("a manifest that doesn't match the files stops the import before any DB is written", () => {
     const exportDir = tempDir();
     cpSync(FIXTURE, exportDir, { recursive: true });
