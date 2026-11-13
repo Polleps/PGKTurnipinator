@@ -105,6 +105,10 @@ export class InteractionHandler {
       return;
     }
 
+    // Acknowledge within Discord's 3s deadline; the member fetch and role change can be
+    // rate limited. The result (or error) then replaces the ephemeral prompt via editReply.
+    await interaction.deferUpdate();
+
     const guild = this.client.guilds.cache.get(interaction.guildId!)!;
     const member = await guild.members.fetch(interaction.user.id);
     const isAdd = interaction.customId.startsWith("flair-add");
@@ -116,7 +120,7 @@ export class InteractionHandler {
         await member.roles.remove(pendingFlair.values);
       }
 
-      await interaction.update({
+      await interaction.editReply({
         content: isAdd ? "De rollen zijn toegevoegd!" : "De rollen zijn verwijderd!",
         components: [],
       });
@@ -145,8 +149,12 @@ export class InteractionHandler {
   private async respondWithError(interaction: ButtonInteraction) {
     const content = "Er is iets fout gegaan, neem contact op met de staff.";
 
-    if (interaction.replied || interaction.deferred) {
-      await interaction.followUp({ content, flags: MessageFlags.Ephemeral }).catch(console.error);
+    if (interaction.deferred || interaction.replied) {
+      // Replaces the ephemeral prompt (and its buttons); fall back to a new ephemeral message.
+      await interaction
+        .editReply({ content, components: [] })
+        .catch(() => interaction.followUp({ content, flags: MessageFlags.Ephemeral }))
+        .catch(console.error);
     } else {
       await interaction.update({ content, components: [] }).catch(console.error);
     }
