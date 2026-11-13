@@ -15,12 +15,14 @@ class UserInfoCache {
 
   public async get(accessToken: string): Promise<IUserInfo> {
     if (this.cache.has(accessToken)) {
-      return this.cache.get(accessToken);
+      return this.cache.get(accessToken)!;
     }
     const fetchedInfo = await fetchUserInfo(accessToken);
 
     if (this.cache.size > this.maxCache) {
-      this.cache.delete(this.cache.keys()[0]);
+      // FIXME: indexing an iterator yields undefined, so this never evicts anything.
+      // Kept as-is in Phase 0 (no behavior change); intended: this.cache.keys().next().value.
+      this.cache.delete((this.cache.keys() as unknown as string[])[0]);
     }
 
     this.cache.set(accessToken, fetchedInfo);

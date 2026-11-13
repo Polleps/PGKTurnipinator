@@ -41,7 +41,7 @@ export const postTournament: Performer = async (userInfo: IUserInfo, action: IAc
     throw new Error("You're not in the Discord.");
   }
 
-  if (!user.roles.cache.has(role.id)) {
+  if (!user.roles.cache.has(role!.id)) {
     throw new Error("You are not allowed to post tournaments.");
   }
 

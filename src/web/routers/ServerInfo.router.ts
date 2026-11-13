@@ -6,7 +6,7 @@ export class ServerInfoRouter {
   private readonly expireTime = 3600000;
 
   private _router: Router;
-  private cachedInfo: IServerInfo;
+  private cachedInfo!: IServerInfo;
   private client: Client;
   private lastUpdated: number = 0;
 
@@ -31,7 +31,7 @@ export class ServerInfoRouter {
     if ((Date.now() - this.lastUpdated) > this.expireTime) {
       const PGK = this.client.guilds.cache.get(Config.GUILD_ID);
       this.cachedInfo = {
-        memberCount: PGK.memberCount,
+        memberCount: PGK!.memberCount,
       };
       this.lastUpdated = Date.now();
     }

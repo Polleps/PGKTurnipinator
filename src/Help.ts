@@ -31,7 +31,7 @@ export default class Help {
     if (!this._commands.has(tag)) {
       return `${tag} is not a command.`;
     }
-    const command = this._commands.get(tag);
+    const command = this._commands.get(tag)!;
 
     if (!command.isPublic && !Config.BotAdmins.some((x) => x === author.id)) {
       return `${tag} is not a command.`;

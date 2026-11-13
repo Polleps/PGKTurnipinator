@@ -11,7 +11,7 @@ import {
 } from "./routers";
 
 export default class Server {
-  private app: express.Application;
+  private app!: express.Application;
   private client: Discord.Client;
 
   constructor(discordClient: Discord.Client) {

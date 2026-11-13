@@ -2,7 +2,7 @@ import * as Discord from "discord.js";
 import Config from "../Config";
 
 export class Command {
-  protected _tag: string;
+  protected _tag!: string;
   protected _isAdminCommand: boolean;
   protected _usage: string;
   protected _description: string;

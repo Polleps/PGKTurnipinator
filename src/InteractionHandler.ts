@@ -9,7 +9,7 @@ export class InteractionHandler {
   private pendingFlairs = new Map<string, PendingFlair>([]);
   private client: Client;
 
-  constructor(client) {
+  constructor(client: Client) {
     this.client = client;
   }
 
@@ -45,10 +45,10 @@ export class InteractionHandler {
       .setLabel('Verwijderen')
       .setStyle('SECONDARY');
 
-    const guild = await this.client.guilds.fetch(interaction.guildId);
+    const guild = await this.client.guilds.fetch(interaction.guildId!);
     await guild.roles.fetch();
 
-    const chosenRoles = interaction.values.map((role) => guild.roles.cache.get(role).name);
+    const chosenRoles = interaction.values.map((role) => guild.roles.cache.get(role)!.name);
     const chosenRolesText = chosenRoles.reduce((acc, current, index) => {
       if (index === 0) {
         return `**${current}**`;
@@ -83,9 +83,9 @@ export class InteractionHandler {
       .replace('flair-remove-', '');
 
     const key = `${interaction.user.id}-${category}`;
-    const pendingFlair = this.pendingFlairs.get(key);
+    const pendingFlair = this.pendingFlairs.get(key)!;
 
-    const guild = this.client.guilds.cache.get(interaction.guildId);
+    const guild = this.client.guilds.cache.get(interaction.guildId!)!;
     const member = await guild.members.fetch(interaction.user.id);
 
     try {

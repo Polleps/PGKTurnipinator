@@ -13,7 +13,7 @@ export default class MessageHandler {
 
   public processMessage(message: Message): void {
     // Message should not be processed if it was posted by the bot.
-    if (message.author.id === sClient.client.user.id) {
+    if (message.author.id === sClient.client.user!.id) {
       return;
     }
     // Commands should not be excecuted if one of the triggers returns true.

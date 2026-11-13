@@ -14,13 +14,13 @@ export class BasicMapCache<T> extends StoreCache<Map<string, T>, string, T> {
     this.assertWritable("add to");
     try {
       await this.ref.add(x);
-      this.cache.set(x[this.mapIndex], x);
+      this.cache.set((x as Record<string, any>)[this.mapIndex], x);
     } catch (e) {
       console.error(e);
     }
   }
 
-  public get(x: string): T {
+  public get(x: string): T | undefined {
     return this.cache.get(x);
   }
 

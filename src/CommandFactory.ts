@@ -24,7 +24,7 @@ export default class CommandFactory {
 
   public createCommand(tag: string): Command {
     if (this.commands.has(tag)) {
-      return this.commands.get(tag)();
+      return this.commands.get(tag)!();
     }
 
     throw new Error("Command does not exist");

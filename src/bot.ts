@@ -31,7 +31,7 @@ class Main {
     const interactionHandler = new InteractionHandler(client);
     const server = new Server(client);
     if (Config.EnableWebServer) {
-      await server.start(+process.env.PORT || Config.ServerPort);
+      await server.start(+process.env.PORT! || Config.ServerPort);
     }
 
     client.once("ready", (): void => {
@@ -47,7 +47,7 @@ class Main {
       process.exit();
     });
 
-    client.on("disconnect", (e) => {
+    client.on("disconnect", () => {
       console.error("Bot disconnected");
       process.exit();
     });

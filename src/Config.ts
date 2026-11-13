@@ -1,22 +1,29 @@
+/**
+ * Reads an env var typed as always-present, matching how Config has always been used.
+ * Not validated here (a missing var is still `undefined` at runtime); proper
+ * validation belongs with the config rework in a later phase.
+ */
+const env = (name: string): string => process.env[name] as string;
+
 export default class Config {
-  public static readonly CommandPrefix: string = process.env.COMMAND_PREFIX;
-  public static readonly DiscordApplicationToken: string = process.env.TOKEN;
-  public static readonly BotAdmins: string[] = JSON.parse(process.env.BOT_ADMINS);
-  public static readonly EnableWebServer: boolean = (process.env.ENABLE_WEBSERVER === "true");
-  public static readonly ServerPort: number = +process.env.SERVERPORT;
-  public static readonly AccountRefExpireTime: number = +process.env.ACCOUNT_REF_EXPIRE_TIME;
-  public static readonly OAUTH2URI: string = process.env.OAUTH2_URI;
-  public static readonly RedirectURI: string = process.env.REDIRECT_URI;
-  public static readonly CLIENTID: string = process.env.CLIENT_ID;
-  public static readonly CLIENTSECRET: string = process.env.CLIENT_SECRET;
-  public static readonly SMASHGG_API_KEY: string = process.env.SMASHGG_API_KEY;
-  public static readonly GUILD_ID: string = process.env.GUILD_ID;
-  public static readonly POST_TOURNAMENT_ROLE_NAME: string = process.env.POST_TOURNAMENT_ROLE_NAME;
-  public static readonly TOURNAMENT_AGENDA_ID: string = process.env.TOURNAMENT_AGENDA_ID;
-  public static readonly ONLINE_TOURNAMENT_AGENDA_ID: string = process.env.ONLINE_TOURNAMENT_AGENDA_ID;
-  public static readonly SERVERURL: string = process.env.SERVERURL;
-  public static readonly PUBLIC_INVITE_LINK: string = process.env.PUBLIC_INVITE_LINK;
-  public static readonly TOURNAMENT_COLLECTION_NAME = process.env.TOURNAMENT_COLLECTION_NAME;
-  public static readonly NEE_ROLE_IDS: string[] = JSON.parse(process.env.NEE_ROLE_IDS);
+  public static readonly CommandPrefix: string = env("COMMAND_PREFIX");
+  public static readonly DiscordApplicationToken: string = env("TOKEN");
+  public static readonly BotAdmins: string[] = JSON.parse(env("BOT_ADMINS"));
+  public static readonly EnableWebServer: boolean = (env("ENABLE_WEBSERVER") === "true");
+  public static readonly ServerPort: number = +env("SERVERPORT");
+  public static readonly AccountRefExpireTime: number = +env("ACCOUNT_REF_EXPIRE_TIME");
+  public static readonly OAUTH2URI: string = env("OAUTH2_URI");
+  public static readonly RedirectURI: string = env("REDIRECT_URI");
+  public static readonly CLIENTID: string = env("CLIENT_ID");
+  public static readonly CLIENTSECRET: string = env("CLIENT_SECRET");
+  public static readonly SMASHGG_API_KEY: string = env("SMASHGG_API_KEY");
+  public static readonly GUILD_ID: string = env("GUILD_ID");
+  public static readonly POST_TOURNAMENT_ROLE_NAME: string = env("POST_TOURNAMENT_ROLE_NAME");
+  public static readonly TOURNAMENT_AGENDA_ID: string = env("TOURNAMENT_AGENDA_ID");
+  public static readonly ONLINE_TOURNAMENT_AGENDA_ID: string = env("ONLINE_TOURNAMENT_AGENDA_ID");
+  public static readonly SERVERURL: string = env("SERVERURL");
+  public static readonly PUBLIC_INVITE_LINK: string = env("PUBLIC_INVITE_LINK");
+  public static readonly TOURNAMENT_COLLECTION_NAME: string = env("TOURNAMENT_COLLECTION_NAME");
+  public static readonly NEE_ROLE_IDS: string[] = JSON.parse(env("NEE_ROLE_IDS"));
   private constructor() {}
 }

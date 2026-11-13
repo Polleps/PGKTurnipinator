@@ -7,7 +7,7 @@ class SClient {
     return this.instance || (this.instance = new this());
   }
 
-  private _client: Discord.Client;
+  private _client!: Discord.Client;
   public get client(): Discord.Client {
     return this._client;
   }

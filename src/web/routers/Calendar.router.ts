@@ -7,7 +7,7 @@ export class CalendarRouter {
   private _router: Router;
   private cache: TournamentStoreCache;
   private lastUpdated: number = 0;
-  private cachedICal: string;
+  private cachedICal!: string;
 
   private readonly expireTime = 18000000;
 

@@ -52,7 +52,7 @@ const slicePart = (b: Buffer): Buffer => {
 };
 
 const formatUTC = (d: Date): string => {
-  const pad0 = (num) => (`${num}`.length === 1 ? `0${num}` : `${num}`);
+  const pad0 = (num: number) => (`${num}`.length === 1 ? `0${num}` : `${num}`);
   const UTCDATE = `${d.getUTCFullYear()}${pad0(d.getUTCMonth() + 1)}${pad0(
     d.getUTCDate()
   )}`;

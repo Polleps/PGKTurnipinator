@@ -8,7 +8,7 @@ export interface ICache {
 }
 export default abstract class StoreCache<T, I, O> implements ICache {
   protected ref: CollectionReference;
-  protected cache: T;
+  protected cache!: T;
   public readonly writable: boolean;
 
   /**

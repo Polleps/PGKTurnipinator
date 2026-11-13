@@ -8,7 +8,7 @@ export class TournamentStoreCache extends StoreCache<
   number,
   ITournament
 > {
-  private expires: number;
+  private expires: number = 0;
   private expireTime: number = 600000;
 
   constructor(collection: CollectionReference, writable?: boolean) {
@@ -61,7 +61,7 @@ export class TournamentStoreCache extends StoreCache<
     return !!this.cache[index];
   }
 
-  public getByID(id: string): ITournament {
+  public getByID(id: string | undefined): ITournament | undefined {
     return this.cache.find((x) => x.id === id);
   }
 
@@ -113,7 +113,7 @@ export class TournamentStoreCache extends StoreCache<
     status
       .filter((p) => p.length > 0)
       .forEach(([p]) => {
-        const tournament = this.cache.find((t) => t.id === p.id);
+        const tournament = this.cache.find((t) => t.id === p.id)!;
         tournament.participants = p.participants;
         tournament.registrationClosesAt = p.registrationClosesAt;
       });

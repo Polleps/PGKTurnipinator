@@ -103,10 +103,10 @@ const buildEmbed = (
 
   let embed = new MessageEmbed();
   embed.setColor(tournamentDetails.isOnline ? onlineColor : localColor);
-  embed.setThumbnail(tournamentDetails.image);
+  embed.setThumbnail(tournamentDetails.image!);
   embed.setFooter({
     text: `${user.user.username}#${user.user.discriminator}`,
-    iconURL: user.user.avatarURL(),
+    iconURL: user.user.avatarURL() ?? undefined,
   });
 
   const title = tournamentDetails.isOnline
@@ -144,7 +144,7 @@ const editExistingPost = async (
   embed: MessageEmbed
 ) => {
   try {
-    const prevMessage = await channel.messages.fetch(tournament.messageID);
+    const prevMessage = await channel.messages.fetch(tournament.messageID!);
     prevMessage.edit({ embeds: [embed] });
   } catch (e) {
     // If the message has already been deleted, post a new one.
@@ -153,7 +153,7 @@ const editExistingPost = async (
     return postMessage(channel, embed);
   }
 
-  return tournament.messageID;
+  return tournament.messageID!;
 };
 
 /**

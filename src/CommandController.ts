@@ -36,7 +36,7 @@ export default class CommandController {
 
     const commandMessage = message.content.substring(1);
     const messageArr = commandMessage.split(" ");
-    const commandTag = messageArr.shift().toLowerCase();
+    const commandTag = messageArr.shift()!.toLowerCase();
 
     if (commandTag.toLowerCase() === "help") {
       message.reply(this._help.getHelp(message.author, messageArr)).then(() => {
@@ -46,7 +46,7 @@ export default class CommandController {
     }
 
     if (this._commands.has(commandTag)) {
-      const command = this._commands.get(commandTag);
+      const command = this._commands.get(commandTag)!;
       // Admin commands should only be able to be used by botadmins.
       if (command.isAdminCommand && !this.isBotAdmin(message.author)) {
         message.reply("This command can only be used by the staff.")

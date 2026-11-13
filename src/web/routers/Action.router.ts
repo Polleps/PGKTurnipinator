@@ -57,12 +57,16 @@ export class ActionRouter {
         res.status(200).json({ message });
       } catch (e) {
         console.error(e);
-        res.status(200).json({error: true, message: e.message});
+        res.status(200).json({error: true, message: (e as Error).message});
       }
     });
 
     this._router.use("/tournamentdetails", async (req: Request, res: Response, next) => {
-      if (userCanFetchTournament(res.locals.userInfo as IUserInfo)) {
+      // FIXME: this check is not awaited, so the promise is always truthy and the role
+      // gate never blocks anyone. Kept as-is in Phase 0 (no behavior change); fix by
+      // awaiting it in a dedicated change.
+      const roleCheck = userCanFetchTournament(res.locals.userInfo as IUserInfo) as Promise<boolean> | undefined;
+      if (roleCheck) {
         next();
       } else {
         res.status(400).send({error: true, message: "Invalid User. Please logout and try again."});

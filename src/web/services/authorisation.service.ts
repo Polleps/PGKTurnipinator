@@ -54,12 +54,12 @@ export const encodeToken = async (data: ITokenRespose) => {
 
 export const pJWTVerify = (token: string, secret: Buffer): Promise<IDecodedToken> => {
   return new Promise((resolve, reject) => {
-    jwt.verify(token, secret, (err: Error | string, data: IDecodedToken) => {
+    jwt.verify(token, secret, (err, data) => {
       if (err) {
         reject(err);
       } else {
         console.log("DATA", data);
-        resolve(data);
+        resolve(data as unknown as IDecodedToken);
       }
     });
   });
@@ -88,7 +88,7 @@ function loadPrivateKey(): Promise<Buffer> {
   });
 }
 
-const callTokenEndpoint = async (body) => {
+const callTokenEndpoint = async (body: Record<string, string>) => {
   const urlencoded = new URLSearchParams();
   Object.keys(body).forEach((key) => urlencoded.append(key, body[key]));
   const headers = {

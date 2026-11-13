@@ -15,7 +15,7 @@ const buildEvent = (
   tournament: ITournament
 ): GuildScheduledEventCreateOptions => ({
   name: buildTitle(tournament.title),
-  scheduledStartTime: tournament.streamStartDate,
+  scheduledStartTime: tournament.streamStartDate!,
   scheduledEndTime: tournament.endDate,
   privacyLevel: "GUILD_ONLY",
   entityType: GuildScheduledEventEntityTypes.EXTERNAL,
