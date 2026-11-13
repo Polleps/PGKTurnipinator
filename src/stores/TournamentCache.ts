@@ -8,7 +8,7 @@ export class TournamentStoreCache extends StoreCache<
   number,
   ITournament
 > {
-  private expires: number = 0;
+  private expires!: number;
   private expireTime: number = 600000;
 
   constructor(collection: CollectionReference, writable?: boolean) {
