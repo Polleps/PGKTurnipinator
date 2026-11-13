@@ -6,7 +6,6 @@ import MessageHandler from "./MessageHandler";
 import Server from "./web/Server";
 import { createLogger } from "./utils/logger";
 import { store } from "./Store";
-// import { NewsStreamer } from "./NewsStream";
 import { InteractionHandler } from "./InteractionHandler";
 
 const log = createLogger("Main");
@@ -30,7 +29,6 @@ class Main {
     log("Caches Loaded.");
     const messageHandler = new MessageHandler();
     const interactionHandler = new InteractionHandler(client);
-    // const newsStreamer = new NewsStreamer(client);
     const server = new Server(client);
     if (Config.EnableWebServer) {
       await server.start(+process.env.PORT || Config.ServerPort);

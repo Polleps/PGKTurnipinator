@@ -2,10 +2,7 @@ import {
   Command,
   FixbotCommand,
   PingCommand,
-  ShucfixCommand,
   PostFlairTextCommand,
-  ShucfixManageCommand,
-  SeedDBCommand,
   ReloadTournamentCacheCommand,
 } from "./commands";
 
@@ -16,11 +13,8 @@ export default class CommandFactory {
     this.commands = new Map<string, () => Command>([
       ["ping", () => new PingCommand()],
       ["fixbot", () => new FixbotCommand()],
-      ["shucfix", () => new ShucfixCommand()],
-      ["shucfix-manage", () => new ShucfixManageCommand()],
       ["postflairtext", () => new PostFlairTextCommand()],
       ["reloadcache", () => new ReloadTournamentCacheCommand()],
-      // ["seeddb", () => new SeedDBCommand()],
     ]);
   }
 

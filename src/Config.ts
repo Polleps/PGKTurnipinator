@@ -16,17 +16,7 @@ export default class Config {
   public static readonly ONLINE_TOURNAMENT_AGENDA_ID: string = process.env.ONLINE_TOURNAMENT_AGENDA_ID;
   public static readonly SERVERURL: string = process.env.SERVERURL;
   public static readonly PUBLIC_INVITE_LINK: string = process.env.PUBLIC_INVITE_LINK;
-  public static readonly BOT_CHANNEL_ID: string = process.env.BOT_CHANNEL_ID;
-  public static readonly ENABLE_NEWS_CHANNEL: boolean = (process.env.ENABLE_NEWS_CHANNEL === "true");
-  public static readonly TWITTER_CONSUMER_KEY: string = process.env.TWITTER_CONSUMER_KEY;
-  public static readonly TWITTER_CONSUMER_KEY_SECRET: string = process.env.TWITTER_CONSUMER_KEY_SECRET;
-  public static readonly TWITTER_ACCESS_TOKEN: string = process.env.TWITTER_ACCESS_TOKEN;
-  public static readonly TWITTER_ACCESS_TOKEN_SECRET: string = process.env.TWITTER_ACCESS_TOKEN_SECRET;
-  public static readonly NEWS_CHANNEL_ID: string = process.env.NEWS_CHANNEL_ID;
-  public static readonly COLOR_ROLE_ID: string = process.env.COLOR_ROLE_ID;
   public static readonly TOURNAMENT_COLLECTION_NAME = process.env.TOURNAMENT_COLLECTION_NAME;
   public static readonly NEE_ROLE_IDS: string[] = JSON.parse(process.env.NEE_ROLE_IDS);
-  public static readonly MUTE_ROLES: Map<string, string> = new Map<string, string>(JSON.parse(process.env.MUTE_ROLES));
-  public static readonly SHUCFIX_GUILD_IDS: string[] = JSON.parse(process.env.SHUCFIX_GUILD_IDS);
   private constructor() {}
 }

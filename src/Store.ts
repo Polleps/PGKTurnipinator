@@ -25,8 +25,6 @@ class Store {
     this.caches = new Map<string, ICache>([
       ["joinableroles", new BasicMapCache<IJoinableRole>(this.db.collection("joinableroles"), 'name')],
       ["role_categories", new BasicMapCache<IRoleCategory>(this.db.collection("role_categories"), 'name')],
-      ["shucfixes", new BasicSetCache(this.db.collection("shucfixes"), "prefix")],
-      ["shucfixbans", new BasicSetCache(this.db.collection("shucfixbans"), "id")],
       ["botadmins", new BasicSetCache(this.db.collection("botadmins"), "id")],
       ["tournaments", new TournamentStoreCache(this.db.collection(Config.TOURNAMENT_COLLECTION_NAME))],
     ]);
