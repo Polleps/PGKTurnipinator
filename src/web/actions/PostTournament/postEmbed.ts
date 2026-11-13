@@ -1,4 +1,4 @@
-import { Guild, GuildMember, MessageEmbed, NewsChannel } from "discord.js";
+import { Guild, GuildMember, EmbedBuilder, NewsChannel } from "discord.js";
 import moment from "moment-timezone";
 
 import Config from "../../../Config";
@@ -7,13 +7,13 @@ import ITournament from "../../../models/ITournament";
 const tournamentagendaID = Config.TOURNAMENT_AGENDA_ID;
 const onlineTournamentAgendaID = Config.ONLINE_TOURNAMENT_AGENDA_ID;
 
-const buildLocation = (embed: MessageEmbed, tD: ITournament): MessageEmbed => {
+const buildLocation = (embed: EmbedBuilder, tD: ITournament): EmbedBuilder => {
   const gUrl = createGoogleMapsURL(tD.location, tD.locationID);
 
-  return embed.addField("🗺 Location", `[${tD.location}](${gUrl})`);
+  return embed.addFields({ name: "🗺 Location", value: `[${tD.location}](${gUrl})` });
 };
 
-const buildEvents = (embed: MessageEmbed, tD: ITournament): MessageEmbed => {
+const buildEvents = (embed: EmbedBuilder, tD: ITournament): EmbedBuilder => {
   const events = tD.events.filter((x) => !!x.name);
 
   if (events.length === 0) {
@@ -24,19 +24,19 @@ const buildEvents = (embed: MessageEmbed, tD: ITournament): MessageEmbed => {
   const names = events.map((x) => `- ${x.name}`).join("\n");
   const caps = events.map((x) => `${x.cap}` || "-").join("\n");
 
-  embed.addField("🕹 Events", names, hasCaps);
+  embed.addFields({ name: "🕹 Events", value: names, inline: hasCaps });
 
   if (hasCaps) {
-    embed.addField("Cap", caps, true);
+    embed.addFields({ name: "Cap", value: caps, inline: true });
   }
 
   return embed;
 };
 
 const buildDescription = (
-  embed: MessageEmbed,
+  embed: EmbedBuilder,
   tD: ITournament
-): MessageEmbed => {
+): EmbedBuilder => {
   if (!tD.description || tD.description.trim().length === 0) {
     return embed;
   }
@@ -45,35 +45,35 @@ const buildDescription = (
     throw new Error("Additional Notes text is to long.");
   }
 
-  return embed.addField("Additional Info", tD.description);
+  return embed.addFields({ name: "Additional Info", value: tD.description });
 };
 
-const buildLink = (embed: MessageEmbed, tD: ITournament): MessageEmbed =>
-  embed.addField(
-    "More Info/Register",
-    `[Start.gg](${"https://start.gg/tournament/" + tD.url})`
-  );
+const buildLink = (embed: EmbedBuilder, tD: ITournament): EmbedBuilder =>
+  embed.addFields({
+    name: "More Info/Register",
+    value: `[Start.gg](${"https://start.gg/tournament/" + tD.url})`,
+  });
 
-const buildTimeField = (embed: MessageEmbed, tD: ITournament): MessageEmbed => {
+const buildTimeField = (embed: EmbedBuilder, tD: ITournament): EmbedBuilder => {
   const { startDate } = tD;
 
-  return embed.addField(
-    "⏰ Time",
-    moment(startDate).tz("Europe/Amsterdam").format("HH:mm")
-  );
+  return embed.addFields({
+    name: "⏰ Time",
+    value: moment(startDate).tz("Europe/Amsterdam").format("HH:mm"),
+  });
 };
 
-const buildDateField = (embed: MessageEmbed, tD: ITournament): MessageEmbed => {
+const buildDateField = (embed: EmbedBuilder, tD: ITournament): EmbedBuilder => {
   const startDate = new Date(tD.startDate);
   const endDate = new Date(tD.endDate);
   const spansSingleDay = compareDay(startDate, endDate);
 
-  return embed.addField(
-    "📅 Date",
-    spansSingleDay
+  return embed.addFields({
+    name: "📅 Date",
+    value: spansSingleDay
       ? formatDate(startDate)
-      : `${formatDate(startDate)} - ${formatDate(endDate)}`
-  );
+      : `${formatDate(startDate)} - ${formatDate(endDate)}`,
+  });
 };
 
 const compareDay = (a: Date, b: Date): boolean =>
@@ -94,25 +94,33 @@ const createGoogleMapsURL = (
 
 const formatDate = (x: Date): string => moment(x).format("MMMM Do YYYY");
 
-const buildEmbed = (
-  user: GuildMember,
+/** Who posted the tournament, shown in the embed footer. */
+export interface EmbedPoster {
+  username: string;
+  discriminator: string;
+  avatarURL: string | null;
+}
+
+export const buildEmbed = (
+  poster: EmbedPoster,
   tournamentDetails: ITournament
-): MessageEmbed => {
+): EmbedBuilder => {
   const localColor = 0xc01f1f;
   const onlineColor = 0x0b92e0;
 
-  let embed = new MessageEmbed();
+  let embed = new EmbedBuilder();
   embed.setColor(tournamentDetails.isOnline ? onlineColor : localColor);
-  embed.setThumbnail(tournamentDetails.image!);
+  // The builder rejects undefined/"" (v13 sent an empty thumbnail).
+  embed.setThumbnail(tournamentDetails.image?.trim() || null);
   embed.setFooter({
-    text: `${user.user.username}#${user.user.discriminator}`,
-    iconURL: user.user.avatarURL() ?? undefined,
+    text: `${poster.username}#${poster.discriminator}`,
+    iconURL: poster.avatarURL ?? undefined,
   });
 
   const title = tournamentDetails.isOnline
     ? `🌐 ${tournamentDetails.title}`
     : tournamentDetails.title;
-  embed.addField(title, "\u200B");
+  embed.addFields({ name: title, value: "\u200B" });
 
   if (tournamentDetails.isOnline) {
     embed = buildDateField(embed, tournamentDetails);
@@ -131,7 +139,7 @@ const buildEmbed = (
 
 const postMessage = async (
   channel: NewsChannel,
-  embed: MessageEmbed
+  embed: EmbedBuilder
 ): Promise<string> => {
   const message = await channel.send({ embeds: [embed] });
 
@@ -141,7 +149,7 @@ const postMessage = async (
 const editExistingPost = async (
   channel: NewsChannel,
   tournament: ITournament,
-  embed: MessageEmbed
+  embed: EmbedBuilder
 ) => {
   try {
     const prevMessage = await channel.messages.fetch(tournament.messageID!);
@@ -173,7 +181,14 @@ export const postEmbed = async (
   const channel = (await guild.channels.fetch(
     isOnline ? onlineTournamentAgendaID : tournamentagendaID
   )) as NewsChannel;
-  const embed = buildEmbed(user, tournamentDetails);
+  const embed = buildEmbed(
+    {
+      username: user.user.username,
+      discriminator: user.user.discriminator,
+      avatarURL: user.user.avatarURL(),
+    },
+    tournamentDetails
+  );
 
   if (tournamentDetails.messageID) {
     return editExistingPost(channel, tournamentDetails, embed);

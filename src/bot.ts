@@ -1,6 +1,6 @@
 // Must stay the first import: it fills process.env before Config is evaluated.
 import "./env";
-import { Client, Intents, Message } from "discord.js";
+import { Client, Events, GatewayIntentBits, Message } from "discord.js";
 import Config from "./Config";
 import { sClient } from "./Context";
 import MessageHandler from "./MessageHandler";
@@ -11,11 +11,14 @@ import { InteractionHandler } from "./InteractionHandler";
 
 const log = createLogger("Main");
 const intents = [
-  Intents.FLAGS.GUILDS,
-  Intents.FLAGS.GUILD_EMOJIS_AND_STICKERS,
-  Intents.FLAGS.GUILD_MEMBERS,
-  Intents.FLAGS.GUILD_MESSAGES,
-  Intents.FLAGS.GUILD_MESSAGE_REACTIONS,
+  GatewayIntentBits.Guilds,
+  GatewayIntentBits.GuildExpressions,
+  GatewayIntentBits.GuildMembers,
+  GatewayIntentBits.GuildMessages,
+  GatewayIntentBits.GuildMessageReactions,
+  // API v10 only fills message.content with this privileged intent; the prefix
+  // commands still parse it.
+  GatewayIntentBits.MessageContent,
 ];
 class Main {
   private args: string[];
@@ -35,25 +38,20 @@ class Main {
       await server.start(+process.env.PORT! || Config.ServerPort);
     }
 
-    client.once("ready", (): void => {
+    client.once(Events.ClientReady, (): void => {
       log("Bot is ready");
     });
 
-    client.on("messageCreate", (message: Message): void => {
+    client.on(Events.MessageCreate, (message: Message): void => {
       messageHandler.processMessage(message);
     });
 
-    client.on("error", (error) => {
+    client.on(Events.Error, (error) => {
       console.error(error);
       process.exit();
     });
 
-    client.on("disconnect", () => {
-      console.error("Bot disconnected");
-      process.exit();
-    });
-
-    client.on("interactionCreate", (interaction) => {
+    client.on(Events.InteractionCreate, (interaction) => {
       interactionHandler.handle(interaction);
     });
 

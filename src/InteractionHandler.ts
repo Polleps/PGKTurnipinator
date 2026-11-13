@@ -1,9 +1,42 @@
-import { ButtonInteraction, Client, Guild, GuildMemberRoleManager, Interaction, Message, MessageActionRow, MessageButton, MessageComponent, SelectMenuInteraction } from "discord.js";
+import {
+  ActionRowBuilder,
+  ButtonBuilder,
+  ButtonInteraction,
+  ButtonStyle,
+  Client,
+  Interaction,
+  MessageFlags,
+  StringSelectMenuInteraction,
+} from "discord.js";
 
 interface PendingFlair {
   values: string[];
-  interaction: SelectMenuInteraction;
+  interaction: StringSelectMenuInteraction;
 }
+
+/** "**a**", "**a** en **b**", "**a**, **b** en **c**" */
+export const formatRoleNames = (names: string[]): string =>
+  names.reduce((acc, current, index) => {
+    if (index === 0) {
+      return `**${current}**`;
+    }
+
+    return `${acc}${index === names.length - 1 ? " en" : ","} **${current}**`;
+  }, "");
+
+export const buildFlairButtons = (category: string): ActionRowBuilder<ButtonBuilder> => {
+  const addButton = new ButtonBuilder()
+    .setCustomId(`flair-add-${category}`)
+    .setLabel("Toevoegen")
+    .setStyle(ButtonStyle.Primary);
+
+  const removeButton = new ButtonBuilder()
+    .setCustomId(`flair-remove-${category}`)
+    .setLabel("Verwijderen")
+    .setStyle(ButtonStyle.Secondary);
+
+  return new ActionRowBuilder<ButtonBuilder>().addComponents(addButton, removeButton);
+};
 
 export class InteractionHandler {
   private pendingFlairs = new Map<string, PendingFlair>([]);
@@ -14,56 +47,38 @@ export class InteractionHandler {
   }
 
   public handle(interaction: Interaction) {
-    if (interaction.isSelectMenu()) {
-      this.handleSelect(interaction);
+    if (interaction.isStringSelectMenu()) {
+      this.handleSelect(interaction).catch(console.error);
 
       return;
     }
 
     if (interaction.isButton()) {
-      this.handleButton(interaction);
+      this.handleButton(interaction).catch(console.error);
 
       return;
     }
   }
 
-  private async handleSelect(interaction: SelectMenuInteraction) {
-    if (!interaction.customId.startsWith('roles-set')) {
+  private async handleSelect(interaction: StringSelectMenuInteraction) {
+    if (!interaction.customId.startsWith("roles-set")) {
       return;
     }
 
-    const category = interaction.customId.replace('roles-set-', '');
+    const category = interaction.customId.replace("roles-set-", "");
     const userFlairKey = `${interaction.user.id}-${category}`;
-
-    const addButton = new MessageButton()
-      .setCustomId(`flair-add-${category}`)
-      .setLabel('Toevoegen')
-      .setStyle('PRIMARY');
-
-    const removeButton = new MessageButton()
-      .setCustomId(`flair-remove-${category}`)
-      .setLabel('Verwijderen')
-      .setStyle('SECONDARY');
 
     const guild = await this.client.guilds.fetch(interaction.guildId!);
     await guild.roles.fetch();
 
     const chosenRoles = interaction.values.map((role) => guild.roles.cache.get(role)!.name);
-    const chosenRolesText = chosenRoles.reduce((acc, current, index) => {
-      if (index === 0) {
-        return `**${current}**`;
-      }
 
-      return `${acc}${index === chosenRoles.length - 1 ? " en" : ","} **${current}**`;
-    }, '');
-
-    interaction.reply({
-      content: `Wil je ${chosenRolesText} toevoegen of verwijderen?`,
-      components: [
-        new MessageActionRow().addComponents([addButton, removeButton]),
-      ],
-      ephemeral: true
-    })
+    interaction
+      .reply({
+        content: `Wil je ${formatRoleNames(chosenRoles)} toevoegen of verwijderen?`,
+        components: [buildFlairButtons(category)],
+        flags: MessageFlags.Ephemeral,
+      })
       .then(() => {
         this.pendingFlairs.set(userFlairKey, {
           values: interaction.values,
@@ -74,61 +89,66 @@ export class InteractionHandler {
   }
 
   private async handleButton(interaction: ButtonInteraction) {
-    if (!interaction.customId.startsWith('flair')) {
+    if (!interaction.customId.startsWith("flair")) {
       return;
     }
 
-    const category = interaction.customId
-      .replace('flair-add-', '')
-      .replace('flair-remove-', '');
+    const category = interaction.customId.replace("flair-add-", "").replace("flair-remove-", "");
 
     const key = `${interaction.user.id}-${category}`;
-    const pendingFlair = this.pendingFlairs.get(key)!;
+    const pendingFlair = this.pendingFlairs.get(key);
+
+    if (!pendingFlair) {
+      // E.g. the bot restarted between the select and the button press.
+      await this.respondWithError(interaction);
+
+      return;
+    }
 
     const guild = this.client.guilds.cache.get(interaction.guildId!)!;
     const member = await guild.members.fetch(interaction.user.id);
+    const isAdd = interaction.customId.startsWith("flair-add");
 
     try {
-      if (interaction.customId.startsWith('flair-add')) {
-        member.roles.add(pendingFlair.values);
-
-        await interaction.update({
-          content: 'De rollen zijn toegevoegd!',
-          components: [],
-        });
-
-        this.resetSelect(pendingFlair.interaction);
+      if (isAdd) {
+        await member.roles.add(pendingFlair.values);
       } else {
-        member.roles.remove(pendingFlair.values);
-
-        await interaction.update({
-          content: 'De rollen zijn verwijderd!',
-          components: [],
-        });
-
-        this.resetSelect(pendingFlair.interaction);
+        await member.roles.remove(pendingFlair.values);
       }
+
+      await interaction.update({
+        content: isAdd ? "De rollen zijn toegevoegd!" : "De rollen zijn verwijderd!",
+        components: [],
+      });
+
+      // Cosmetic; the roles are already changed, so a failure here isn't reported.
+      this.resetSelect(pendingFlair.interaction).catch(console.error);
     } catch (e) {
-      this.respondWithError(interaction);
+      console.error(e);
+      await this.respondWithError(interaction);
     }
 
     this.pendingFlairs.delete(key);
   }
 
-  private resetSelect(select: SelectMenuInteraction) {
+  /** Re-sends the role message unchanged, which clears the user's selection in the menu. */
+  private async resetSelect(select: StringSelectMenuInteraction) {
     const { message } = select;
 
-    (select.message as Message).edit({
+    await message.edit({
       content: message.content,
       embeds: message.embeds,
-      components: message.components as MessageActionRow[],
-    })
+      components: message.components,
+    });
   }
 
-  private respondWithError(interaction: ButtonInteraction | SelectMenuInteraction) {
-    interaction.followUp({
-      content: 'Er is iets fout gegaan, neem contact op met de staff.',
-      ephemeral: true,
-    });
+  private async respondWithError(interaction: ButtonInteraction) {
+    const content = "Er is iets fout gegaan, neem contact op met de staff.";
+
+    if (interaction.replied || interaction.deferred) {
+      await interaction.followUp({ content, flags: MessageFlags.Ephemeral }).catch(console.error);
+    } else {
+      await interaction.update({ content, components: [] }).catch(console.error);
+    }
   }
 }
