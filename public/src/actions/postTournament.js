@@ -8,27 +8,7 @@ import { priceInput } from "../templates/price.js";
 import { textarea } from "../templates/textarea.js";
 import { checkbox } from "../templates/checkbox.js";
 import { createValidators, validate } from "../validateTournament.js";
-
-const TWITCH_BASE_URL = "https://twitch.tv/";
-
-const buildStreamURL = (name, source) => {
-  if (source !== "TWITCH") {
-    return undefined;
-  }
-
-  return `${TWITCH_BASE_URL}${name}`;
-};
-
-const getStreamURL = (streams, startDate) => {
-  if (!streams || streams.length === 0) {
-    return {};
-  }
-
-  return {
-    streamURL: buildStreamURL(streams[0].streamName, streams[0].streamSource),
-    streamStartDate: startDate,
-  };
-};
+import { convertToITournament, getStreamURL, parseDate } from "../tournamentFormat.js";
 
 export default class PostTournament extends Action {
   constructor(args, token) {
@@ -406,33 +386,5 @@ const createClick = (func) => ({
   capture: true,
 });
 
-const parseDate = (date) => {
-  const aZ = (x) => (x < 10 ? `0${x}` : x);
-  const year = date.getFullYear();
-  const month = date.getMonth() + 1;
-  const day = date.getDate();
-  const hour = date.getHours();
-  const minutes = date.getMinutes();
-  return `${year}-${aZ(month)}-${aZ(day)}T${aZ(hour)}:${aZ(minutes)}`;
-};
-
 const randomID = () => `${Math.floor(Math.random() * 100000)}`;
 
-const convertToITournament = (x) => ({
-  ...x,
-  startDate: new Date(x.startDate).getTime(),
-  endDate: new Date(x.endDate).getTime(),
-  events: x.events.map((e) => ({
-    name: e.name,
-    cap: e.cap,
-  })),
-  prices: x.prices.map((p) => ({
-    name: p.name,
-    amount: +p.amount,
-  })),
-  type: "smashgg",
-  ...(!!x.streamURL && !!x.streamStartDate && {
-    streamURL: x.streamURL,
-    streamStartDate: new Date(x.streamStartDate).getTime(),
-  }),
-});

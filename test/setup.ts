@@ -1,0 +1,26 @@
+/**
+ * Preloaded before every test file (see bunfig.toml).
+ *
+ * Tests must never touch live Firestore: firebasekey.json is the PRODUCTION
+ * project. Any runtime import of the Firebase SDKs fails loudly here, and the
+ * network client is stubbed out, so tests can only use fakes.
+ */
+import { mock } from "bun:test";
+
+const forbidden = (name: string) => () => {
+  throw new Error(`${name} must not be loaded in tests (no live Firestore / network). Use a fake.`);
+};
+
+mock.module("firebase-admin", forbidden("firebase-admin"));
+mock.module("@google-cloud/firestore", forbidden("@google-cloud/firestore"));
+// node-fetch is imported (not called) by the start.gg service; any actual call fails.
+mock.module("node-fetch", () => {
+  const fetch = () => Promise.reject(new Error("Network access is disabled in tests."));
+  return { default: fetch, FetchError: Error };
+});
+
+// Config parses these at import time; give tests harmless defaults.
+process.env.BOT_ADMINS ??= "[]";
+process.env.NEE_ROLE_IDS ??= "[]";
+// The write guard reads NODE_ENV; tests pass it explicitly or assert the default.
+process.env.NODE_ENV = "test";
