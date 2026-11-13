@@ -24,6 +24,16 @@ export const formatRoleNames = (names: string[]): string =>
     return `${acc}${index === names.length - 1 ? " en" : ","} **${current}**`;
   }, "");
 
+/** The picked role IDs that still exist, with their names; deleted roles are skipped. */
+export const knownRoles = (
+  roleIds: readonly string[],
+  nameOf: (id: string) => string | undefined,
+): { id: string; name: string }[] =>
+  roleIds.flatMap((id) => {
+    const name = nameOf(id);
+    return name === undefined ? [] : [{ id, name }];
+  });
+
 export const buildFlairButtons = (category: string): ActionRowBuilder<ButtonBuilder> => {
   const addButton = new ButtonBuilder()
     .setCustomId(`flair-add-${category}`)
@@ -68,20 +78,32 @@ export class InteractionHandler {
     const category = interaction.customId.replace("roles-set-", "");
     const userFlairKey = `${interaction.user.id}-${category}`;
 
-    const guild = await this.client.guilds.fetch(interaction.guildId!);
-    await guild.roles.fetch();
+    let chosen: { id: string; name: string }[];
+    try {
+      const guild = await this.client.guilds.fetch(interaction.guildId!);
+      await guild.roles.fetch();
+      chosen = knownRoles(interaction.values, (id) => guild.roles.cache.get(id)?.name);
+    } catch (e) {
+      console.error(e);
+      await this.respondWithError(interaction);
+      return;
+    }
 
-    const chosenRoles = interaction.values.map((role) => guild.roles.cache.get(role)!.name);
+    if (chosen.length === 0) {
+      // Every picked role was deleted since the menu was posted.
+      await this.respondWithError(interaction);
+      return;
+    }
 
     interaction
       .reply({
-        content: `Wil je ${formatRoleNames(chosenRoles)} toevoegen of verwijderen?`,
+        content: `Wil je ${formatRoleNames(chosen.map((r) => r.name))} toevoegen of verwijderen?`,
         components: [buildFlairButtons(category)],
         flags: MessageFlags.Ephemeral,
       })
       .then(() => {
         this.pendingFlairs.set(userFlairKey, {
-          values: interaction.values,
+          values: chosen.map((r) => r.id),
           interaction,
         });
       })
@@ -109,11 +131,12 @@ export class InteractionHandler {
     // rate limited. The result (or error) then replaces the ephemeral prompt via editReply.
     await interaction.deferUpdate();
 
-    const guild = this.client.guilds.cache.get(interaction.guildId!)!;
-    const member = await guild.members.fetch(interaction.user.id);
     const isAdd = interaction.customId.startsWith("flair-add");
 
     try {
+      const guild = await this.client.guilds.fetch(interaction.guildId!);
+      const member = await guild.members.fetch(interaction.user.id);
+
       if (isAdd) {
         await member.roles.add(pendingFlair.values);
       } else {
@@ -146,7 +169,7 @@ export class InteractionHandler {
     });
   }
 
-  private async respondWithError(interaction: ButtonInteraction) {
+  private async respondWithError(interaction: ButtonInteraction | StringSelectMenuInteraction) {
     const content = "Er is iets fout gegaan, neem contact op met de staff.";
 
     if (interaction.deferred || interaction.replied) {
@@ -155,8 +178,12 @@ export class InteractionHandler {
         .editReply({ content, components: [] })
         .catch(() => interaction.followUp({ content, flags: MessageFlags.Ephemeral }))
         .catch(console.error);
-    } else {
+    } else if (interaction.isButton()) {
+      // The button sits on the user's ephemeral prompt; replace it.
       await interaction.update({ content, components: [] }).catch(console.error);
+    } else {
+      // Never update() a select: that would edit the public role selector message.
+      await interaction.reply({ content, flags: MessageFlags.Ephemeral }).catch(console.error);
     }
   }
 }

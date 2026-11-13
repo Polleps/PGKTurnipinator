@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
 import { ButtonStyle, ComponentType } from "discord.js";
 import { buildCategoryEmbed, buildRoleSelectRows } from "../src/commands/PostFlairText";
-import { buildFlairButtons, formatRoleNames } from "../src/InteractionHandler";
+import { buildFlairButtons, formatRoleNames, knownRoles } from "../src/InteractionHandler";
 import { IJoinableRole } from "../src/models/IJoinableRole";
 
 const role = (i: number, description?: string): IJoinableRole => ({
@@ -100,5 +100,19 @@ describe("role selector reply", () => {
     expect(formatRoleNames(["A"])).toBe("**A**");
     expect(formatRoleNames(["A", "B"])).toBe("**A** en **B**");
     expect(formatRoleNames(["A", "B", "C"])).toBe("**A**, **B** en **C**");
+  });
+});
+
+describe("picked roles", () => {
+  test("roles deleted since the menu was posted are skipped", () => {
+    const names = new Map([
+      ["1", "A"],
+      ["3", "C"],
+    ]);
+    expect(knownRoles(["1", "2", "3"], (id) => names.get(id))).toEqual([
+      { id: "1", name: "A" },
+      { id: "3", name: "C" },
+    ]);
+    expect(knownRoles(["2"], (id) => names.get(id))).toEqual([]);
   });
 });
