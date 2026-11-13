@@ -1,8 +1,4 @@
 import { Guild, GuildScheduledEventCreateOptions } from "discord.js";
-import {
-  GuildScheduledEventEntityTypes,
-  PrivacyLevels,
-} from "discord.js/typings/enums";
 
 import ITournament from "../../../models/ITournament";
 
@@ -18,7 +14,9 @@ const buildEvent = (
   scheduledStartTime: tournament.streamStartDate!,
   scheduledEndTime: tournament.endDate,
   privacyLevel: "GUILD_ONLY",
-  entityType: GuildScheduledEventEntityTypes.EXTERNAL,
+  // String form: the GuildScheduledEventEntityTypes const enum lives in a .d.ts
+  // (discord.js/typings/enums) that has no runtime module. tsc inlined it; Bun can't.
+  entityType: "EXTERNAL",
   description: buildDescription(tournament.url),
   entityMetadata: {
     location: tournament.streamURL,
