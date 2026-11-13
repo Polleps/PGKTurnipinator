@@ -1,6 +1,5 @@
 import { ChatInputCommandInteraction, GuildMember, MessageFlags } from "discord.js";
 import {
-  canRunCommand,
   CommandHandler,
   findCommand,
   FixbotCommand,
@@ -8,10 +7,7 @@ import {
   PingCommand,
   PostFlairTextCommand,
   ReloadTournamentCacheCommand,
-  STAFF_ONLY_MESSAGE,
 } from "./commands";
-import { BasicSetCache } from "./stores";
-import { store } from "./Store";
 import { createLogger } from "./utils/logger";
 import { hasNeeRole, NEE_COMMAND_REPLY } from "./triggers";
 
@@ -26,16 +22,20 @@ const memberRoleIds = (interaction: ChatInputCommandInteraction): Iterable<strin
   return member?.roles ?? [];
 };
 
-/** Dispatches slash commands. Construct after store.init(). */
+/**
+ * Dispatches slash commands. Construct after store.init().
+ *
+ * Admin-only commands are gated by Discord alone: they default to Manage Server, and server
+ * admins can grant them to other roles or members (Server Settings > Integrations). Discord
+ * enforces that before the interaction reaches the bot, so it is deliberately not re-checked here.
+ */
 export default class CommandController {
   private handlers: Map<string, CommandHandler>;
-  private botadmins: BasicSetCache;
 
   constructor() {
-    this.botadmins = store.cache("botadmins") as BasicSetCache;
     this.handlers = new Map<string, CommandHandler>([
       ["ping", new PingCommand()],
-      ["help", new HelpCommand(this.botadmins)],
+      ["help", new HelpCommand()],
       ["postflairtext", new PostFlairTextCommand()],
       ["reloadcache", new ReloadTournamentCacheCommand()],
       ["fixbot", new FixbotCommand()],
@@ -55,11 +55,6 @@ export default class CommandController {
     // As in v13, where NeeTrigger answered these members before any command ran.
     if (hasNeeRole(memberRoleIds(interaction))) {
       await interaction.reply({ content: NEE_COMMAND_REPLY, flags: MessageFlags.Ephemeral });
-      return;
-    }
-
-    if (!canRunCommand(command, interaction.user.id, this.botadmins)) {
-      await interaction.reply({ content: STAFF_ONLY_MESSAGE, flags: MessageFlags.Ephemeral });
       return;
     }
 

@@ -25,7 +25,7 @@ describe("export-firestore script", () => {
     });
     const stdout = result.stdout.toString();
     expect(result.exitCode).toBe(0);
-    expect(stdout).toContain("joinableroles, role_categories, botadmins, tournaments, tournaments_dev");
+    expect(stdout).toContain("joinableroles, role_categories, tournaments, tournaments_dev");
     expect(stdout).toContain("Dry run: nothing was read");
     expect(existsSync(out)).toBe(false);
   });

@@ -3,14 +3,14 @@ import { readFileSync } from "fs";
 import { join } from "path";
 import { Store, store } from "../src/Store";
 import { resolveDataSource, SnapshotInProductionError } from "../src/stores/dataSource";
-import { BasicMapCache, BasicSetCache, TournamentStoreCache } from "../src/stores";
+import { BasicMapCache, TournamentStoreCache } from "../src/stores";
 import { loadSnapshotCollection, SnapshotCollection } from "../src/stores/snapshot/SnapshotCollection";
 import { SnapshotTimestamp } from "../src/stores/snapshot/codec";
 import type ITournament from "../src/models/ITournament";
 
 const FIXTURE = process.env.FIRESTORE_SNAPSHOT as string;
 const fixtureText = () =>
-  ["joinableroles", "role_categories", "botadmins", "tournaments"].map((c) =>
+  ["joinableroles", "role_categories", "tournaments"].map((c) =>
     readFileSync(join(FIXTURE, `${c}.json`), "utf8"),
   );
 
@@ -72,8 +72,7 @@ describe("snapshot mode", () => {
     const categories = s.cache("role_categories") as BasicMapCache<any>;
     expect(categories.get("Fixture Category")?.description).toBe("Fake category for tests");
 
-    const admins = s.cache("botadmins") as BasicSetCache;
-    expect([...admins.data]).toEqual(["200000000000000001"]);
+    expect(s.cache("botadmins")).toBeUndefined();
 
     const tournaments = s.cache("tournaments") as TournamentStoreCache;
     expect(tournaments.collectionId).toBe("tournaments");
@@ -91,14 +90,8 @@ describe("snapshot mode", () => {
     const log = quiet();
     const s = await newStore();
 
-    const admins = s.cache("botadmins") as BasicSetCache;
-    expect(admins.writable).toBe(true);
-    await admins.add("200000000000000002");
-    expect(admins.has("200000000000000002")).toBe(true);
-    await admins.delete("200000000000000001");
-    expect(admins.has("200000000000000001")).toBe(false);
-
     const roles = s.cache("joinableroles") as BasicMapCache<any>;
+    expect(roles.writable).toBe(true);
     await roles.add({ name: "fixture-role-c", category: "Fixture Category", categoryID: "rc1", ID: "3" });
     expect(roles.has("fixture-role-c")).toBe(true);
 
@@ -116,8 +109,6 @@ describe("snapshot mode", () => {
     const lines = log.mock.calls.map((c) => String(c[0])).filter((l) => l.startsWith("[snapshot] would write"));
     log.mockRestore();
     expect(lines.map((l) => l.split(" ")[3] + " " + l.split(" ")[4].split("/")[0])).toEqual([
-      "add botadmins",
-      "delete botadmins",
       "add joinableroles",
       "add tournaments",
       "update tournaments",
@@ -128,7 +119,7 @@ describe("snapshot mode", () => {
     const quiet2 = quiet();
     const fresh = await newStore();
     quiet2.mockRestore();
-    expect((fresh.cache("botadmins") as BasicSetCache).has("200000000000000001")).toBe(true);
+    expect((fresh.cache("joinableroles") as BasicMapCache<any>).has("fixture-role-c")).toBe(false);
     expect((fresh.cache("tournaments") as TournamentStoreCache).getByID("777")).toBeUndefined();
   });
 

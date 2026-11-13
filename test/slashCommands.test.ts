@@ -1,12 +1,8 @@
 import { describe, expect, test } from "bun:test";
 import { PermissionFlagsBits } from "discord.js";
 import { commandDefinitions, commandsJSON, findCommand } from "../src/commands/definitions";
-import { canRunCommand } from "../src/commands/permissions";
 import { buildHelpText } from "../src/Help";
 import { hasNeeRole } from "../src/triggers/NeeTrigger";
-
-const ADMIN_ID = "200000000000000001";
-const admins = new Set([ADMIN_ID]);
 
 describe("slash command definitions", () => {
   test("registration JSON", () => {
@@ -24,20 +20,6 @@ describe("slash command definitions", () => {
       reloadcache: manageGuild,
       fixbot: manageGuild,
     });
-  });
-});
-
-describe("permission gating (botadmins is the authority)", () => {
-  test("public commands run for anyone", () => {
-    expect(canRunCommand(findCommand("ping")!, "123", admins)).toBe(true);
-  });
-
-  test("admin-only commands run for bot admins only", () => {
-    for (const name of ["postflairtext", "reloadcache", "fixbot"]) {
-      expect(canRunCommand(findCommand(name)!, ADMIN_ID, admins)).toBe(true);
-      // A member Discord lets through (Manage Server, or a permission override) is still refused.
-      expect(canRunCommand(findCommand(name)!, "123", admins)).toBe(false);
-    }
   });
 });
 

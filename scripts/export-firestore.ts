@@ -32,7 +32,7 @@ import {
   FirestoreTypes,
 } from "../src/stores/snapshot/codec.ts";
 
-const BOT_COLLECTIONS = ["joinableroles", "role_categories", "botadmins"];
+const BOT_COLLECTIONS = ["joinableroles", "role_categories"];
 const DEV_COLLECTION = "tournaments_dev";
 const REPO_ROOT = resolve(import.meta.dirname, "..");
 

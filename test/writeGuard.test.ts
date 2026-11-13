@@ -1,7 +1,6 @@
 import { describe, expect, test } from "bun:test";
 import {
   BasicMapCache,
-  BasicSetCache,
   DEV_WRITABLE_COLLECTIONS,
   isCollectionWritable,
   ReadOnlyCollectionError,
@@ -31,7 +30,7 @@ describe("isCollectionWritable", () => {
       expect(isCollectionWritable("tournaments_dev", env)).toBe(true);
       expect(isCollectionWritable("tournaments", env)).toBe(false);
       expect(isCollectionWritable("joinableroles", env)).toBe(false);
-      expect(isCollectionWritable("botadmins", env)).toBe(false);
+      expect(isCollectionWritable("role_categories", env)).toBe(false);
     }
   });
 
@@ -47,20 +46,6 @@ describe("isCollectionWritable", () => {
 });
 
 describe("read-only caches", () => {
-  test("BasicSetCache refuses add/delete without touching the collection", async () => {
-    const { ref, writes } = fakeCollection("botadmins", [{ id: "1" }]);
-    const cache = new BasicSetCache(ref, "id");
-    await cache.init();
-    expect(cache.writable).toBe(false);
-    expect(cache.has("1")).toBe(true);
-
-    await expect(cache.add("2")).rejects.toBeInstanceOf(ReadOnlyCollectionError);
-    await expect(cache.delete("1")).rejects.toThrow(/read-only outside NODE_ENV=production/);
-    expect(writes).toEqual([]);
-    expect(cache.has("2")).toBe(false);
-    expect(cache.has("1")).toBe(true);
-  });
-
   test("BasicMapCache refuses add", async () => {
     const { ref, writes } = fakeCollection("joinableroles", [{ name: "a" }]);
     const cache = new BasicMapCache<{ name: string }>(ref, "name");
@@ -105,10 +90,10 @@ describe("writable caches", () => {
   });
 
   test("production caches write through", async () => {
-    const { ref, writes } = fakeCollection("botadmins");
-    const cache = new BasicSetCache(ref, "id", isCollectionWritable("botadmins", "production"));
-    await cache.add("2");
+    const { ref, writes } = fakeCollection("joinableroles");
+    const cache = new BasicMapCache<{ name: string }>(ref, "name", isCollectionWritable("joinableroles", "production"));
+    await cache.add({ name: "b" });
     expect(writes).toEqual(["add"]);
-    expect(cache.has("2")).toBe(true);
+    expect(cache.has("b")).toBe(true);
   });
 });

@@ -1,6 +1,6 @@
 import type { CollectionReference } from "firebase-admin/firestore";
 import { ICache } from "./stores/StoreCache.js";
-import { BasicSetCache, TournamentStoreCache, isCollectionWritable } from "./stores/index.js";
+import { TournamentStoreCache, isCollectionWritable } from "./stores/index.js";
 import Config from "./Config";
 import { BasicMapCache } from "./stores/BasicMapCache";
 import { IJoinableRole } from "./models/IJoinableRole";
@@ -64,13 +64,11 @@ export class Store {
 
     const [joinableRoles, joinableRolesWritable] = collection("joinableroles");
     const [roleCategories, roleCategoriesWritable] = collection("role_categories");
-    const [botAdmins, botAdminsWritable] = collection("botadmins");
     const [tournaments, tournamentsWritable] = collection(tournamentCollection);
 
     this.caches = new Map<string, ICache>([
       ["joinableroles", new BasicMapCache<IJoinableRole>(joinableRoles, "name", joinableRolesWritable)],
       ["role_categories", new BasicMapCache<IRoleCategory>(roleCategories, "name", roleCategoriesWritable)],
-      ["botadmins", new BasicSetCache(botAdmins, "id", botAdminsWritable)],
       ["tournaments", new TournamentStoreCache(tournaments, tournamentsWritable)],
     ]);
 

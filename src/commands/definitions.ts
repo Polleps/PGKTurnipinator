@@ -14,7 +14,7 @@ export interface CommandDefinition {
   description: string;
   /** Shown by /help <command>. */
   usage: string;
-  /** Only bot admins (the botadmins collection) may run it; enforced by CommandController. */
+  /** Defaults to Manage Server in Discord (server admins can grant it to others); Discord enforces it. */
   adminOnly: boolean;
   /** Listed by /help for everyone (admin-only commands are listed for admins only). */
   isPublic: boolean;
@@ -24,9 +24,8 @@ export interface CommandDefinition {
 type RestPostCommand = RESTPostAPIChatInputApplicationCommandsJSONBody;
 
 /**
- * Discord-side first gate for admin-only commands: hides them from members without
+ * The only gate for admin-only commands: Discord hides and refuses them for members without
  * Manage Server unless a server admin adds an override (Server Settings > Integrations).
- * The botadmins check in CommandController stays the authority.
  */
 export const ADMIN_DEFAULT_PERMISSIONS = PermissionFlagsBits.ManageGuild;
 

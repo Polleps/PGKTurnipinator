@@ -1,8 +1,0 @@
-{
-  "format": "turnipinator-firestore-export",
-  "version": 1,
-  "collection": "botadmins",
-  "exportedAt": "2026-01-01T00:00:00.000Z",
-  "count": 1,
-  "docs": [{ "id": "ba1", "data": { "id": "200000000000000001" } }]
-}
