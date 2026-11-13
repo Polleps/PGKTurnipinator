@@ -64,7 +64,7 @@ export class PostFlairTextCommand extends Command {
 
     const chunks = this.splitToChunks(options, this.optionChunkSize);
 
-    const categoryId = category.name.toLowerCase().replace(/\-/g, '');
+    const categoryId = category.name.toLowerCase().replace(/-/g, '');
 
     const isIcons = category.name.toLowerCase() === 'icons';
 
