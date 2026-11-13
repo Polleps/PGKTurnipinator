@@ -8,7 +8,8 @@ module.exports = {
     cwd: __dirname,
     script: "src/bot.ts",
     interpreter: "bun",
-    interpreter_args: "--env-file=.env.prod",
+    // src/env.ts loads .env.prod (NODE_ENV=production) with dotenv semantics.
+    interpreter_args: "--no-env-file",
     exec_mode: "fork",
     instances: 1,
     watch: false,

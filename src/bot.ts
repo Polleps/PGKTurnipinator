@@ -1,3 +1,5 @@
+// Must stay the first import: it fills process.env before Config is evaluated.
+import "./env";
 import { Client, Intents, Message } from "discord.js";
 import Config from "./Config";
 import { sClient } from "./Context";

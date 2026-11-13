@@ -1,3 +1,7 @@
+# Don't auto-load .env/.env.local/...: src/env.ts loads .env.dev/.env.prod with dotenv 6
+# semantics (Bun's parser expands `$` and strips `#` comments).
+env = false
+
 [install]
 # npm-style node_modules layout: webpack 4/5 loaders resolve their peers from the hoisted tree.
 linker = "hoisted"

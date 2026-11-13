@@ -25,10 +25,10 @@
   },
   "scripts": {
     "test": "bun --no-env-file test",
-    "dev": "bun --watch --env-file=.env.dev src/bot.ts",
-    "start": "NODE_ENV=production bun --env-file=.env.prod src/bot.ts",
-    "prod": "NODE_ENV=production bun --env-file=.env.prod src/bot.ts",
-    "debug": "bun --inspect --env-file=.env.dev src/bot.ts",
+    "dev": "bun --watch --no-env-file src/bot.ts",
+    "start": "NODE_ENV=production bun --no-env-file src/bot.ts",
+    "prod": "NODE_ENV=production bun --no-env-file src/bot.ts",
+    "debug": "bun --inspect --no-env-file src/bot.ts",
     "build": "bun run --filter agenda_src --filter public build",
     "typecheck": "tsc",
     "lint": "oxlint",
@@ -40,6 +40,7 @@
   "license": "ISC",
   "dependencies": {
     "discord.js": "^13.6.0",
+    "dotenv": "6.2.0",
     "express": "4.16.4",
     "firebase-admin": "14.5.1",
     "jsonwebtoken": "9.0.3",
@@ -48,6 +49,7 @@
   },
   "devDependencies": {
     "@types/bun": "1.4.4",
+    "@types/dotenv": "6.1.0",
     "@types/express": "4.17.25",
     "@types/jsonwebtoken": "9.0.10",
     "@types/node": "^26",
