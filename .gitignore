@@ -63,8 +63,6 @@ typings/
 .next
 
 #Build output dir
-built/*
-!built/.gitkeep
 agenda/dist/*
 !agenda/dist/.gitkeep
 public/dist/*
@@ -75,6 +73,5 @@ firebasekey.json
 
 .DS_Store
 
-# Firestore JSON exports (scripts/export-firestore.ts) and compiled scripts
+# Firestore JSON exports (scripts/export-firestore.ts)
 data/firestore-export/
-built-scripts/

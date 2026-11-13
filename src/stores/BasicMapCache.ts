@@ -13,7 +13,7 @@ export class BasicMapCache<T> extends StoreCache<Map<string, T>, string, T> {
   public async add(x: T): Promise<void> {
     this.assertWritable("add to");
     try {
-      await this.ref.add(x);
+      await this.ref.add(x as Record<string, unknown>);
       this.cache.set((x as Record<string, any>)[this.mapIndex], x);
     } catch (e) {
       console.error(e);

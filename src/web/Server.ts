@@ -20,15 +20,14 @@ export default class Server {
   }
 
   public start(port: number): Promise<void> {
-    return new Promise<void>((resolve: () => void, reject: (reason: any) => void) => {
-      this.app.listen(port, (err: Error) => {
-        if (err) {
-          reject(err);
-        } else {
-          console.log(`Web server running on port: ${port}`);
-          resolve();
-        }
+    return new Promise<void>((resolve, reject) => {
+      // listen() never passes an error to its callback; failures (e.g. EADDRINUSE)
+      // are emitted as an "error" event on the http.Server.
+      const server = this.app.listen(port, () => {
+        console.log(`Web server running on port: ${port}`);
+        resolve();
       });
+      server.once("error", reject);
     });
   }
 

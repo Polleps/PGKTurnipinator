@@ -1,14 +1,29 @@
 {
   "compilerOptions": {
-    "outDir": "./built",
+    "target": "es2022",
+    "module": "preserve",
+    "moduleResolution": "bundler",
+    "types": ["bun"],
+    "noEmit": true,
+    "allowImportingTsExtensions": true,
     "allowJs": true,
-    "target": "es6",
-    "module": "CommonJS",
-    "moduleResolution": "node",
     "esModuleInterop": true,
-    "strict": true
+    "strict": true,
+    // Bun transpiles each file on its own; flag what only tsc's whole-program emit
+    // could handle (e.g. ambient const enums, which caught scheduleEvent.ts).
+    "isolatedModules": true,
+    "skipLibCheck": true,
+    // discord.js 13's dependencies only declare types for their "require" export
+    // condition, which bundler resolution doesn't pick for imports. Point at the
+    // declarations directly until discord.js 14 (Phase 2) removes the need.
+    "paths": {
+      "discord-api-types/v9": ["./node_modules/discord-api-types/v9.d.ts"],
+      "@discordjs/collection": ["./node_modules/@discordjs/collection/dist/index.d.ts"],
+      "@discordjs/builders": ["./node_modules/@discordjs/builders/dist/index.d.ts"],
+      // Same for firebase-admin 10's subpath exports (fixed upstream in 11+).
+      "firebase-admin/app": ["./node_modules/firebase-admin/lib/app/index.d.ts"],
+      "firebase-admin/firestore": ["./node_modules/firebase-admin/lib/firestore/index.d.ts"]
+    }
   },
-  "include": [
-    "./src/**/*"
-  ]
+  "include": ["./src/**/*", "./scripts/**/*", "./test/**/*"]
 }

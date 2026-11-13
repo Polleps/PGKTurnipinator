@@ -15,10 +15,13 @@
  * Output: <out>/<timestamp>/<collection>.json plus manifest.json, copied to
  * <out>/latest/. Point the bot at it with FIRESTORE_SNAPSHOT=<out>/latest.
  *
- * Runs under Node (firebase-admin is not officially supported on Bun). It only
- * calls CollectionReference.get(); there are no write APIs in this file.
+ * Runs under Node (firebase-admin is not officially supported on Bun), straight
+ * from the .ts source via Node's built-in type stripping (Node >= 22.18), so this
+ * file and the modules it imports must stick to erasable TypeScript syntax and
+ * import local files with their .ts extension. It only calls
+ * CollectionReference.get(); there are no write APIs in this file.
  */
-import { copyFileSync, existsSync, mkdirSync, readdirSync, rmSync, writeFileSync } from "fs";
+import { copyFileSync, existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from "fs";
 import { join, resolve } from "path";
 import {
   CollectionExport,
@@ -26,11 +29,11 @@ import {
   EXPORT_FORMAT,
   EXPORT_VERSION,
   FirestoreTypes,
-} from "../src/stores/snapshot/codec";
+} from "../src/stores/snapshot/codec.ts";
 
 const BOT_COLLECTIONS = ["joinableroles", "role_categories", "botadmins"];
 const DEV_COLLECTION = "tournaments_dev";
-const REPO_ROOT = resolve(__dirname, "..", "..");
+const REPO_ROOT = resolve(import.meta.dirname, "..");
 
 interface Options {
   yes: boolean;
@@ -103,15 +106,12 @@ const main = async () => {
   }
 
   // Loaded only after --yes, so the dry run never touches Firebase or the network.
-  const admin = require("firebase-admin") as typeof import("firebase-admin");
-  const serviceAccount = require(opts.keyFile);
-  const app = admin.initializeApp({ credential: admin.credential.cert(serviceAccount) }, "export");
-  const db = app.firestore();
-  const types: FirestoreTypes = {
-    Timestamp: admin.firestore.Timestamp,
-    GeoPoint: admin.firestore.GeoPoint,
-    DocumentReference: admin.firestore.DocumentReference,
-  };
+  const { initializeApp, cert } = await import("firebase-admin/app");
+  const { getFirestore, Timestamp, GeoPoint, DocumentReference } = await import("firebase-admin/firestore");
+  const serviceAccount = JSON.parse(readFileSync(opts.keyFile, "utf8"));
+  const app = initializeApp({ credential: cert(serviceAccount) }, "export");
+  const db = getFirestore(app);
+  const types: FirestoreTypes = { Timestamp, GeoPoint, DocumentReference };
 
   const exportedAt = new Date().toISOString();
   const dir = join(opts.outRoot, exportedAt.replace(/:/g, "-"));

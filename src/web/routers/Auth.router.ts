@@ -21,7 +21,7 @@ export class AuthRouter {
 
     this._router.get("/callback", async (req: Request, res: Response) => {
       const code = req.query.code;
-      if (!code) {
+      if (typeof code !== "string" || !code) {
         return res.send("Error Something went wrong");
       }
       console.log("callback called");
