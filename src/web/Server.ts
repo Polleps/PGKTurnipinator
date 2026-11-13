@@ -5,6 +5,7 @@ import {
   AuthRouter,
   InviteRouter,
   TournamentRouter,
+  TournamentApiRouter,
   CalendarRouter,
   ServerInfoRouter,
 } from "./routers";
@@ -45,6 +46,7 @@ export default class Server {
     const actionRouter = new ActionRouter();
     const inviteRouter = new InviteRouter();
     const tournamentRouter = new TournamentRouter();
+    const tournamentApiRouter = new TournamentApiRouter();
     const calendarRouter = new CalendarRouter();
     const serverInfoRouter = new ServerInfoRouter(this.client);
 
@@ -55,7 +57,9 @@ export default class Server {
     this.app.use("/auth", authRouter.router);
     this.app.use("/actions", actionRouter.router);
     this.app.use("/invite", inviteRouter.router);
+    // Legacy array shape for nsd-site and installed agenda PWAs; new clients use /api/tournaments.
     this.app.use("/tournaments", tournamentRouter.router);
+    this.app.use("/api/tournaments", tournamentApiRouter.router);
     this.app.use("/serverinfo", serverInfoRouter.router);
     this.app.use("/", express.static("home"));
   }

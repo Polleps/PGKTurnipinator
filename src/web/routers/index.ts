@@ -4,3 +4,4 @@ export * from "./Invite.router";
 export * from "./Tournament.router";
 export * from "./Calendar.router";
 export * from "./ServerInfo.router";
+export * from "./TournamentApi.router";
