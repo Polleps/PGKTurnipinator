@@ -1,0 +1,43 @@
+{
+  "format": "turnipinator-firestore-export",
+  "version": 1,
+  "collection": "joinableroles",
+  "exportedAt": "2026-01-01T00:00:00.000Z",
+  "count": 4,
+  "docs": [
+    {
+      "id": "jr1",
+      "data": {
+        "name": "fixture-role-a",
+        "category": "Fixture Category",
+        "categoryID": "rc1",
+        "ID": "100000000000000001"
+      }
+    },
+    {
+      "id": "jr2",
+      "data": {
+        "name": "fixture-role-b",
+        "category": "Fixture Category",
+        "ID": "100000000000000002",
+        "description": "Fake role"
+      }
+    },
+    {
+      "id": "joinablerole.icon",
+      "data": {
+        "name": "fixture-icon",
+        "category": "Icons",
+        "ID": "100000000000000003"
+      }
+    },
+    {
+      "id": "jr4",
+      "data": {
+        "name": "fixture-orphan",
+        "category": "No Such Category",
+        "ID": "100000000000000004"
+      }
+    }
+  ]
+}

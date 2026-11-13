@@ -1,6 +1,6 @@
 /**
  * One-off, READ-ONLY Firestore export: dumps collections to JSON (document IDs kept)
- * as a backup and as input for FIRESTORE_SNAPSHOT mode.
+ * as a backup and as input for the SQLite import (scripts/import-firestore-export.ts).
  *
  *   npm run export:firestore              # dry run: prints the plan, no Firebase, no network
  *   npm run export:firestore -- --yes     # actually reads Firestore (costs reads)
@@ -14,7 +14,7 @@
  *   --key=<file>          Service account key (default: firebasekey.json in the repo root).
  *
  * Output: <out>/<timestamp>/<collection>.json plus manifest.json, copied to
- * <out>/latest/. Point the bot at it with FIRESTORE_SNAPSHOT=<out>/latest.
+ * <out>/latest/. Build the bot's DB from it with `bun run import:firestore <out>/latest`.
  *
  * Runs under Node (firebase-admin is not officially supported on Bun), straight
  * from the .ts source via Node's built-in type stripping (Node >= 22.18), so this
@@ -30,7 +30,7 @@ import {
   EXPORT_FORMAT,
   EXPORT_VERSION,
   FirestoreTypes,
-} from "../src/stores/snapshot/codec.ts";
+} from "./lib/firestoreCodec.ts";
 
 const BOT_COLLECTIONS = ["joinableroles", "role_categories"];
 const DEV_COLLECTION = "tournaments_dev";
@@ -160,7 +160,7 @@ const main = async () => {
   console.log(`\nExported ${total} docs from ${opts.collections.length} collections (~${reads} reads).`);
   console.log(`  ${dir}`);
   console.log(`  ${latest}`);
-  console.log(`\nRun the bot on it: FIRESTORE_SNAPSHOT=${latest} npm run dev`);
+  console.log(`\nBuild a SQLite DB from it: bun run import:firestore ${latest} --dry-run`);
 };
 
 main().catch((e) => {

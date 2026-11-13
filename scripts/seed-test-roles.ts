@@ -24,7 +24,7 @@ import { join, relative, resolve } from "path";
 import { parse } from "dotenv";
 import { Client, GatewayIntentBits, GuildPremiumTier, type Guild } from "discord.js";
 import { envFileFor } from "../src/envLoader";
-import type { ExportedDoc } from "../src/stores/snapshot/codec";
+import type { ExportedDoc } from "./lib/firestoreCodec";
 
 const ROOT = resolve(import.meta.dir, "..");
 const SOURCE_DIR = join(ROOT, "data/firestore-export/latest");
@@ -151,7 +151,7 @@ const seed = async () => {
 
     console.log(
       `\nRoles created: ${created}. Roles reused: ${reused}.` +
-        `\nStart the bot with FIRESTORE_SNAPSHOT=${relative(ROOT, TARGET_DIR)}`,
+        `\nBuild a test DB from it: bun run import:firestore ${relative(ROOT, TARGET_DIR)} --db=data/test-guild.db`,
     );
   } finally {
     await client.destroy();

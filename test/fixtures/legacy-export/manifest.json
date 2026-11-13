@@ -1,0 +1,12 @@
+{
+  "format": "turnipinator-firestore-export",
+  "version": 1,
+  "exportedAt": "2026-01-01T00:00:00.000Z",
+  "counts": {
+    "joinableroles": 4,
+    "role_categories": 2,
+    "botadmins": 1,
+    "tournaments": 11
+  },
+  "note": "Fake fixture data for tests. Not real Firestore data."
+}

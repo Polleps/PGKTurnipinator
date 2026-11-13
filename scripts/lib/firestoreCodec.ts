@@ -1,9 +1,9 @@
 /**
  * Lossless JSON encoding of Firestore document data, shared by the export script
- * (scripts/export-firestore.ts) and the local snapshot mode (FIRESTORE_SNAPSHOT).
+ * (scripts/export-firestore.ts) and the SQLite import (scripts/import-firestore-export.ts).
  *
- * This module must not import firebase-admin or @google-cloud/firestore: the bot
- * uses it in snapshot mode, where the Firebase SDK is never loaded. The exporter
+ * This module must not import firebase-admin or @google-cloud/firestore: the import
+ * runs on Bun, where the Firebase SDK is never loaded. The exporter
  * passes the real SDK classes in via `FirestoreTypes`.
  *
  * Plain JSON values (string, finite number, boolean, null, array, map) are written

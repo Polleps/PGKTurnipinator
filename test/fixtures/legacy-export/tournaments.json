@@ -1,0 +1,364 @@
+{
+  "format": "turnipinator-firestore-export",
+  "version": 1,
+  "collection": "tournaments",
+  "exportedAt": "2026-01-01T00:00:00.000Z",
+  "count": 11,
+  "docs": [
+    {
+      "id": "t01",
+      "data": {
+        "id": 900001,
+        "url": "fixture-online-weekly",
+        "title": "Fixture Online Weekly",
+        "image": "https://images.example.test/a.png",
+        "description": "",
+        "location": null,
+        "city": null,
+        "locationID": null,
+        "startDate": 4070944800000,
+        "endDate": 4070966400000,
+        "type": "smashgg",
+        "isOnline": true,
+        "nocap": false,
+        "events": [
+          {
+            "name": "Singles",
+            "cap": ""
+          }
+        ],
+        "prices": [
+          {
+            "name": "",
+            "amount": 0
+          }
+        ],
+        "streamURL": "https://twitch.tv/fixture",
+        "streamStartDate": 4070943000000.0,
+        "messageID": "300000000000000001",
+        "guildEventID": "400000000000000001",
+        "error": ""
+      }
+    },
+    {
+      "id": "t02",
+      "data": {
+        "id": 900002,
+        "url": "fixture-legacy-2019",
+        "title": "Fixture Legacy 2019",
+        "image": "",
+        "description": "Old doc",
+        "location": "Teststraat 1, Testdorp",
+        "city": "Testdorp",
+        "locationID": "place-1",
+        "startDate": 1563530400000,
+        "endDate": 1563559200000,
+        "type": "smashgg",
+        "pr": true,
+        "events": [
+          {
+            "name": "Singles",
+            "cap": "64"
+          },
+          {
+            "name": "",
+            "cap": ""
+          }
+        ],
+        "prices": [
+          {
+            "name": "Entree",
+            "amount": 5
+          },
+          {
+            "name": "Venue",
+            "amount": 0
+          }
+        ],
+        "error": ""
+      }
+    },
+    {
+      "id": "t03",
+      "data": {
+        "id": 900003,
+        "url": "fixture-local-stream",
+        "title": "Fixture Local Stream",
+        "image": "https://images.example.test/b.png",
+        "description": "",
+        "location": "Teststraat 2, Testdorp",
+        "city": "Testdorp",
+        "locationID": "place-2",
+        "startDate": 1688220000000,
+        "endDate": 1688248800000,
+        "type": "smashgg",
+        "isOnline": false,
+        "nocap": true,
+        "events": [
+          {
+            "name": "Singles",
+            "cap": "128"
+          }
+        ],
+        "prices": [
+          {
+            "name": "",
+            "amount": 0
+          }
+        ],
+        "streamURL": "twitch.tv/fixture",
+        "streamStartDate": "2023-07-01T16:00",
+        "messageID": "300000000000000003",
+        "guildEventID": "400000000000000003",
+        "error": ""
+      }
+    },
+    {
+      "id": "t04",
+      "data": {
+        "id": 900004,
+        "url": "fixture-no-stream",
+        "title": "Fixture No Stream",
+        "image": "https://images.example.test/b.png",
+        "description": "",
+        "location": "",
+        "city": "Testdorp",
+        "locationID": "place-2",
+        "startDate": 1688220000000,
+        "endDate": 1688248800000,
+        "type": "smashgg",
+        "isOnline": true,
+        "nocap": false,
+        "events": [
+          {
+            "name": "Singles",
+            "cap": "128"
+          }
+        ],
+        "prices": [
+          {
+            "name": "",
+            "amount": 0
+          }
+        ],
+        "streamURL": "",
+        "streamStartDate": "",
+        "messageID": "300000000000000004",
+        "error": ""
+      }
+    },
+    {
+      "id": "t05",
+      "data": {}
+    },
+    {
+      "id": "t06",
+      "data": {
+        "id": 900002,
+        "url": "fixture-legacy-2019",
+        "title": "Fixture Legacy 2019 (first post)",
+        "image": "",
+        "description": "Old doc",
+        "location": "Teststraat 1, Testdorp",
+        "city": "Testdorp",
+        "locationID": "place-1",
+        "startDate": 1563444000000,
+        "endDate": 1563458400000,
+        "type": "smashgg",
+        "pr": true,
+        "events": [
+          {
+            "name": "Singles",
+            "cap": "64"
+          },
+          {
+            "name": "",
+            "cap": ""
+          }
+        ],
+        "prices": [
+          {
+            "name": "Entree",
+            "amount": 5
+          },
+          {
+            "name": "Venue",
+            "amount": 0
+          }
+        ],
+        "error": ""
+      }
+    },
+    {
+      "id": "t07",
+      "data": {
+        "id": 900005,
+        "url": "fixture-repost",
+        "title": "Fixture Repost",
+        "image": "https://images.example.test/a.png",
+        "description": "",
+        "location": "Teststraat 5, Testdorp",
+        "city": "Testdorp",
+        "locationID": "place-5",
+        "startDate": 1630000000000,
+        "endDate": 1630020000000,
+        "type": "smashgg",
+        "isOnline": false,
+        "nocap": false,
+        "events": [
+          {
+            "name": "Singles",
+            "cap": ""
+          }
+        ],
+        "prices": [
+          {
+            "name": "",
+            "amount": 0
+          }
+        ],
+        "streamURL": "",
+        "streamStartDate": "",
+        "messageID": "300000000000000005",
+        "error": ""
+      }
+    },
+    {
+      "id": "t08",
+      "data": {
+        "id": 900005,
+        "url": "fixture-repost",
+        "title": "Fixture Repost",
+        "image": "https://images.example.test/a.png",
+        "description": "",
+        "location": "Teststraat 5, Testdorp",
+        "city": "Testdorp",
+        "locationID": "place-5",
+        "startDate": 1630000000000,
+        "endDate": 1630020000000,
+        "type": "smashgg",
+        "isOnline": false,
+        "nocap": false,
+        "events": [
+          {
+            "name": "Singles",
+            "cap": ""
+          }
+        ],
+        "prices": [
+          {
+            "name": "",
+            "amount": 0
+          }
+        ],
+        "streamURL": "",
+        "streamStartDate": "",
+        "messageID": "300000000000000006",
+        "error": ""
+      }
+    },
+    {
+      "id": "t09",
+      "data": {
+        "id": 900006,
+        "url": "fixture-repost",
+        "title": "Fixture Repost, next edition",
+        "image": "https://images.example.test/a.png",
+        "description": "",
+        "location": "Teststraat 5, Testdorp",
+        "city": "Testdorp",
+        "locationID": "place-5",
+        "startDate": 1730000000000,
+        "endDate": 1730020000000,
+        "type": "smashgg",
+        "isOnline": false,
+        "nocap": false,
+        "events": [
+          {
+            "name": "Singles",
+            "cap": ""
+          }
+        ],
+        "prices": [
+          {
+            "name": "",
+            "amount": 0
+          }
+        ],
+        "streamURL": "",
+        "streamStartDate": "",
+        "messageID": "300000000000000007",
+        "error": ""
+      }
+    },
+    {
+      "id": "t10",
+      "data": {
+        "id": 900007,
+        "url": "fixture-tagged",
+        "title": "Fixture Tagged Timestamps",
+        "image": "",
+        "description": "",
+        "location": "Teststraat 7, Testdorp",
+        "city": "Testdorp",
+        "locationID": "",
+        "startDate": {
+          "__fs": "timestamp",
+          "seconds": 1546344000,
+          "nanoseconds": 500000000
+        },
+        "endDate": {
+          "__fs": "timestamp",
+          "seconds": 1546365600,
+          "nanoseconds": 0
+        },
+        "type": "smashgg",
+        "events": [
+          {
+            "name": "Singles",
+            "cap": ""
+          }
+        ],
+        "prices": [],
+        "lat": 52.0,
+        "lng": 5.0,
+        "smashggID": "900007"
+      }
+    },
+    {
+      "id": "t11",
+      "data": {
+        "id": 900008,
+        "url": "fixture-bad-end",
+        "title": "Fixture Bad End",
+        "image": "https://images.example.test/a.png",
+        "description": "",
+        "location": null,
+        "city": null,
+        "locationID": null,
+        "startDate": 4070944800000,
+        "endDate": 4070941200000,
+        "type": "smashgg",
+        "isOnline": true,
+        "nocap": false,
+        "events": [
+          {
+            "name": "Singles",
+            "cap": ""
+          }
+        ],
+        "prices": [
+          {
+            "name": "",
+            "amount": 0
+          }
+        ],
+        "streamURL": "not a url at all",
+        "streamStartDate": 4070944800000,
+        "messageID": "300000000000000001",
+        "guildEventID": "400000000000000001",
+        "error": ""
+      }
+    }
+  ]
+}

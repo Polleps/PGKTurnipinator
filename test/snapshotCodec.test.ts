@@ -7,7 +7,7 @@ import {
   SnapshotDocumentReference,
   SnapshotGeoPoint,
   SnapshotTimestamp,
-} from "../src/stores/snapshot/codec";
+} from "../scripts/lib/firestoreCodec";
 
 // Hand-built stand-ins for the SDK classes (firebase-admin is blocked in tests).
 class FakeTimestamp {
