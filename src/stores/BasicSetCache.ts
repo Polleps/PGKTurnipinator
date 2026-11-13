@@ -4,13 +4,14 @@ import { CollectionReference } from "@google-cloud/firestore";
 export class BasicSetCache extends StoreCache<Set<string>, string, string> {
   private prop: string;
 
-  constructor(collection: CollectionReference, prop: string) {
-    super(collection);
+  constructor(collection: CollectionReference, prop: string, writable?: boolean) {
+    super(collection, writable);
     this.prop = prop;
     this.cache = new Set<string>();
   }
 
   public async add(x: string): Promise<void> {
+    this.assertWritable("add to");
     try {
       await this.ref.add({ [this.prop]: x });
       this.cache.add(x);
@@ -20,6 +21,7 @@ export class BasicSetCache extends StoreCache<Set<string>, string, string> {
   }
 
   public async delete(x: string): Promise<void> {
+    this.assertWritable("delete from");
     try {
       const snapshot = await this.ref.where(this.prop, "==", x).get();
       if (!snapshot.empty) {
@@ -37,10 +39,6 @@ export class BasicSetCache extends StoreCache<Set<string>, string, string> {
 
   public has(index: string): boolean {
     return this.cache.has(index);
-  }
-
-  public async seed(data: string[]) {
-    return Promise.all(data.map((item) => this.add(item)));
   }
 
   protected async fillCache(): Promise<void> {

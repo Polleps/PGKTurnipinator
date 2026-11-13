@@ -1,12 +1,15 @@
 import * as admin from "firebase-admin";
 import * as serviceAccount from "../firebasekey.json";
-import { Firestore } from "@google-cloud/firestore";
+import { CollectionReference, Firestore } from "@google-cloud/firestore";
 import { ICache } from "./stores/StoreCache.js";
-import { BasicSetCache, TournamentStoreCache } from "./stores/index.js";
+import { BasicSetCache, TournamentStoreCache, isCollectionWritable } from "./stores/index.js";
 import Config from "./Config";
 import { BasicMapCache } from "./stores/BasicMapCache";
 import { IJoinableRole } from "./models/IJoinableRole";
 import { IRoleCategory } from "./models/IRoleCategory";
+import { createLogger } from "./utils/logger";
+
+const log = createLogger("Store");
 
 class Store {
   private static instance: Store;
@@ -22,16 +25,30 @@ class Store {
     admin.initializeApp({credential: admin.credential.cert(serviceAccount as admin.ServiceAccount)});
     this.db = admin.firestore();
 
-    this.caches = new Map<string, ICache>([
-      ["joinableroles", new BasicMapCache<IJoinableRole>(this.db.collection("joinableroles"), 'name')],
-      ["role_categories", new BasicMapCache<IRoleCategory>(this.db.collection("role_categories"), 'name')],
-      ["botadmins", new BasicSetCache(this.db.collection("botadmins"), "id")],
-      ["tournaments", new TournamentStoreCache(this.db.collection(Config.TOURNAMENT_COLLECTION_NAME))],
-    ]);
-  }
+    // Every cache is read-only outside NODE_ENV=production unless its collection is
+    // explicitly allowed (tournaments_dev). There is deliberately no raw collection
+    // accessor: all Firestore access goes through these guarded caches.
+    const collection = (name: string): [CollectionReference, boolean] => {
+      const ref = this.db.collection(name);
+      return [ref, isCollectionWritable(ref.id)];
+    };
+    const [joinableRoles, joinableRolesWritable] = collection("joinableroles");
+    const [roleCategories, roleCategoriesWritable] = collection("role_categories");
+    const [botAdmins, botAdminsWritable] = collection("botadmins");
+    const [tournaments, tournamentsWritable] = collection(Config.TOURNAMENT_COLLECTION_NAME);
 
-  public collection(name: string) {
-    return this.db.collection(name);
+    this.caches = new Map<string, ICache>([
+      ["joinableroles", new BasicMapCache<IJoinableRole>(joinableRoles, "name", joinableRolesWritable)],
+      ["role_categories", new BasicMapCache<IRoleCategory>(roleCategories, "name", roleCategoriesWritable)],
+      ["botadmins", new BasicSetCache(botAdmins, "id", botAdminsWritable)],
+      ["tournaments", new TournamentStoreCache(tournaments, tournamentsWritable)],
+    ]);
+
+    const writable = [...this.caches.values()].filter((c) => c.writable).map((c) => c.collectionId);
+    log(
+      `NODE_ENV=${process.env.NODE_ENV ?? "(unset)"}; writable collections: ` +
+        (writable.length > 0 ? writable.join(", ") : "none (read-only)"),
+    );
   }
 
   public cache(name: string) {

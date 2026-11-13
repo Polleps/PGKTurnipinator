@@ -4,13 +4,14 @@ import { CollectionReference } from "@google-cloud/firestore";
 export class BasicMapCache<T> extends StoreCache<Map<string, T>, string, T> {
   private mapIndex: string;
 
-  constructor(collection: CollectionReference, mapIndex: string) {
-    super(collection);
+  constructor(collection: CollectionReference, mapIndex: string, writable?: boolean) {
+    super(collection, writable);
     this.cache = new Map<string, T>();
     this.mapIndex = mapIndex;
   }
 
   public async add(x: T): Promise<void> {
+    this.assertWritable("add to");
     try {
       await this.ref.add(x);
       this.cache.set(x[this.mapIndex], x);

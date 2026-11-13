@@ -45,6 +45,15 @@ export const postTournament: Performer = async (userInfo: IUserInfo, action: IAc
     throw new Error("You are not allowed to post tournaments.");
   }
 
+  // Local data-safety guard: refuse up front (before posting anything to Discord)
+  // when the tournament collection is read-only in this environment.
+  if (!cache.writable) {
+    throw new Error(
+      `Tournament store "${cache.collectionId}" is read-only in this environment; ` +
+        "set TOURNAMENT_COLLECTION_NAME=tournaments_dev to test posting locally.",
+    );
+  }
+
   try {
     const parsedTournament = JSON.parse(action.args[0]) as ITournament;
     const existingTournament = cache.getByID(parsedTournament.id);

@@ -11,8 +11,8 @@ export class TournamentStoreCache extends StoreCache<
   private expires: number;
   private expireTime: number = 600000;
 
-  constructor(collection: CollectionReference) {
-    super(collection);
+  constructor(collection: CollectionReference, writable?: boolean) {
+    super(collection, writable);
     this.cache = new Array<ITournament>();
   }
 
@@ -20,6 +20,7 @@ export class TournamentStoreCache extends StoreCache<
     x: ITournament,
     updateIfExist: boolean = true
   ): Promise<void> {
+    this.assertWritable("write to");
     try {
       if (updateIfExist && this.getByID(x.id)) {
         await this.update(x);
@@ -87,6 +88,7 @@ export class TournamentStoreCache extends StoreCache<
   }
 
   private async update(tournament: ITournament) {
+    this.assertWritable("update");
     const snapshot = await this.ref.where("id", "==", tournament.id).get();
     if (snapshot.size === 0) {
       throw new Error(
