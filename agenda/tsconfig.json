@@ -1,6 +1,6 @@
 {
   // Editor and type-check settings for this app's TypeScript (Solid components in .tsx).
-  // The lit-html .js files are bundled by Vite but not type-checked.
+  // The service worker (.js) is bundled by Vite but not type-checked.
   "compilerOptions": {
     "target": "es2022",
     "module": "preserve",

@@ -12,7 +12,7 @@ export default defineConfig({
     target: 'baseline-widely-available',
   },
   plugins: [
-    // Solid components live in .jsx/.tsx files; the lit-html .js files are left alone.
+    // Solid components live in .tsx files; the service worker (.js) is not JSX.
     solid({ include: /\.[jt]sx$/ }),
     VitePWA({
       // Keep our own worker (legacy cache cleanup, runtime caching rules); Workbox injects
