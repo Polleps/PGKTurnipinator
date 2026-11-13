@@ -1,0 +1,60 @@
+{
+  "format": "turnipinator-firestore-export",
+  "version": 1,
+  "collection": "tournaments",
+  "exportedAt": "2026-01-01T00:00:00.000Z",
+  "count": 3,
+  "docs": [
+    {
+      "id": "t1",
+      "data": {
+        "id": "900001",
+        "url": "fixture-past",
+        "title": "Fixture Past",
+        "events": [{ "name": "Singles" }],
+        "location": "Nowhere 1",
+        "city": "Testville",
+        "locationID": "",
+        "startDate": 1577872800000,
+        "endDate": 1577908800000,
+        "type": "smashgg",
+        "isOnline": false,
+        "messageID": "300000000000000001"
+      }
+    },
+    {
+      "id": "t2",
+      "data": {
+        "url": "fixture-upcoming",
+        "title": "Fixture Upcoming (no id, so no start.gg status call)",
+        "events": [],
+        "location": "",
+        "city": "",
+        "locationID": "",
+        "startDate": 4070944800000,
+        "endDate": 4070980800000,
+        "type": "smashgg",
+        "isOnline": true,
+        "streamURL": "",
+        "streamStartDate": ""
+      }
+    },
+    {
+      "id": "t3",
+      "data": {
+        "id": "900003",
+        "url": "fixture-legacy",
+        "title": "Fixture Legacy (tagged Firestore types)",
+        "location": "",
+        "city": "",
+        "locationID": "",
+        "type": "smashgg",
+        "startDate": { "__fs": "timestamp", "seconds": 1546344000, "nanoseconds": 500000000 },
+        "endDate": { "__fs": "timestamp", "seconds": 1546365600, "nanoseconds": 0 },
+        "where": { "__fs": "geopoint", "latitude": 52.0907, "longitude": 5.1214 },
+        "organizer": { "__fs": "ref", "path": "organizers/fixture-org" },
+        "meta": { "__fs": "map", "value": { "__fs": "not a tag", "n": { "__fs": "number", "value": "NaN" } } }
+      }
+    }
+  ]
+}

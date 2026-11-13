@@ -24,3 +24,7 @@ process.env.BOT_ADMINS ??= "[]";
 process.env.NEE_ROLE_IDS ??= "[]";
 // The write guard reads NODE_ENV; tests pass it explicitly or assert the default.
 process.env.NODE_ENV = "test";
+// Anything that imports Store gets snapshot mode on the fake fixture export, so the
+// `store` singleton never tries to load firebase-admin.
+process.env.FIRESTORE_SNAPSHOT = new URL("./fixtures/firestore-export", import.meta.url).pathname;
+process.env.TOURNAMENT_COLLECTION_NAME ??= "tournaments";
