@@ -10,7 +10,7 @@ import { postEmbed } from "./postEmbed";
 import { scheduleEvent } from "./scheduleEvent";
 
 const guildID = Config.GUILD_ID;
-const roleName = Config.POST_TOURNAMENT_ROLE_NAME;
+const roleID = Config.POST_TOURNAMENT_ROLE_ID;
 
 /**
  * Perform 'posttournament' action.
@@ -31,14 +31,11 @@ export const postTournament: Performer = async (userInfo: IUserInfo, action: IAc
 
   const user = await guild.members.fetch(userInfo.id);
 
-  await guild.roles.fetch();
-  const role = guild.roles.cache.find((x) => x.name === roleName);
-
   if (!user) {
     throw new Error("You're not in the Discord.");
   }
 
-  if (!user.roles.cache.has(role!.id)) {
+  if (!user.roles.cache.has(roleID)) {
     throw new Error("You are not allowed to post tournaments.");
   }
 

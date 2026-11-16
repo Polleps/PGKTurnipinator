@@ -8,18 +8,16 @@ export const userCanFetchTournament = async (userInfo: IUserInfo) => {
   }
 
   const guildID = Config.GUILD_ID;
-  const roleName = Config.POST_TOURNAMENT_ROLE_NAME;
+  const roleID = Config.POST_TOURNAMENT_ROLE_ID;
   const client = sClient.client;
   const guild = client.guilds.cache.get(guildID)!;
   const user = await guild.members.fetch(userInfo.id);
-  await guild.roles.fetch();
-  const role = guild.roles.cache.find((x) => x.name === roleName)!;
 
   if (!user) {
     return false;
   }
 
-  if (!user.roles.cache.has(role.id)) {
+  if (!user.roles.cache.has(roleID)) {
     return false;
   }
 

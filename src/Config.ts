@@ -16,7 +16,7 @@ export default class Config {
   public static readonly CLIENTSECRET: string = env("CLIENT_SECRET");
   public static readonly SMASHGG_API_KEY: string = env("SMASHGG_API_KEY");
   public static readonly GUILD_ID: string = env("GUILD_ID");
-  public static readonly POST_TOURNAMENT_ROLE_NAME: string = env("POST_TOURNAMENT_ROLE_NAME");
+  public static readonly POST_TOURNAMENT_ROLE_ID: string = env("POST_TOURNAMENT_ROLE_ID");
   public static readonly TOURNAMENT_AGENDA_ID: string = env("TOURNAMENT_AGENDA_ID");
   public static readonly ONLINE_TOURNAMENT_AGENDA_ID: string = env("ONLINE_TOURNAMENT_AGENDA_ID");
   public static readonly SERVERURL: string = env("SERVERURL");
