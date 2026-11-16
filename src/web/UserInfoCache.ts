@@ -19,10 +19,12 @@ class UserInfoCache {
     }
     const fetchedInfo = await fetchUserInfo(accessToken);
 
-    if (this.cache.size > this.maxCache) {
-      // FIXME: indexing an iterator yields undefined, so this never evicts anything.
-      // Kept as-is in Phase 0 (no behavior change); intended: this.cache.keys().next().value.
-      this.cache.delete((this.cache.keys() as unknown as string[])[0]);
+    if (this.cache.size >= this.maxCache) {
+      // Maps iterate in insertion order, so this drops the oldest entry.
+      const oldest = this.cache.keys().next().value;
+      if (oldest !== undefined) {
+        this.cache.delete(oldest);
+      }
     }
 
     this.cache.set(accessToken, fetchedInfo);
