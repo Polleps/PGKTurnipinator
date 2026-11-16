@@ -5,6 +5,13 @@ import { buildHelpText } from "../src/Help";
 import { hasNeeRole } from "../src/triggers/NeeTrigger";
 
 describe("slash command definitions", () => {
+  test("/delete-tournament has a required, autocompleted slug option", () => {
+    const json = commandsJSON().find((c) => c.name === "delete-tournament");
+    expect(json?.options).toEqual([
+      expect.objectContaining({ name: "slug", type: 3, required: true, autocomplete: true }),
+    ]);
+  });
+
   test("registration JSON", () => {
     expect(commandsJSON()).toMatchSnapshot();
   });
@@ -18,6 +25,7 @@ describe("slash command definitions", () => {
       help: undefined,
       postflairtext: manageGuild,
       fixbot: manageGuild,
+      "delete-tournament": manageGuild,
     });
   });
 });
@@ -39,6 +47,10 @@ describe("/help", () => {
     expect(buildHelpText(commandDefinitions, false, "fixbot")).toBe("fixbot is not a command.");
     expect(buildHelpText(commandDefinitions, true, "fixbot")).toContain("**Description**: Restarts the bot.");
     expect(buildHelpText(commandDefinitions, true, "nope")).toBe("nope is not a command.");
+    expect(buildHelpText(commandDefinitions, false, "delete-tournament")).toBe("delete-tournament is not a command.");
+    expect(buildHelpText(commandDefinitions, true, "/delete-tournament")).toContain(
+      "**Usage**: Type `/delete-tournament slug:`",
+    );
   });
 });
 

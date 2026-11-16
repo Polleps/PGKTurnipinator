@@ -65,6 +65,10 @@ class Main {
         commandController.handle(interaction).catch(console.error);
         return;
       }
+      if (interaction.isAutocomplete()) {
+        commandController.autocomplete(interaction).catch(console.error);
+        return;
+      }
       interactionHandler.handle(interaction);
     });
 

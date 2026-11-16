@@ -75,6 +75,24 @@ export const commandDefinitions: readonly CommandDefinition[] = [
     adminOnly: true,
     isPublic: false,
   }),
+  define(
+    {
+      name: "delete-tournament",
+      description: "Removes an upcoming tournament: its agenda message, Discord event and website entry.",
+      usage:
+        "Type `/delete-tournament slug:` and pick the tournament (start.gg slug and date) from the suggestions, then press Delete",
+      adminOnly: true,
+      isPublic: false,
+    },
+    (builder) =>
+      builder.addStringOption((option) =>
+        option
+          .setName("slug")
+          .setDescription("start.gg slug of the tournament; pick one from the suggestions")
+          .setRequired(true)
+          .setAutocomplete(true),
+      ),
+  ),
   define({
     name: "fixbot",
     description: "Restarts the bot.",

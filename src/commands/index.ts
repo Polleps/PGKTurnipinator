@@ -4,3 +4,4 @@ export * from "./Ping";
 export * from "./Help";
 export * from "./Fixbot";
 export * from "./PostFlairText";
+export * from "./DeleteTournament";

@@ -1,12 +1,20 @@
-import { ChatInputCommandInteraction, GuildMember, MessageFlags } from "discord.js";
-import { CommandHandler, findCommand, FixbotCommand, HelpCommand, PingCommand, PostFlairTextCommand } from "./commands";
+import { AutocompleteInteraction, ChatInputCommandInteraction, GuildMember, MessageFlags } from "discord.js";
+import {
+  CommandHandler,
+  DeleteTournamentCommand,
+  findCommand,
+  FixbotCommand,
+  HelpCommand,
+  PingCommand,
+  PostFlairTextCommand,
+} from "./commands";
 import { createLogger } from "./utils/logger";
 import { hasNeeRole, NEE_COMMAND_REPLY } from "./triggers";
 
 const log = createLogger("CommandController");
 
 /** Role IDs of the invoking member (a cached GuildMember, or the raw API member). */
-const memberRoleIds = (interaction: ChatInputCommandInteraction): Iterable<string> => {
+const memberRoleIds = (interaction: ChatInputCommandInteraction | AutocompleteInteraction): Iterable<string> => {
   const { member } = interaction;
   if (member instanceof GuildMember) {
     return member.roles.cache.keys();
@@ -30,7 +38,23 @@ export default class CommandController {
       ["help", new HelpCommand()],
       ["postflairtext", new PostFlairTextCommand()],
       ["fixbot", new FixbotCommand()],
+      ["delete-tournament", new DeleteTournamentCommand()],
     ]);
+  }
+
+  /** Answers autocomplete for a command option; NEE members and unknown commands get no suggestions. */
+  public async autocomplete(interaction: AutocompleteInteraction): Promise<void> {
+    const handler = this.handlers.get(interaction.commandName);
+    try {
+      if (!handler?.autocomplete || hasNeeRole(memberRoleIds(interaction))) {
+        await interaction.respond([]);
+        return;
+      }
+      await handler.autocomplete(interaction);
+    } catch (err) {
+      // Too late or already answered: Discord just shows no suggestions.
+      log(err);
+    }
   }
 
   public async handle(interaction: ChatInputCommandInteraction): Promise<void> {
