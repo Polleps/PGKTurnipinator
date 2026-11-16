@@ -1,20 +1,27 @@
-import * as jwt from "jsonwebtoken";
 import Config from "../../Config";
-import { createSecretKey, KeyObject } from "crypto";
 
 const APIURL = "https://discord.com/api/v10";
 const TOKENURL = "/oauth2/token";
 const baseDir = process.cwd();
-let tokenKey: KeyObject | undefined;
+let tokenKey: Promise<CryptoKey> | undefined;
 
 /**
- * The session JWT is HS256, keyed with the raw bytes of token.key. jsonwebtoken 9
- * rejects asymmetric (PEM) keys for HS* algorithms, so wrap the bytes as a secret
- * KeyObject explicitly: this keeps the exact v8 behavior (HMAC over the file's bytes)
- * whatever the file contains, so existing cookies stay valid.
+ * The session JWT is HS256, keyed with the raw bytes of token.key (whatever the file
+ * contains, PEM or random bytes), exactly as jsonwebtoken did, so existing sessions stay valid.
  */
-export const toSigningKey = (raw: Buffer): KeyObject => createSecretKey(raw);
-const ALGORITHM = "HS256";
+export const toSigningKey = (raw: Uint8Array<ArrayBuffer>): Promise<CryptoKey> =>
+  crypto.subtle.importKey("raw", raw, { name: "HMAC", hash: "SHA-256" }, false, ["sign", "verify"]);
+
+const signingKey = (): Promise<CryptoKey> => {
+  if (!tokenKey) {
+    tokenKey = loadPrivateKey().then(toSigningKey);
+    // A failed load (missing token.key) is retried on the next request instead of cached.
+    void tokenKey.catch(() => {
+      tokenKey = undefined;
+    });
+  }
+  return tokenKey;
+};
 
 export const fetchUserToken = async (code: string): Promise<ITokenRespose> => {
   // TODO: State checking in token request.
@@ -43,51 +50,84 @@ export const refreshUserToken = async (refresh_token: string): Promise<ITokenRes
 };
 
 export const verifyActionRequest = async (token: string): Promise<IDecodedToken> => {
-  if (!tokenKey) {
-    tokenKey = toSigningKey(await loadPrivateKey());
+  const payload = await verifyJWT(token, await signingKey());
+  const { access_token, refresh_token, expires } = payload;
+  if (typeof access_token !== "string" || typeof refresh_token !== "string" || typeof expires !== "number") {
+    throw new Error("Invalid session token");
   }
-  return pJWTVerify(token, tokenKey);
+  return payload as unknown as IDecodedToken;
 };
 
-export const encodeToken = async (data: ITokenRespose) => {
-  if (!tokenKey) {
-    tokenKey = toSigningKey(await loadPrivateKey());
-  }
+export const encodeToken = async (data: ITokenRespose): Promise<string> => {
   const { access_token, refresh_token, expires_in } = data;
-  const tokenData = { access_token, refresh_token, expires: Date.now() + (expires_in * 1000) };
-  // const tokenData = { access_token, refresh_token, expires: Date.now() + (1 * 1000) };
-
-  return pJWTSign(JSON.stringify(tokenData), tokenKey);
+  const tokenData = { access_token, refresh_token, expires: Date.now() + expires_in * 1000 };
+  return signJWT(tokenData, await signingKey());
 };
 
-export const pJWTVerify = (token: string, secret: KeyObject): Promise<IDecodedToken> => {
-  return new Promise((resolve, reject) => {
-    jwt.verify(token, secret, { algorithms: [ALGORITHM] }, (err, data) => {
-      if (err) {
-        reject(err);
-      } else {
-        resolve(data as unknown as IDecodedToken);
-      }
-    });
-  });
+/*
+ * A minimal HS256 JWT, compatible with what jsonwebtoken produced for this app: header
+ * `{"alg":"HS256"}` (no `typ`; jsonwebtoken only adds it for object payloads, and the app
+ * signed a JSON string), the payload's JSON as-is, and an HMAC-SHA256 signature.
+ */
+const HEADER = { alg: "HS256" };
+const encoder = new TextEncoder();
+const b64url = (bytes: Uint8Array | string): string => Buffer.from(bytes).toString("base64url");
+const B64URL_PART = /^[A-Za-z0-9_-]+$/;
+
+export const signJWT = async (payload: Record<string, unknown>, key: CryptoKey): Promise<string> => {
+  const signingInput = `${b64url(JSON.stringify(HEADER))}.${b64url(JSON.stringify(payload))}`;
+  const signature = await crypto.subtle.sign("HMAC", key, encoder.encode(signingInput));
+  return `${signingInput}.${b64url(new Uint8Array(signature))}`;
 };
 
-export const pJWTSign = (payload: string, key: KeyObject): Promise<string> => {
-  return new Promise((resolve, reject) => {
-    jwt.sign(payload, key, { algorithm: ALGORITHM }, (err, token) => {
-      if (err) {
-        reject(err);
-      } else {
-        resolve(token as string);
-      }
-    });
-  });
+const parseJSONPart = (part: string): unknown => {
+  try {
+    return JSON.parse(Buffer.from(part, "base64url").toString("utf8"));
+  } catch {
+    return undefined;
+  }
+};
+
+const isObject = (x: unknown): x is Record<string, unknown> => typeof x === "object" && x !== null && !Array.isArray(x);
+
+/**
+ * Verifies an HS256 JWT and returns its payload. Only HS256 is accepted (no `none`, no other
+ * algorithm), the signature is checked by Web Crypto (constant-time), and an `exp` claim, if
+ * present, must lie in the future.
+ */
+export const verifyJWT = async (token: string, key: CryptoKey, now = Date.now()): Promise<Record<string, unknown>> => {
+  const parts = typeof token === "string" ? token.split(".") : [];
+  if (parts.length !== 3 || !parts.every((p) => B64URL_PART.test(p))) {
+    throw new Error("Malformed token");
+  }
+  const [headerPart, payloadPart, signaturePart] = parts;
+  const header = parseJSONPart(headerPart);
+  if (!isObject(header) || header.alg !== HEADER.alg || (header.typ !== undefined && header.typ !== "JWT")) {
+    throw new Error("Unsupported token header");
+  }
+  const valid = await crypto.subtle.verify(
+    "HMAC",
+    key,
+    Buffer.from(signaturePart, "base64url"),
+    encoder.encode(`${headerPart}.${payloadPart}`),
+  );
+  if (!valid) {
+    throw new Error("Invalid token signature");
+  }
+  const payload = parseJSONPart(payloadPart);
+  if (!isObject(payload)) {
+    throw new Error("Invalid token payload");
+  }
+  if (payload.exp !== undefined && !(typeof payload.exp === "number" && payload.exp * 1000 > now)) {
+    throw new Error("Token expired");
+  }
+  return payload;
 };
 
 // Read as raw bytes, not text: the HMAC key is the file's exact bytes (see toSigningKey).
-async function loadPrivateKey(): Promise<Buffer> {
+async function loadPrivateKey(): Promise<Uint8Array<ArrayBuffer>> {
   try {
-    return Buffer.from(await Bun.file(`${baseDir}/token.key`).bytes());
+    return await Bun.file(`${baseDir}/token.key`).bytes();
   } catch (err) {
     console.log(err);
     throw new Error("Could not read token.key, make sure it exists.");
