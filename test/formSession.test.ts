@@ -210,6 +210,19 @@ describe("POST /bot/api/actions/tournamentdetails/:slug", () => {
     expect(res.status).toBe(200);
     expect(JSON.parse(res.body)).toEqual({ message: "success", data: { slug: "cup" } });
   });
+
+  test("is refused without the posting role", async () => {
+    const { base } = await start({ userCanFetchTournament: () => Promise.resolve(false) });
+    const res = await post(`${base}/actions/tournamentdetails/cup`, sessionCookie(fresh()));
+    expect(res.status).toBe(403);
+    expect(JSON.parse(res.body).error).toBe(true);
+  });
+
+  test("is refused when the role check fails (e.g. not in the guild)", async () => {
+    const { base } = await start({ userCanFetchTournament: () => Promise.reject(new Error("Unknown Member")) });
+    const res = await post(`${base}/actions/tournamentdetails/cup`, sessionCookie(fresh()));
+    expect(res.status).toBe(403);
+  });
 });
 
 describe("POST /bot/api/logout", () => {

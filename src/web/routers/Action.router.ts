@@ -1,4 +1,4 @@
-import { Request, Response, Router } from "express";
+import { NextFunction, Request, Response, Router } from "express";
 import {
   verifyActionRequest,
   refreshUserToken,
@@ -23,7 +23,7 @@ export interface ActionDeps {
   getUserInfo: (accessToken: string) => Promise<IUserInfo>;
   runAction: (userInfo: IUserInfo, action: IAction) => Promise<string>;
   fetchTournamentDetails: typeof fetchTournamentDetails;
-  userCanFetchTournament: (userInfo: IUserInfo) => Promise<boolean> | undefined;
+  userCanFetchTournament: (userInfo: IUserInfo) => Promise<boolean>;
 }
 
 const defaultDeps = (): ActionDeps => {
@@ -138,17 +138,23 @@ export class ActionRouter {
       }),
     );
 
-    this._router.use("/actions/tournamentdetails", (_req: Request, res: Response, next) => {
-      // FIXME: this check is not awaited, so the promise is always truthy and the role
-      // gate never blocks anyone. Kept as-is in Phase 0 (no behavior change); fix by
-      // awaiting it in a dedicated change.
-      const roleCheck = this.deps.userCanFetchTournament(res.locals.userInfo as IUserInfo);
-      if (roleCheck) {
-        next();
-      } else {
-        res.status(400).send({ error: true, message: "Invalid User. Please logout and try again." });
-      }
-    });
+    this._router.use(
+      "/actions/tournamentdetails",
+      asyncHandler(async (_req: Request, res: Response, next: NextFunction) => {
+        let allowed = false;
+        try {
+          allowed = await this.deps.userCanFetchTournament(res.locals.userInfo as IUserInfo);
+        } catch (e) {
+          // E.g. the user isn't a member of the guild (anymore).
+          console.error(e);
+        }
+        if (allowed) {
+          next();
+        } else {
+          res.status(403).json({ error: true, message: "You don't have the role needed to post tournaments." });
+        }
+      }),
+    );
 
     this._router.post(
       "/actions/tournamentdetails/:slug",
