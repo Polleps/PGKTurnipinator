@@ -1,5 +1,4 @@
 import { Guild, GuildMember, EmbedBuilder, NewsChannel } from "discord.js";
-import moment from "moment-timezone";
 
 import Config from "../../../Config";
 import ITournament from "../../../models/ITournament";
@@ -59,7 +58,7 @@ const buildTimeField = (embed: EmbedBuilder, tD: ITournament): EmbedBuilder => {
 
   return embed.addFields({
     name: "⏰ Time",
-    value: moment(startDate).tz("Europe/Amsterdam").format("HH:mm"),
+    value: formatTime(startDate),
   });
 };
 
@@ -76,10 +75,13 @@ const buildDateField = (embed: EmbedBuilder, tD: ITournament): EmbedBuilder => {
   });
 };
 
-const compareDay = (a: Date, b: Date): boolean =>
-  a.getDate() === b.getDate() &&
-  a.getMonth() === b.getMonth() &&
-  a.getFullYear() === b.getFullYear();
+const compareDay = (a: Date, b: Date): boolean => {
+  const day = (x: Date) => {
+    const { year, month, day } = dateParts(x);
+    return `${year}-${month}-${day}`;
+  };
+  return day(a) === day(b);
+};
 
 const createGoogleMapsURL = (
   location: string,
@@ -92,7 +94,43 @@ const createGoogleMapsURL = (
   return url.toString();
 };
 
-const formatDate = (x: Date): string => moment(x).format("MMMM Do YYYY");
+// Tournaments are Dutch: dates and times are shown in Amsterdam time, whatever the server's TZ.
+const TIME_ZONE = "Europe/Amsterdam";
+
+const dateFormat = new Intl.DateTimeFormat("en-US", {
+  timeZone: TIME_ZONE,
+  year: "numeric",
+  month: "long",
+  day: "numeric",
+});
+
+const timeFormat = new Intl.DateTimeFormat("en-US", {
+  timeZone: TIME_ZONE,
+  hour: "2-digit",
+  minute: "2-digit",
+  hourCycle: "h23",
+});
+
+const partsOf = (format: Intl.DateTimeFormat, x: Date | number): Partial<Record<Intl.DateTimeFormatPartTypes, string>> =>
+  Object.fromEntries(format.formatToParts(x).map((p) => [p.type, p.value]));
+
+const dateParts = (x: Date) => partsOf(dateFormat, x);
+
+const ordinalRules = new Intl.PluralRules("en-US", { type: "ordinal" });
+const ordinalSuffix: Partial<Record<Intl.LDMLPluralRule, string>> = { one: "st", two: "nd", few: "rd" };
+const ordinal = (n: number): string => `${n}${ordinalSuffix[ordinalRules.select(n)] ?? "th"}`;
+
+/** "March 14th 2026" (in Amsterdam). */
+export const formatDate = (x: Date): string => {
+  const { year, month, day } = dateParts(x);
+  return `${month} ${ordinal(Number(day))} ${year}`;
+};
+
+/** "20:05" (24-hour, in Amsterdam). */
+export const formatTime = (x: Date | number): string => {
+  const { hour, minute } = partsOf(timeFormat, x);
+  return `${hour}:${minute}`;
+};
 
 /** Who posted the tournament, shown in the embed footer. */
 export interface EmbedPoster {

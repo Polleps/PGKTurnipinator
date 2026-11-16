@@ -42,9 +42,7 @@
     "dotenv": "6.2.0",
     "drizzle-orm": "0.45.4",
     "express": "4.16.4",
-    "jsonwebtoken": "9.0.3",
-    "moment": "2.24.0",
-    "moment-timezone": "^0.5.31"
+    "jsonwebtoken": "9.0.3"
   },
   "devDependencies": {
     "@types/bun": "1.4.4",
