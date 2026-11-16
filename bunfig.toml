@@ -11,7 +11,7 @@ root = "./test"
 preload = ["./test/setup.ts"]
 
 [fmt]
-# `bun fmt` (Prettier-compatible). The codebase is not reformatted yet; use `bun run fmt:check`.
+# `bun fmt` (Prettier-compatible); CI runs `bun run fmt:check`. Ignored paths: .gitignore + .prettierignore.
 printWidth = 120
 # The repo mixes CRLF and LF files; keep each file's own line endings
 # (otherwise .editorconfig's end_of_line = crlf would apply to every file).
