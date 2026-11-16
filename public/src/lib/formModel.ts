@@ -36,7 +36,7 @@ export interface FormState {
   streamStartDate: string;
 }
 
-/** What `POST /actions/tournamentdetails/:slug` returns in `data` (src/web/services/smashgg.service.ts). */
+/** What `POST /bot/api/actions/tournamentdetails/:slug` returns in `data` (src/web/services/smashgg.service.ts). */
 export interface StartGGDetails {
   id: number | string;
   name: string;
@@ -178,7 +178,7 @@ export const toRequestBody = (state: FormState): TournamentBody => {
   };
 };
 
-/** The `/actions/run` action that posts a tournament. */
+/** The `/bot/api/actions/run` action that posts a tournament. */
 export const postTournamentAction = (state: FormState) => ({
   name: "posttournament",
   args: [JSON.stringify(toRequestBody(state))],

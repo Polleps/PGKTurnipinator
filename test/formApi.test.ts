@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
-import { parseDetailsResponse, parsePostResponse } from "../public/src/lib/api";
-import { readCookie } from "../public/src/lib/session";
+import { parseDetailsResponse, parseMeResponse, parsePostResponse } from "../public/src/lib/api";
+import { loginURL } from "../public/src/lib/session";
 import { MISSING_START_GG_ID } from "../src/web/actions/PostTournament/PostTournament";
 
 describe("posting: server answers", () => {
@@ -52,11 +52,29 @@ describe("start.gg lookup: server answers", () => {
   });
 });
 
-describe("session cookie", () => {
-  test("reads the token cookie", () => {
-    expect(readCookie("a=1; token=eyJ.x.y; b=2", "token")).toBe("eyJ.x.y");
-    expect(readCookie("mytoken=1", "token")).toBe("");
-    expect(readCookie("", "token")).toBe("");
-    expect(readCookie("token=a%20b", "token")).toBe("a b");
+describe("login state", () => {
+  test("GET /me: a user, nobody (401), or an error", () => {
+    expect(parseMeResponse(200, { id: "1", username: "u", global_name: "U" })).toEqual({
+      ok: true,
+      value: { id: "1", username: "u", global_name: "U" },
+    });
+    expect(parseMeResponse(200, { id: "1", username: "u" })).toEqual({
+      ok: true,
+      value: { id: "1", username: "u", global_name: null },
+    });
+    expect(parseMeResponse(401, { error: true, message: "not logged in" })).toEqual({ ok: true, value: null });
+    expect(parseMeResponse(502, undefined)).toEqual({ ok: false, message: "The server answered with HTTP 502." });
+  });
+
+  test("a 401 while posting shows the server's message", () => {
+    expect(parsePostResponse(401, { error: true, message: "Please log in again." })).toEqual({
+      ok: false,
+      message: "Please log in again.",
+    });
+  });
+
+  test("the login link carries the remember choice", () => {
+    expect(loginURL(true)).toBe("/auth/login?remember=1");
+    expect(loginURL(false)).toBe("/auth/login");
   });
 });

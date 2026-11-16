@@ -67,12 +67,13 @@ export default class Server {
         }
       },
     };
+    // The tournament form's API, under /bot/ so the form's session cookie (path /bot/) reaches it.
+    this.app.use("/bot/api", actionRouter.router);
     this.app.use("/bot", express.static("public/dist", staticOptions));
     this.app.use("/agenda", express.static("agenda/dist", staticOptions));
 
     this.app.use("/calendar", calendarRouter.router);
     this.app.use("/auth", authRouter.router);
-    this.app.use("/actions", actionRouter.router);
     this.app.use("/invite", inviteRouter.router);
     // Legacy array shape for nsd-site and installed agenda PWAs; new clients use /api/tournaments.
     this.app.use("/tournaments", tournamentRouter.router);

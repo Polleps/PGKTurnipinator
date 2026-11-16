@@ -24,7 +24,6 @@ const signingKey = (): Promise<CryptoKey> => {
 };
 
 export const fetchUserToken = async (code: string): Promise<ITokenRespose> => {
-  // TODO: State checking in token request.
   const body = {
     client_id: Config.CLIENTID,
     client_secret: Config.CLIENTSECRET,
@@ -37,7 +36,6 @@ export const fetchUserToken = async (code: string): Promise<ITokenRespose> => {
 };
 
 export const refreshUserToken = async (refresh_token: string): Promise<ITokenRespose> => {
-  // TODO: State checking in token request.
   const body = {
     client_id: Config.CLIENTID,
     client_secret: Config.CLIENTSECRET,
@@ -52,16 +50,24 @@ export const refreshUserToken = async (refresh_token: string): Promise<ITokenRes
 export const verifyActionRequest = async (token: string): Promise<IDecodedToken> => {
   const payload = await verifyJWT(token, await signingKey());
   const { access_token, refresh_token, expires } = payload;
-  if (typeof access_token !== "string" || typeof refresh_token !== "string" || typeof expires !== "number") {
+  const { remember } = payload;
+  if (
+    typeof access_token !== "string" ||
+    typeof refresh_token !== "string" ||
+    typeof expires !== "number" ||
+    (remember !== undefined && typeof remember !== "boolean")
+  ) {
     throw new Error("Invalid session token");
   }
   return payload as unknown as IDecodedToken;
 };
 
-export const encodeToken = async (data: ITokenRespose): Promise<string> => {
+/** Signs a session; `remember` says whether its cookie outlives the browser session. */
+export const encodeSession = async (session: IDecodedToken): Promise<string> => signJWT({ ...session }, await signingKey());
+
+export const encodeToken = (data: ITokenRespose, remember: boolean): Promise<string> => {
   const { access_token, refresh_token, expires_in } = data;
-  const tokenData = { access_token, refresh_token, expires: Date.now() + expires_in * 1000 };
-  return signJWT(tokenData, await signingKey());
+  return encodeSession({ access_token, refresh_token, expires: Date.now() + expires_in * 1000, remember });
 };
 
 /*
@@ -163,10 +169,13 @@ export const parseTokenResponse = (status: number, data: unknown): ITokenRespose
   return body as ITokenRespose;
 };
 
-interface IDecodedToken {
+export interface IDecodedToken {
   access_token: string;
   refresh_token: string;
+  /** When the Discord access token expires (ms); then it is refreshed. */
   expires: number;
+  /** Persistent cookie or session cookie. Missing in tokens issued before it existed. */
+  remember?: boolean;
 }
 
 export interface ITokenRespose {

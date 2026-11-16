@@ -11,7 +11,6 @@ import {
   postTournamentAction,
   type EventRow as EventRowState,
 } from "../lib/formModel";
-import { getToken, keepToken } from "../lib/session";
 import { validateForm } from "../lib/validation";
 import { Checkbox, Input, Textarea } from "./fields";
 
@@ -88,9 +87,8 @@ export const TournamentForm = (): JSX.Element => {
       return;
     }
     busy = true;
-    const result = await fetchTournamentDetails(r.slug, getToken());
+    const result = await fetchTournamentDetails(r.slug);
     busy = false;
-    keepToken();
     if (!result.ok) {
       setFetchError(result.message);
       return;
@@ -113,9 +111,8 @@ export const TournamentForm = (): JSX.Element => {
       return;
     }
     busy = true;
-    const result = await postAction(postTournamentAction(state), getToken());
+    const result = await postAction(postTournamentAction(state));
     busy = false;
-    keepToken();
     if (result.ok) {
       setPosted("Tournament Posted");
     } else {
