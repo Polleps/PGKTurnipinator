@@ -50,7 +50,10 @@ const priceLineEmpty = (prices: FormState["prices"]) =>
  * an unchanged link, the DST gap, and the stream URL.
  * Returns the message to show, or undefined when the form can be posted.
  */
-export const validateForm = (state: FormState, { linkSlug, now = Date.now() }: ValidationContext): string | undefined => {
+export const validateForm = (
+  state: FormState,
+  { linkSlug, now = Date.now() }: ValidationContext,
+): string | undefined => {
   const start = fromLocalInput(state.startDate);
   const end = fromLocalInput(state.endDate);
   const checks: Array<[string, () => boolean]> = [
@@ -67,7 +70,10 @@ export const validateForm = (state: FormState, { linkSlug, now = Date.now() }: V
     ["Location is empty", () => state.isOnline || state.location !== ""],
     ["The start.gg page does not contain a City", () => state.isOnline || state.city !== ""],
     ["Tournament needs at least 1 event", () => state.events.length > 0],
-    ["At least one events needs an entry cap", () => state.nocap || state.events.some((e) => e.cap !== "" && +e.cap > 0)],
+    [
+      "At least one events needs an entry cap",
+      () => state.nocap || state.events.some((e) => e.cap !== "" && +e.cap > 0),
+    ],
     [
       `Additional Notes cannot be longer than ${MAX_DESCRIPTION_LENGTH} characters`,
       () => state.description.length < MAX_DESCRIPTION_LENGTH,

@@ -28,7 +28,7 @@ export class ServerInfoRouter {
   }
 
   private updateInfo() {
-    if ((Date.now() - this.lastUpdated) > this.expireTime) {
+    if (Date.now() - this.lastUpdated > this.expireTime) {
       const PGK = this.client.guilds.cache.get(Config.GUILD_ID);
       this.cachedInfo = {
         memberCount: PGK!.memberCount,

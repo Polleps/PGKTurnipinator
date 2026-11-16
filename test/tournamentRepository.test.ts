@@ -44,7 +44,11 @@ const memory = () => {
 describe("TournamentRepository", () => {
   test("insert, read back with JSON columns and booleans, update by id", () => {
     const { tournaments } = memory();
-    const t = tournament("1", { events: [{ name: "Singles", cap: "64" }], prices: [{ name: "Entree", amount: 5 }], pr: true });
+    const t = tournament("1", {
+      events: [{ name: "Singles", cap: "64" }],
+      prices: [{ name: "Entree", amount: 5 }],
+      pr: true,
+    });
     expect(tournaments.upsert(t)).toBe("inserted");
     expect(tournaments.getById("1")).toEqual({ ...t, participants: null, registrationClosesAt: null });
 
@@ -108,7 +112,11 @@ describe("TournamentRepository", () => {
     expect(tournaments.getById("1")).toMatchObject({ participants: 42, registrationClosesAt: 1780000000000 });
 
     tournaments.upsert(tournament("1", { title: "Re-posted" }));
-    expect(tournaments.getById("1")).toMatchObject({ title: "Re-posted", participants: 42, registrationClosesAt: 1780000000000 });
+    expect(tournaments.getById("1")).toMatchObject({
+      title: "Re-posted",
+      participants: 42,
+      registrationClosesAt: 1780000000000,
+    });
     expect(tournaments.setStatus("missing", { participants: 1, registrationClosesAt: null })).toBe(false);
   });
 });

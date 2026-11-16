@@ -73,10 +73,7 @@ export const tournaments = sqliteTable(
     check("tournaments_pr_bool", bool("pr")),
     check("tournaments_events_array", sql`json_type(${t.events}) = 'array'`),
     check("tournaments_prices_array", sql`json_type(${t.prices}) = 'array'`),
-    check(
-      "tournaments_stream_pair",
-      sql`(${t.streamURL} IS NULL) = (${t.streamStartDate} IS NULL)`,
-    ),
+    check("tournaments_stream_pair", sql`(${t.streamURL} IS NULL) = (${t.streamStartDate} IS NULL)`),
   ],
 );
 

@@ -10,7 +10,11 @@ const MAX_LINE_OCTETS = 75;
 
 /** RFC 5545 3.3.11: backslash, semicolon and comma are escaped; newlines become \n. */
 export const escapeText = (value: string): string =>
-  value.replace(/\\/g, "\\\\").replace(/;/g, "\\;").replace(/,/g, "\\,").replace(/\r?\n|\r/g, "\\n");
+  value
+    .replace(/\\/g, "\\\\")
+    .replace(/;/g, "\\;")
+    .replace(/,/g, "\\,")
+    .replace(/\r?\n|\r/g, "\\n");
 
 /**
  * RFC 5545 3.1: lines longer than 75 octets continue on the next line after CRLF and a space.
@@ -34,7 +38,11 @@ export const foldLine = (line: string): string => {
   return parts.join(CRLF);
 };
 
-const formatUTC = (ms: number): string => new Date(ms).toISOString().replace(/[-:]/g, "").replace(/\.\d{3}/, "");
+const formatUTC = (ms: number): string =>
+  new Date(ms)
+    .toISOString()
+    .replace(/[-:]/g, "")
+    .replace(/\.\d{3}/, "");
 
 const buildEvent = (tournament: ITournament, now: number): string[] => [
   "BEGIN:VEVENT",

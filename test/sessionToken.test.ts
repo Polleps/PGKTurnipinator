@@ -69,7 +69,10 @@ describe.each(keys)("session JWT with %s as token.key", (_name, raw) => {
   });
 
   test("accepts a typ: JWT header", async () => {
-    const token = hs256(`${b64url(JSON.stringify({ alg: "HS256", typ: "JWT" }))}.${b64url(JSON.stringify(session))}`, raw);
+    const token = hs256(
+      `${b64url(JSON.stringify({ alg: "HS256", typ: "JWT" }))}.${b64url(JSON.stringify(session))}`,
+      raw,
+    );
     expect(await verifyJWT(token, await key())).toEqual(session);
   });
 
@@ -79,7 +82,9 @@ describe.each(keys)("session JWT with %s as token.key", (_name, raw) => {
     const otherPayload = `${h}.${b64url(JSON.stringify({ ...session, access_token: "x" }))}.${s}`;
     expect((await rejection(verifyJWT(otherPayload, await key()))).message).toContain("signature");
     const flipped = s.startsWith("A") ? `B${s.slice(1)}` : `A${s.slice(1)}`;
-    expect((await rejection(verifyJWT(`${h}.${token.split(".")[1]}.${flipped}`, await key()))).message).toContain("signature");
+    expect((await rejection(verifyJWT(`${h}.${token.split(".")[1]}.${flipped}`, await key()))).message).toContain(
+      "signature",
+    );
   });
 
   test("rejects alg none and other algorithms", async () => {

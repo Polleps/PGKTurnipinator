@@ -20,10 +20,9 @@ export class CalendarRouter {
   }
 
   private setupRoutes() {
-
     // ::GET:: [URL]/calendar/tournaments.ics
     this._router.get("/tournaments.ics", (req, res) => {
-      if ((Date.now() - this.lastUpdated) > this.expireTime) {
+      if (Date.now() - this.lastUpdated > this.expireTime) {
         this.cachedICal = buildICallFile(this.repo().upcoming());
         this.lastUpdated = Date.now();
       }

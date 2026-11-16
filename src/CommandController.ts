@@ -1,12 +1,5 @@
 import { ChatInputCommandInteraction, GuildMember, MessageFlags } from "discord.js";
-import {
-  CommandHandler,
-  findCommand,
-  FixbotCommand,
-  HelpCommand,
-  PingCommand,
-  PostFlairTextCommand,
-} from "./commands";
+import { CommandHandler, findCommand, FixbotCommand, HelpCommand, PingCommand, PostFlairTextCommand } from "./commands";
 import { createLogger } from "./utils/logger";
 import { hasNeeRole, NEE_COMMAND_REPLY } from "./triggers";
 

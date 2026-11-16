@@ -104,7 +104,9 @@ const seed = async () => {
   try {
     // Role icons need boost level 2. The export has no icon or color data anyway.
     const iconsPossible = guild.premiumTier >= GuildPremiumTier.Tier2 || guild.features.includes("ROLE_ICONS");
-    console.log(`Guild "${guild.name}": role icons ${iconsPossible ? "possible" : "NOT possible (needs boost level 2)"}.`);
+    console.log(
+      `Guild "${guild.name}": role icons ${iconsPossible ? "possible" : "NOT possible (needs boost level 2)"}.`,
+    );
 
     const previouslySeeded = readSeeded();
     const seeded = new Map(previouslySeeded.map((r) => [r.id, r]));
@@ -122,7 +124,11 @@ const seed = async () => {
       }
       // Color/icon copied only if the data had them; it has neither.
       const color = typeof doc.data.color === "number" ? doc.data.color : undefined;
-      const role = await guild.roles.create({ name, reason: SEED_REASON, ...(color ? { colors: { primaryColor: color } } : {}) });
+      const role = await guild.roles.create({
+        name,
+        reason: SEED_REASON,
+        ...(color ? { colors: { primaryColor: color } } : {}),
+      });
       roleIdByName.set(name, role.id);
       seeded.set(role.id, { name, id: role.id });
       created++;
@@ -135,14 +141,25 @@ const seed = async () => {
         copyFileSync(join(SOURCE_DIR, file), join(TARGET_DIR, file));
       }
     }
-    const derivedRoles = iconRoles.map((d) => ({ id: d.id, data: { ...d.data, ID: roleIdByName.get(d.data.name as string)! } }));
+    const derivedRoles = iconRoles.map((d) => ({
+      id: d.id,
+      data: { ...d.data, ID: roleIdByName.get(d.data.name as string)! },
+    }));
     writeJson(join(TARGET_DIR, "joinableroles.json"), { ...roles, count: derivedRoles.length, docs: derivedRoles });
-    writeJson(join(TARGET_DIR, "role_categories.json"), { ...categories, count: iconCategories.length, docs: iconCategories });
+    writeJson(join(TARGET_DIR, "role_categories.json"), {
+      ...categories,
+      count: iconCategories.length,
+      docs: iconCategories,
+    });
 
     const manifestFile = join(TARGET_DIR, "manifest.json");
     if (existsSync(manifestFile)) {
       const manifest = JSON.parse(readFileSync(manifestFile, "utf8"));
-      manifest.counts = { ...manifest.counts, joinableroles: derivedRoles.length, role_categories: iconCategories.length };
+      manifest.counts = {
+        ...manifest.counts,
+        joinableroles: derivedRoles.length,
+        role_categories: iconCategories.length,
+      };
       manifest.derivedFrom = "latest";
       manifest.note = `Icon roles remapped to test guild ${guildId}; non-icon roles and categories dropped.`;
       writeJson(manifestFile, manifest);

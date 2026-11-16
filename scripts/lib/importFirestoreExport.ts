@@ -141,7 +141,13 @@ export const prepareImport = ({
   // --- tournaments
   const tournamentDocs = readCollection(dir, tournamentCollection);
   const tr = (collections[tournamentCollection] = emptyReport(tournamentDocs.length));
-  const candidates: Array<{ index: number; docId: string; row: NormalizedTournament; fields: string[]; dropped: string[] }> = [];
+  const candidates: Array<{
+    index: number;
+    docId: string;
+    row: NormalizedTournament;
+    fields: string[];
+    dropped: string[];
+  }> = [];
   tournamentDocs.forEach((doc, index) => {
     const result = normalizeTournament(decodeMap(doc.data));
     if (!result.ok) {

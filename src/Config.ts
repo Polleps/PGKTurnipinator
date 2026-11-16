@@ -7,7 +7,7 @@ const env = (name: string): string => process.env[name] as string;
 
 export default class Config {
   public static readonly DiscordApplicationToken: string = env("TOKEN");
-  public static readonly EnableWebServer: boolean = (env("ENABLE_WEBSERVER") === "true");
+  public static readonly EnableWebServer: boolean = env("ENABLE_WEBSERVER") === "true";
   public static readonly ServerPort: number = +env("SERVERPORT");
   public static readonly AccountRefExpireTime: number = +env("ACCOUNT_REF_EXPIRE_TIME");
   public static readonly OAUTH2URI: string = env("OAUTH2_URI");

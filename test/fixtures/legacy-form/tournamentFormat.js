@@ -46,8 +46,9 @@ export const convertToITournament = (x) => ({
     amount: +p.amount,
   })),
   type: "smashgg",
-  ...(!!x.streamURL && !!x.streamStartDate && {
-    streamURL: x.streamURL,
-    streamStartDate: new Date(x.streamStartDate).getTime(),
-  }),
+  ...(!!x.streamURL &&
+    !!x.streamStartDate && {
+      streamURL: x.streamURL,
+      streamStartDate: new Date(x.streamStartDate).getTime(),
+    }),
 });

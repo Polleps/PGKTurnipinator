@@ -11,10 +11,16 @@ import {
 
 // Hand-built stand-ins for the SDK classes (firebase-admin is blocked in tests).
 class FakeTimestamp {
-  constructor(public seconds: number, public nanoseconds: number) {}
+  constructor(
+    public seconds: number,
+    public nanoseconds: number,
+  ) {}
 }
 class FakeGeoPoint {
-  constructor(public latitude: number, public longitude: number) {}
+  constructor(
+    public latitude: number,
+    public longitude: number,
+  ) {}
 }
 class FakeRef {
   constructor(public path: string) {}

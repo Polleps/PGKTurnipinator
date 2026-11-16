@@ -26,7 +26,7 @@ export const postTournament: Performer = async (userInfo: IUserInfo, action: IAc
   const guild = await client.guilds.fetch(guildID);
 
   if (!userInfo.id) {
-    throw new Error('Session expired, please re-login and try again.');
+    throw new Error("Session expired, please re-login and try again.");
   }
 
   const user = await guild.members.fetch(userInfo.id);
@@ -41,7 +41,6 @@ export const postTournament: Performer = async (userInfo: IUserInfo, action: IAc
   if (!user.roles.cache.has(role!.id)) {
     throw new Error("You are not allowed to post tournaments.");
   }
-
 
   try {
     const existing = store.tournaments.getById(tournament.id);

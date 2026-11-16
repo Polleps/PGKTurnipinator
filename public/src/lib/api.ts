@@ -32,7 +32,14 @@ export const parsePostResponse = (status: number, body: ServerBody | undefined):
 
 /** `/actions/tournamentdetails/:slug`: `{ message: "success", data }`, or an error message. */
 export const parseDetailsResponse = (status: number, body: ServerBody | undefined): ApiResult<StartGGDetails> => {
-  if (status < 200 || status >= 300 || body === undefined || body.error || typeof body.data !== "object" || !body.data) {
+  if (
+    status < 200 ||
+    status >= 300 ||
+    body === undefined ||
+    body.error ||
+    typeof body.data !== "object" ||
+    !body.data
+  ) {
     return { ok: false, message: messageOf(body, status) };
   }
   return { ok: true, value: body.data as StartGGDetails };

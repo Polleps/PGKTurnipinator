@@ -45,4 +45,7 @@ export const request = (
 export const cookieLine = (reply: Reply, name: string) => reply.setCookie.find((c) => c.startsWith(`${name}=`));
 
 /** The value set for cookie `name` ("" when it is being cleared). */
-export const cookieValue = (reply: Reply, name: string) => cookieLine(reply, name)?.split(";")[0].slice(name.length + 1);
+export const cookieValue = (reply: Reply, name: string) =>
+  cookieLine(reply, name)
+    ?.split(";")[0]
+    .slice(name.length + 1);

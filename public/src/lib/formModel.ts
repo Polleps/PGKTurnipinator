@@ -174,7 +174,9 @@ export const toRequestBody = (state: FormState): TournamentBody => {
     image: state.image,
     type: "smashgg",
     streamURL: state.streamURL,
-    streamStartDate: hasStream ? (toMillisOrNull(state.streamStartDate) ?? state.streamStartDate) : state.streamStartDate,
+    streamStartDate: hasStream
+      ? (toMillisOrNull(state.streamStartDate) ?? state.streamStartDate)
+      : state.streamStartDate,
   };
 };
 

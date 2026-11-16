@@ -19,13 +19,7 @@
 
 export const TAG = "__fs";
 
-export type EncodedValue =
-  | string
-  | number
-  | boolean
-  | null
-  | EncodedValue[]
-  | { [key: string]: EncodedValue };
+export type EncodedValue = string | number | boolean | null | EncodedValue[] | { [key: string]: EncodedValue };
 
 export type EncodedMap = { [key: string]: EncodedValue };
 
@@ -84,9 +78,7 @@ export class SnapshotTimestamp {
 
   public isEqual(other: unknown): boolean {
     return (
-      other instanceof SnapshotTimestamp &&
-      other.seconds === this._seconds &&
-      other.nanoseconds === this._nanoseconds
+      other instanceof SnapshotTimestamp && other.seconds === this._seconds && other.nanoseconds === this._nanoseconds
     );
   }
 
@@ -118,9 +110,7 @@ export class SnapshotGeoPoint {
 
   public isEqual(other: unknown): boolean {
     return (
-      other instanceof SnapshotGeoPoint &&
-      other.latitude === this._latitude &&
-      other.longitude === this._longitude
+      other instanceof SnapshotGeoPoint && other.latitude === this._latitude && other.longitude === this._longitude
     );
   }
 }
@@ -186,7 +176,10 @@ export const encodeValue = (value: unknown, types: FirestoreTypes = {}, path: st
     const g = value as { latitude: number; longitude: number };
     return { [TAG]: "geopoint", latitude: g.latitude, longitude: g.longitude };
   }
-  if (value instanceof SnapshotDocumentReference || (types.DocumentReference && value instanceof types.DocumentReference)) {
+  if (
+    value instanceof SnapshotDocumentReference ||
+    (types.DocumentReference && value instanceof types.DocumentReference)
+  ) {
     return { [TAG]: "ref", path: (value as { path: string }).path };
   }
   if (value instanceof Uint8Array) {
@@ -201,11 +194,7 @@ export const encodeValue = (value: unknown, types: FirestoreTypes = {}, path: st
 };
 
 /** Encodes a document's data (a map). */
-export const encodeMap = (
-  data: Record<string, unknown>,
-  types: FirestoreTypes = {},
-  path: string = "",
-): EncodedMap => {
+export const encodeMap = (data: Record<string, unknown>, types: FirestoreTypes = {}, path: string = ""): EncodedMap => {
   const out: EncodedMap = {};
   for (const [key, v] of Object.entries(data)) {
     if (v === undefined) {

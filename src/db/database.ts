@@ -63,7 +63,8 @@ export const openDatabase = ({ path, create = false }: OpenOptions): Db => {
 
 export const BUSY_TIMEOUT_MS = 5000;
 
-const isBusy = (e: unknown) => e instanceof Error && /database is locked|SQLITE_BUSY/i.test(`${e.message} ${(e as { code?: string }).code ?? ""}`);
+const isBusy = (e: unknown) =>
+  e instanceof Error && /database is locked|SQLITE_BUSY/i.test(`${e.message} ${(e as { code?: string }).code ?? ""}`);
 
 const retryWhileBusy = (fn: () => void, timeoutMs: number = BUSY_TIMEOUT_MS): void => {
   const deadline = Date.now() + timeoutMs;

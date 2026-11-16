@@ -72,9 +72,13 @@ const parseArgs = (argv: string[]) => {
 const main = () => {
   const opts = parseArgs(process.argv.slice(2));
   const stamp = new Date().toISOString().replace(/[:.]/g, "-");
-  const reportDir = resolve(opts.reportDir ?? join(ROOT, "data", "import-reports", `${stamp}${opts.dryRun ? "-dry-run" : ""}`));
+  const reportDir = resolve(
+    opts.reportDir ?? join(ROOT, "data", "import-reports", `${stamp}${opts.dryRun ? "-dry-run" : ""}`),
+  );
 
-  console.log(`${opts.dryRun ? "Dry run: importing into :memory:" : `Importing into ${opts.dbPath}`} from ${opts.exportDir}`);
+  console.log(
+    `${opts.dryRun ? "Dry run: importing into :memory:" : `Importing into ${opts.dbPath}`} from ${opts.exportDir}`,
+  );
   const result = runImport(opts);
   writeReports(reportDir, result);
 

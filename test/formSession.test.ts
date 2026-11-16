@@ -45,7 +45,12 @@ const start = async (overrides: Partial<ActionDeps> = {}) => {
     },
     encodeToken: (data, remember) =>
       Promise.resolve(
-        JSON.stringify({ access_token: data.access_token, refresh_token: data.refresh_token, expires: Date.now() + 3600_000, remember }),
+        JSON.stringify({
+          access_token: data.access_token,
+          refresh_token: data.refresh_token,
+          expires: Date.now() + 3600_000,
+          remember,
+        }),
       ),
     encodeSession: (session) => Promise.resolve(JSON.stringify(session)),
     getUserInfo: () => Promise.resolve(user),
@@ -180,10 +185,15 @@ describe("POST /bot/api/actions/run", () => {
 
   test("CSRF: accepts a same-origin JSON post", async () => {
     const { base } = await start();
-    const res = await post(`${base}/actions/run`, sessionCookie(fresh()), {
-      "Content-Type": "application/json; charset=utf-8",
-      "Sec-Fetch-Site": "same-origin",
-    }, body);
+    const res = await post(
+      `${base}/actions/run`,
+      sessionCookie(fresh()),
+      {
+        "Content-Type": "application/json; charset=utf-8",
+        "Sec-Fetch-Site": "same-origin",
+      },
+      body,
+    );
     expect(res.status).toBe(200);
   });
 });

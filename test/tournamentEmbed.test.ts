@@ -1,8 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import {
-  GuildScheduledEventEntityType,
-  GuildScheduledEventPrivacyLevel,
-} from "discord.js";
+import { GuildScheduledEventEntityType, GuildScheduledEventPrivacyLevel } from "discord.js";
 import { buildEmbed, EmbedPoster } from "../src/web/actions/PostTournament/postEmbed";
 import { buildEvent } from "../src/web/actions/PostTournament/scheduleEvent";
 import ITournament from "../src/models/ITournament";

@@ -15,7 +15,9 @@ const FIXTURE = join(import.meta.dir, "fixtures", "legacy-export");
 const exported = JSON.parse(readFileSync(join(FIXTURE, "tournaments.json"), "utf8")) as CollectionExport;
 
 /** What the old route sent: `JSON.stringify(cache.data)`, the decoded Firestore docs in export order. */
-const oldRoute: Array<Record<string, unknown>> = JSON.parse(JSON.stringify(exported.docs.map((d) => decodeMap(d.data))));
+const oldRoute: Array<Record<string, unknown>> = JSON.parse(
+  JSON.stringify(exported.docs.map((d) => decodeMap(d.data))),
+);
 
 const { report, quarantine } = runImport({ exportDir: FIXTURE, dbPath: "unused.db", dryRun: true });
 const quarantined = new Set(quarantine.filter((q) => q.collection === "tournaments").map((q) => q.docId));
@@ -57,7 +59,24 @@ const get = (path: string) =>
   });
 
 /** Fields every legacy consumer (agenda, nsd-site) reads, always present now. */
-const ALWAYS = ["id", "url", "title", "image", "description", "location", "city", "locationID", "startDate", "endDate", "type", "isOnline", "nocap", "pr", "events", "prices"];
+const ALWAYS = [
+  "id",
+  "url",
+  "title",
+  "image",
+  "description",
+  "location",
+  "city",
+  "locationID",
+  "startDate",
+  "endDate",
+  "type",
+  "isOnline",
+  "nocap",
+  "pr",
+  "events",
+  "prices",
+];
 /** Present only when set (NULL columns are left out, as absent fields were). */
 const OPTIONAL = ["streamURL", "streamStartDate", "messageID", "guildEventID", "participants", "registrationClosesAt"];
 
@@ -108,7 +127,10 @@ describe("legacy GET /tournaments", () => {
 
     // Plain ms dates were sent unchanged; Firestore Timestamps become ms.
     const plain = items.find((t) => t.id === 900002)!;
-    expect([plain.startDate, plain.endDate]).toEqual([sourceDocs.get("900002")!.startDate, sourceDocs.get("900002")!.endDate]);
+    expect([plain.startDate, plain.endDate]).toEqual([
+      sourceDocs.get("900002")!.startDate,
+      sourceDocs.get("900002")!.endDate,
+    ]);
     expect(items.find((t) => t.id === 900007)?.startDate).toBe(1546344000500);
   });
 

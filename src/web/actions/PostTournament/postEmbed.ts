@@ -32,10 +32,7 @@ const buildEvents = (embed: EmbedBuilder, tD: ITournament): EmbedBuilder => {
   return embed;
 };
 
-const buildDescription = (
-  embed: EmbedBuilder,
-  tD: ITournament
-): EmbedBuilder => {
+const buildDescription = (embed: EmbedBuilder, tD: ITournament): EmbedBuilder => {
   if (!tD.description || tD.description.trim().length === 0) {
     return embed;
   }
@@ -69,9 +66,7 @@ const buildDateField = (embed: EmbedBuilder, tD: ITournament): EmbedBuilder => {
 
   return embed.addFields({
     name: "📅 Date",
-    value: spansSingleDay
-      ? formatDate(startDate)
-      : `${formatDate(startDate)} - ${formatDate(endDate)}`,
+    value: spansSingleDay ? formatDate(startDate) : `${formatDate(startDate)} - ${formatDate(endDate)}`,
   });
 };
 
@@ -83,13 +78,8 @@ const compareDay = (a: Date, b: Date): boolean => {
   return day(a) === day(b);
 };
 
-const createGoogleMapsURL = (
-  location: string,
-  googleMapsID: string
-): string => {
-  const url = new URL(
-    `https://www.google.com/maps/search/?api=1&query=${location}&query_place_id=${googleMapsID}`
-  );
+const createGoogleMapsURL = (location: string, googleMapsID: string): string => {
+  const url = new URL(`https://www.google.com/maps/search/?api=1&query=${location}&query_place_id=${googleMapsID}`);
 
   return url.toString();
 };
@@ -111,7 +101,10 @@ const timeFormat = new Intl.DateTimeFormat("en-US", {
   hourCycle: "h23",
 });
 
-const partsOf = (format: Intl.DateTimeFormat, x: Date | number): Partial<Record<Intl.DateTimeFormatPartTypes, string>> =>
+const partsOf = (
+  format: Intl.DateTimeFormat,
+  x: Date | number,
+): Partial<Record<Intl.DateTimeFormatPartTypes, string>> =>
   Object.fromEntries(format.formatToParts(x).map((p) => [p.type, p.value]));
 
 const dateParts = (x: Date) => partsOf(dateFormat, x);
@@ -139,10 +132,7 @@ export interface EmbedPoster {
   avatarURL: string | null;
 }
 
-export const buildEmbed = (
-  poster: EmbedPoster,
-  tournamentDetails: ITournament
-): EmbedBuilder => {
+export const buildEmbed = (poster: EmbedPoster, tournamentDetails: ITournament): EmbedBuilder => {
   const localColor = 0xc01f1f;
   const onlineColor = 0x0b92e0;
 
@@ -155,9 +145,7 @@ export const buildEmbed = (
     iconURL: poster.avatarURL ?? undefined,
   });
 
-  const title = tournamentDetails.isOnline
-    ? `🌐 ${tournamentDetails.title}`
-    : tournamentDetails.title;
+  const title = tournamentDetails.isOnline ? `🌐 ${tournamentDetails.title}` : tournamentDetails.title;
   embed.addFields({ name: title, value: "\u200B" });
 
   if (tournamentDetails.isOnline) {
@@ -175,20 +163,13 @@ export const buildEmbed = (
   return embed;
 };
 
-const postMessage = async (
-  channel: NewsChannel,
-  embed: EmbedBuilder
-): Promise<string> => {
+const postMessage = async (channel: NewsChannel, embed: EmbedBuilder): Promise<string> => {
   const message = await channel.send({ embeds: [embed] });
 
   return message.id;
 };
 
-const editExistingPost = async (
-  channel: NewsChannel,
-  tournament: ITournament,
-  embed: EmbedBuilder
-) => {
+const editExistingPost = async (channel: NewsChannel, tournament: ITournament, embed: EmbedBuilder) => {
   try {
     const prevMessage = await channel.messages.fetch(tournament.messageID!);
     prevMessage.edit({ embeds: [embed] });
@@ -209,23 +190,17 @@ const editExistingPost = async (
  * @param tournamentDetails The tournament details to be posted.
  * @returns id of the posted message.
  */
-export const postEmbed = async (
-  guild: Guild,
-  user: GuildMember,
-  tournamentDetails: ITournament
-): Promise<string> => {
+export const postEmbed = async (guild: Guild, user: GuildMember, tournamentDetails: ITournament): Promise<string> => {
   const { isOnline } = tournamentDetails;
 
-  const channel = (await guild.channels.fetch(
-    isOnline ? onlineTournamentAgendaID : tournamentagendaID
-  )) as NewsChannel;
+  const channel = (await guild.channels.fetch(isOnline ? onlineTournamentAgendaID : tournamentagendaID)) as NewsChannel;
   const embed = buildEmbed(
     {
       username: user.user.username,
       discriminator: user.user.discriminator,
       avatarURL: user.user.avatarURL(),
     },
-    tournamentDetails
+    tournamentDetails,
   );
 
   if (tournamentDetails.messageID) {

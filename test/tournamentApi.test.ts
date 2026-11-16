@@ -70,7 +70,13 @@ const seed = () => {
 beforeAll(async () => {
   seed();
   const app = express();
-  app.use("/api/tournaments", new TournamentApiRouter(() => repo, () => NOW).router);
+  app.use(
+    "/api/tournaments",
+    new TournamentApiRouter(
+      () => repo,
+      () => NOW,
+    ).router,
+  );
   await new Promise<void>((resolve) => {
     server = app.listen(0, "127.0.0.1", resolve);
   });
@@ -128,7 +134,10 @@ describe("GET /api/tournaments: default (upcoming)", () => {
       expect(typeof item.startDate).toBe("number");
     }
     const streamed = items.find((t) => t.id === "303")!;
-    expect(streamed).toMatchObject({ streamURL: "https://twitch.tv/fixture", streamStartDate: Date.parse("2026-06-27T09:30:00Z") });
+    expect(streamed).toMatchObject({
+      streamURL: "https://twitch.tv/fixture",
+      streamStartDate: Date.parse("2026-06-27T09:30:00Z"),
+    });
     expect(items.find((t) => t.id === "302")).not.toHaveProperty("streamURL");
   });
 
@@ -170,7 +179,13 @@ describe("filters", () => {
       big.upsert(tournament(String(1000 + i), { startDate: NOW + i * HOUR, endDate: NOW + i * HOUR + HOUR }));
     }
     const app = express();
-    app.use("/api/tournaments", new TournamentApiRouter(() => big, () => NOW).router);
+    app.use(
+      "/api/tournaments",
+      new TournamentApiRouter(
+        () => big,
+        () => NOW,
+      ).router,
+    );
     const s = app.listen(0, "127.0.0.1");
     await new Promise((r) => s.once("listening", r));
     const prev = base;

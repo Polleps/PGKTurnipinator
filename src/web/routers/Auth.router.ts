@@ -40,9 +40,7 @@ const errorPage = (res: Response, status: number, message: string) =>
  */
 export class AuthRouter {
   private _router: Router;
-  constructor(
-    private deps: AuthDeps = { fetchUserToken, encodeToken, authorizeURL: Config.OAUTH2URI },
-  ) {
+  constructor(private deps: AuthDeps = { fetchUserToken, encodeToken, authorizeURL: Config.OAUTH2URI }) {
     this._router = Router();
     this.setupRoutes();
   }

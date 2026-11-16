@@ -45,7 +45,9 @@ describe("posting a tournament: validation happens before Discord", () => {
   });
 
   test("unparseable JSON and missing args are 400s", async () => {
-    const bad = await postTournament({ id: "1" } as never, { name: "posttournament", args: ["{"] }).catch((e: unknown) => e);
+    const bad = await postTournament({ id: "1" } as never, { name: "posttournament", args: ["{"] }).catch(
+      (e: unknown) => e,
+    );
     expect(actionErrorResponse(bad).status).toBe(400);
     const none = await postTournament({ id: "1" } as never, { name: "posttournament" }).catch((e: unknown) => e);
     expect(actionErrorResponse(none).status).toBe(400);

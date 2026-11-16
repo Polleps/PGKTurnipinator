@@ -10,11 +10,19 @@ export class RoleRepository {
   constructor(private readonly db: Db) {}
 
   public categories(): RoleCategory[] {
-    return this.db.select().from(roleCategories).orderBy(asc(sql`rowid`)).all();
+    return this.db
+      .select()
+      .from(roleCategories)
+      .orderBy(asc(sql`rowid`))
+      .all();
   }
 
   public roles(): JoinableRole[] {
-    return this.db.select().from(joinableRoles).orderBy(asc(sql`rowid`)).all();
+    return this.db
+      .select()
+      .from(joinableRoles)
+      .orderBy(asc(sql`rowid`))
+      .all();
   }
 
   public rolesInCategory(category: string): JoinableRole[] {

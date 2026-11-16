@@ -87,7 +87,9 @@ type Edit = (s: Record<string, unknown> & { events: Array<{ name: string; cap: s
 /** Applies the same user edits to the old and the new state. */
 const both = (data: StartGGDetails, edit: Edit = () => {}) => {
   const legacy = legacyFilledState("fixture-cup-3", data) as Parameters<Edit>[0];
-  const next = structuredClone(applyStartGG(initialFormState(), "fixture-cup-3", data)) as unknown as Parameters<Edit>[0];
+  const next = structuredClone(
+    applyStartGG(initialFormState(), "fixture-cup-3", data),
+  ) as unknown as Parameters<Edit>[0];
   edit(legacy);
   edit(next);
   return { legacy: legacyBody(legacy), next: newBody(next as unknown as FormState) };
@@ -132,13 +134,17 @@ describe("request body: same as the old lit-html form", () => {
         s.events.splice(0, 1);
       },
     ],
-    ["across the DST switch", details({ startAt: Date.parse("2026-10-24T12:00:00Z") / 1000, endAt: Date.parse("2026-10-25T12:00:00Z") / 1000 }), () => {}],
+    [
+      "across the DST switch",
+      details({ startAt: Date.parse("2026-10-24T12:00:00Z") / 1000, endAt: Date.parse("2026-10-25T12:00:00Z") / 1000 }),
+      () => {},
+    ],
   ])("%s", (_name, data, edit) => {
     const { legacy, next } = both(data, edit);
     expect(next).toEqual(legacy);
   });
 
-  test("a non-Twitch stream: the old form sent no streamURL key, the new one sends \"\" (both: no stream)", () => {
+  test('a non-Twitch stream: the old form sent no streamURL key, the new one sends "" (both: no stream)', () => {
     const { legacy, next } = both(details({ streams: [{ streamName: "x", streamSource: "YOUTUBE" }] }));
     expect(legacy.streamURL).toBeUndefined();
     expect(next.streamURL).toBe("");
@@ -181,14 +187,18 @@ describe("request body: same as the old lit-html form", () => {
     }
   });
 
-  test("before a start.gg lookup the id is \"0\", which the server refuses", () => {
+  test('before a start.gg lookup the id is "0", which the server refuses', () => {
     const body = toRequestBody({ ...initialFormState(), url: "x", title: "T", startDate: "2026-03-14T12:00" });
     expect(body.id).toBe("0");
     expect(normalizeTournament(body)).toMatchObject({ ok: false, badId: true });
   });
 
-  test("an online tournament without address/city sends \"\" (the old form sent null)", () => {
-    const state = applyStartGG(initialFormState(), "online-cup", details({ isOnline: true, address: null, city: null }));
+  test('an online tournament without address/city sends "" (the old form sent null)', () => {
+    const state = applyStartGG(
+      initialFormState(),
+      "online-cup",
+      details({ isOnline: true, address: null, city: null }),
+    );
     expect(toRequestBody(state)).toMatchObject({ isOnline: true, location: "", city: "" });
   });
 });
@@ -198,13 +208,24 @@ describe("applyStartGG", () => {
     const first = applyStartGG(initialFormState(), "a", details());
     const edited: FormState = { ...first, description: "notes", nocap: true };
     const second = applyStartGG(edited, "b", details({ id: 5, streams: null, events: ["Melee Singles"] }));
-    expect(second).toMatchObject({ url: "b", id: 5, description: "notes", nocap: true, streamURL: "", streamStartDate: "" });
+    expect(second).toMatchObject({
+      url: "b",
+      id: 5,
+      description: "notes",
+      nocap: true,
+      streamURL: "",
+      streamStartDate: "",
+    });
     expect(second.events.map((e) => e.name)).toEqual(["Melee Singles"]);
   });
 
   test("dates are shown in Amsterdam time", () => {
     const s = applyStartGG(initialFormState(), "a", details());
-    expect([s.startDate, s.endDate, s.streamStartDate]).toEqual(["2026-03-14T12:00", "2026-03-14T21:30", "2026-03-14T12:00"]);
+    expect([s.startDate, s.endDate, s.streamStartDate]).toEqual([
+      "2026-03-14T12:00",
+      "2026-03-14T21:30",
+      "2026-03-14T12:00",
+    ]);
   });
 });
 

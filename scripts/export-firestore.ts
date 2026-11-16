@@ -24,13 +24,7 @@
  */
 import { copyFileSync, existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from "fs";
 import { join, resolve } from "path";
-import {
-  CollectionExport,
-  encodeMap,
-  EXPORT_FORMAT,
-  EXPORT_VERSION,
-  FirestoreTypes,
-} from "./lib/firestoreCodec.ts";
+import { CollectionExport, encodeMap, EXPORT_FORMAT, EXPORT_VERSION, FirestoreTypes } from "./lib/firestoreCodec.ts";
 
 const BOT_COLLECTIONS = ["joinableroles", "role_categories"];
 const DEV_COLLECTION = "tournaments_dev";
@@ -71,7 +65,10 @@ const parseArgs = (argv: string[]): Options => {
   if (flags.has("include-dev")) {
     collections.push(DEV_COLLECTION);
   }
-  for (const extra of (str("also") ?? "").split(",").map((s) => s.trim()).filter(Boolean)) {
+  for (const extra of (str("also") ?? "")
+    .split(",")
+    .map((s) => s.trim())
+    .filter(Boolean)) {
     collections.push(extra);
   }
 

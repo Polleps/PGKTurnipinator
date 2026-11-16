@@ -97,7 +97,9 @@ describe("form validation: new checks", () => {
 
   test("stream URLs: what the server would drop is refused, the rest passes", () => {
     expect(check({ ...validState(), streamURL: "twitch.tv/pgk", streamStartDate: at(DAY) })).toBeUndefined();
-    expect(check({ ...validState(), streamURL: "https://user:pw@twitch.tv/pgk" })).toBe("Stream URL is not a valid link");
+    expect(check({ ...validState(), streamURL: "https://user:pw@twitch.tv/pgk" })).toBe(
+      "Stream URL is not a valid link",
+    );
     expect(check({ ...validState(), streamURL: "pgk" })).toBe("Stream URL is not a valid link");
   });
 

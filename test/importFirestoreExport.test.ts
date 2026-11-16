@@ -64,7 +64,12 @@ describe("import of the fixture export", () => {
     const byId = new Map(tournaments.map((t) => [t.id, t]));
 
     expect(tournaments.filter((t) => t.url === "fixture-repost").map((t) => t.id)).toEqual(["900005", "900006"]);
-    expect(byId.get("900002")).toMatchObject({ title: "Fixture Legacy 2019", pr: true, isOnline: false, messageID: null });
+    expect(byId.get("900002")).toMatchObject({
+      title: "Fixture Legacy 2019",
+      pr: true,
+      isOnline: false,
+      messageID: null,
+    });
     expect(byId.get("900002")?.events).toEqual([{ name: "Singles", cap: "64" }]);
     expect(byId.get("900001")).toMatchObject({ location: "", city: "", locationID: "", prices: [] });
     expect(byId.get("900003")).toMatchObject({
@@ -134,7 +139,9 @@ describe("import of the fixture export", () => {
 
       // The holder is gone and its WAL was folded in on close: now --force may replace it.
       const before = new Database(dbPath, { readonly: true });
-      expect(before.query("SELECT title FROM tournaments WHERE id = '900001'").get()).toEqual({ title: "posted while importing" });
+      expect(before.query("SELECT title FROM tournaments WHERE id = '900001'").get()).toEqual({
+        title: "posted while importing",
+      });
       before.close();
       runImport({ exportDir: FIXTURE, dbPath, force: true });
 
@@ -168,9 +175,12 @@ describe("import of the fixture export", () => {
     const dir = tempDir();
     const dbPath = join(dir, "cli.db");
     const run = (...args: string[]) =>
-      Bun.spawnSync(["bun", "--no-env-file", SCRIPT, FIXTURE, `--db=${dbPath}`, `--report-dir=${join(dir, "reports")}`, ...args], {
-        env: { PATH: process.env.PATH ?? "" },
-      });
+      Bun.spawnSync(
+        ["bun", "--no-env-file", SCRIPT, FIXTURE, `--db=${dbPath}`, `--report-dir=${join(dir, "reports")}`, ...args],
+        {
+          env: { PATH: process.env.PATH ?? "" },
+        },
+      );
 
     const dry = run("--dry-run");
     expect(dry.exitCode).toBe(0);

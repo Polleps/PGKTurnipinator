@@ -23,7 +23,11 @@ export const toLegacyTournament = (t: Tournament): LegacyTournament => {
       continue;
     }
     out[key] =
-      key === "registrationClosesAt" ? Math.floor((value as number) / 1000) : key === "id" ? legacyId(value as string) : value;
+      key === "registrationClosesAt"
+        ? Math.floor((value as number) / 1000)
+        : key === "id"
+          ? legacyId(value as string)
+          : value;
   }
   return out as LegacyTournament;
 };

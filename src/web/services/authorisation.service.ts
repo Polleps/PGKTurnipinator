@@ -63,7 +63,8 @@ export const verifyActionRequest = async (token: string): Promise<IDecodedToken>
 };
 
 /** Signs a session; `remember` says whether its cookie outlives the browser session. */
-export const encodeSession = async (session: IDecodedToken): Promise<string> => signJWT({ ...session }, await signingKey());
+export const encodeSession = async (session: IDecodedToken): Promise<string> =>
+  signJWT({ ...session }, await signingKey());
 
 export const encodeToken = (data: ITokenRespose, remember: boolean): Promise<string> => {
   const { access_token, refresh_token, expires_in } = data;

@@ -45,23 +45,10 @@ query TournamentQuery($id: ID) {
 }
 `;
 
-export const fetchTournamentDetails = async (
-  slug: string
-): Promise<ITournamentDetails> => {
+export const fetchTournamentDetails = async (slug: string): Promise<ITournamentDetails> => {
   const result = await executeQuery(detailsQuery, { slug });
-  const {
-    name,
-    id,
-    mapsPlaceId,
-    startAt,
-    endAt,
-    isOnline,
-    images,
-    venueAddress,
-    events,
-    city,
-    streams,
-  } = result.data.tournament;
+  const { name, id, mapsPlaceId, startAt, endAt, isOnline, images, venueAddress, events, city, streams } =
+    result.data.tournament;
 
   const img = images.find((img: { type: string; url: string }) => img.type === "profile");
   const tournamentDetails: ITournamentDetails = {
@@ -84,7 +71,7 @@ export const fetchTournamentDetails = async (
 export type FETCH_ERROR = -1;
 
 export const fetchTournamentStatus = async (
-  id: string
+  id: string,
 ): Promise<
   Array<{
     id: string;
