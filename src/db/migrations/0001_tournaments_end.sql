@@ -1,0 +1,1 @@
+CREATE INDEX `tournaments_end` ON `tournaments` (`end_date`);

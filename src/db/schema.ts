@@ -66,6 +66,8 @@ export const tournaments = sqliteTable(
   (t) => [
     index("tournaments_start_id").on(t.startDate, t.id),
     index("tournaments_url").on(t.url, t.startDate),
+    /** Range scans for tournaments that haven't ended (`end_date > now`). */
+    index("tournaments_end").on(t.endDate),
     check("tournaments_end_after_start", sql`${t.endDate} >= ${t.startDate}`),
     check("tournaments_type", sql`${t.type} IN ('smashgg', 'other')`),
     check("tournaments_is_online_bool", bool("is_online")),

@@ -157,4 +157,16 @@ describe("GET /calendar/tournaments.ics", () => {
     }
     expect(res.body).not.toContain("UID:900002@"); // 2019
   });
+
+  test("a deleted tournament leaves the cached feed right away", async () => {
+    const [first] = repo.upcoming();
+    expect((await get("/calendar/tournaments.ics")).body).toContain(`UID:${first!.id}@`);
+    repo.delete(first!.id);
+    try {
+      expect((await get("/calendar/tournaments.ics")).body).not.toContain(`UID:${first!.id}@`);
+    } finally {
+      repo.upsert(first!);
+    }
+    expect((await get("/calendar/tournaments.ics")).body).toContain(`UID:${first!.id}@`);
+  });
 });

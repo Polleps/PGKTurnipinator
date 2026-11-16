@@ -7,6 +7,8 @@ export class CalendarRouter {
   private _router: Router;
   private lastUpdated: number = 0;
   private cachedICal!: string;
+  /** The repository revision the cached feed was built from; a post or delete rebuilds it. */
+  private cachedRevision = -1;
 
   private readonly expireTime = 18000000;
 
@@ -22,8 +24,10 @@ export class CalendarRouter {
   private setupRoutes() {
     // ::GET:: [URL]/calendar/tournaments.ics
     this._router.get("/tournaments.ics", (req, res) => {
-      if (Date.now() - this.lastUpdated > this.expireTime) {
-        this.cachedICal = buildICallFile(this.repo().upcoming());
+      const repo = this.repo();
+      if (Date.now() - this.lastUpdated > this.expireTime || repo.revision !== this.cachedRevision) {
+        this.cachedRevision = repo.revision;
+        this.cachedICal = buildICallFile(repo.upcoming());
         this.lastUpdated = Date.now();
       }
       res.setHeader("Content-Type", "text/calendar;charset=utf-8");

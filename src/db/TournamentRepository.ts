@@ -43,7 +43,17 @@ export interface TournamentStatus {
  * which the `tournaments_start_id` index serves; paginated queries build on the same order.
  */
 export class TournamentRepository {
+  private writes = 0;
+
   constructor(private readonly db: Db) {}
+
+  /**
+   * Changes whenever this repository adds, changes or removes tournament details, so
+   * in-memory caches built from it (the iCal feed) can tell they are stale.
+   */
+  public get revision(): number {
+    return this.writes;
+  }
 
   /** Every tournament, oldest first. */
   public all(): Tournament[] {
@@ -93,6 +103,46 @@ export class TournamentRepository {
       .all();
   }
 
+  /**
+   * Up to `limit` tournaments that haven't ended at `now`, soonest first, whose start.gg slug or
+   * title contains `search` (case-insensitive; empty matches all). For the /delete-tournament
+   * autocomplete.
+   */
+  public searchUpcoming(search: string, now: number, limit: number): Tournament[] {
+    return this.searchUpcomingQuery(search, now, limit).all();
+  }
+
+  /**
+   * The query behind searchUpcoming (exposed so tests can check its plan). It range-scans the
+   * `tournaments_end` index and sorts the few upcoming rows; the unary `+` keeps SQLite from
+   * walking `tournaments_start_id` from the oldest tournament instead (to skip the sort).
+   */
+  public searchUpcomingQuery(search: string, now: number, limit: number) {
+    const needle = search.trim().toLowerCase();
+    const conditions: SQL[] = [gt(tournaments.endDate, now)];
+    if (needle !== "") {
+      conditions.push(
+        sql`(instr(lower(${tournaments.url}), ${needle}) > 0 OR instr(lower(${tournaments.title}), ${needle}) > 0)`,
+      );
+    }
+    return this.db
+      .select()
+      .from(tournaments)
+      .where(and(...conditions))
+      .orderBy(sql`+${tournaments.startDate}`, sql`+${tournaments.id}`)
+      .limit(limit);
+  }
+
+  /** Tournaments that haven't ended at `now` with exactly this slug (case-insensitive), newest first. */
+  public upcomingBySlug(slug: string, now: number): Tournament[] {
+    return this.db
+      .select()
+      .from(tournaments)
+      .where(and(gt(tournaments.endDate, now), sql`lower(${tournaments.url}) = ${slug.trim().toLowerCase()}`))
+      .orderBy(desc(tournaments.startDate), desc(tournaments.id))
+      .all();
+  }
+
   public getById(id: string): Tournament | undefined {
     return this.db.select().from(tournaments).where(eq(tournaments.id, id)).get();
   }
@@ -108,7 +158,7 @@ export class TournamentRepository {
    */
   public upsert(t: NormalizedTournament): UpsertResult {
     const { id, ...rest } = t;
-    return this.db.transaction((tx) => {
+    const result = this.db.transaction((tx): UpsertResult => {
       const exists = tx.select({ id: tournaments.id }).from(tournaments).where(eq(tournaments.id, id)).get();
       if (exists) {
         tx.update(tournaments).set(rest).where(eq(tournaments.id, id)).run();
@@ -117,6 +167,8 @@ export class TournamentRepository {
       tx.insert(tournaments).values(t).run();
       return "inserted";
     });
+    this.writes++;
+    return result;
   }
 
   /** Inserts many rows in one transaction (the import). Fails as a whole on any constraint violation. */
@@ -126,6 +178,14 @@ export class TournamentRepository {
         tx.insert(tournaments).values(row).run();
       }
     });
+    this.writes++;
+  }
+
+  /** Removes a tournament. Returns false if there is no such row. */
+  public delete(id: string): boolean {
+    const deleted = this.db.delete(tournaments).where(eq(tournaments.id, id)).returning({ id: tournaments.id }).all();
+    this.writes++;
+    return deleted.length > 0;
   }
 
   /** Stores the start.gg status of a tournament. Returns false if there is no such row. */

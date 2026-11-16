@@ -3,7 +3,8 @@ import { Database } from "bun:sqlite";
 import { mkdtempSync, rmSync } from "fs";
 import { tmpdir } from "os";
 import { join } from "path";
-import { runMigrations } from "../src/db/database";
+import { readMigrationFiles } from "drizzle-orm/migrator";
+import { MIGRATIONS_FOLDER, runMigrations } from "../src/db/database";
 
 const DATABASE_TS = join(import.meta.dir, "..", "src", "db", "database.ts");
 
@@ -40,7 +41,8 @@ describe("migrations", () => {
 
     const db = new Database(path, { readonly: true });
     const applied = db.query('SELECT count(*) AS n FROM "__drizzle_migrations"').get() as { n: number };
-    expect(applied.n).toBe(1);
+    // One row per migration, not one per process.
+    expect(applied.n).toBe(readMigrationFiles({ migrationsFolder: MIGRATIONS_FOLDER }).length);
     expect(db.query("SELECT count(*) AS n FROM tournaments").get()).toEqual({ n: 0 });
     db.close();
   }, 20000);
