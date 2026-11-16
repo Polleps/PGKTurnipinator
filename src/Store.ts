@@ -44,6 +44,11 @@ export class Store {
     return this.require().db;
   }
 
+  /** The path the DB was opened with (a file path or ":memory:"). */
+  public get path(): string {
+    return this.require().path;
+  }
+
   /** Closes the DB for real (finalizing Drizzle's statements), so its WAL is folded in and the file unlocked. */
   public close(): void {
     this.opened?.db.$client.close(true);

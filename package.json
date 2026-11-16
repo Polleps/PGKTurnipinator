@@ -32,7 +32,8 @@
     "export:firestore": "node scripts/export-firestore.ts",
     "import:firestore": "bun --no-env-file scripts/import-firestore-export.ts",
     "db:generate": "drizzle-kit generate",
-    "commands": "bun --no-env-file scripts/register-commands.ts"
+    "commands": "bun --no-env-file scripts/register-commands.ts",
+    "backup:now": "bun --no-env-file scripts/backup-now.ts"
   },
   "author": "Polle Pas",
   "license": "ISC",
