@@ -81,7 +81,6 @@ export const fetchTournamentStatus = async (
 > => {
   try {
     const result = (await executeQuery(statusQuery, { id })) as IStatusResult;
-    console.log(result);
     if (!result.data || !result.data.tournament) {
       return [];
     }
