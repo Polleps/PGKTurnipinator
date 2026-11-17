@@ -24,7 +24,7 @@
  */
 import { copyFileSync, existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from "fs";
 import { join, resolve } from "path";
-import { CollectionExport, encodeMap, EXPORT_FORMAT, EXPORT_VERSION, FirestoreTypes } from "./lib/firestoreCodec.ts";
+import { type CollectionExport, encodeMap, EXPORT_FORMAT, EXPORT_VERSION, type FirestoreTypes } from "./lib/firestoreCodec.ts";
 
 const BOT_COLLECTIONS = ["joinableroles", "role_categories"];
 const DEV_COLLECTION = "tournaments_dev";
