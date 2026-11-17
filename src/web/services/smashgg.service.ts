@@ -1,5 +1,4 @@
 import Config from "../../Config";
-import fetch, { FetchError } from "node-fetch";
 
 const baseURL = "https://api.start.gg/gql/alpha";
 const TWITCH_BASE_URL = "https://twitch.tv/";
@@ -46,25 +45,12 @@ query TournamentQuery($id: ID) {
 }
 `;
 
-export const fetchTournamentDetails = async (
-  slug: string
-): Promise<ITournamentDetails> => {
+export const fetchTournamentDetails = async (slug: string): Promise<ITournamentDetails> => {
   const result = await executeQuery(detailsQuery, { slug });
-  const {
-    name,
-    id,
-    mapsPlaceId,
-    startAt,
-    endAt,
-    isOnline,
-    images,
-    venueAddress,
-    events,
-    city,
-    streams,
-  } = result.data.tournament;
+  const { name, id, mapsPlaceId, startAt, endAt, isOnline, images, venueAddress, events, city, streams } =
+    result.data.tournament;
 
-  const img = images.find((img) => img.type === "profile");
+  const img = images.find((img: { type: string; url: string }) => img.type === "profile");
   const tournamentDetails: ITournamentDetails = {
     name,
     id,
@@ -74,7 +60,7 @@ export const fetchTournamentDetails = async (
     city,
     startAt,
     endAt,
-    events: events.map((evt) => evt.name),
+    events: events.map((evt: { name: string }) => evt.name),
     image: img ? img.url : "",
     streams,
   };
@@ -85,7 +71,7 @@ export const fetchTournamentDetails = async (
 export type FETCH_ERROR = -1;
 
 export const fetchTournamentStatus = async (
-  id: string
+  id: string,
 ): Promise<
   Array<{
     id: string;
@@ -114,7 +100,7 @@ export const fetchTournamentStatus = async (
   }
 };
 
-const executeQuery = async (query, variables) => {
+const executeQuery = async (query: string, variables: Record<string, unknown>): Promise<any> => {
   const headers = {
     "Content-Type": "application/json",
     Accept: "application/json",

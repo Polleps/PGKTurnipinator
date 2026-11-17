@@ -1,51 +1,66 @@
-import * as admin from "firebase-admin";
-import * as serviceAccount from "../firebasekey.json";
-import { Firestore } from "@google-cloud/firestore";
-import { ICache } from "./stores/StoreCache.js";
-import { BasicSetCache, TournamentStoreCache } from "./stores/index.js";
-import Config from "./Config";
-import { BasicMapCache } from "./stores/BasicMapCache";
-import { IJoinableRole } from "./models/IJoinableRole";
-import { IRoleCategory } from "./models/IRoleCategory";
+import { createLogger } from "./utils/logger";
+import { DEFAULT_DATABASE_PATH, isMemoryPath, openDatabase, type Db } from "./db/database";
+import { RoleRepository } from "./db/RoleRepository";
+import { TournamentRepository } from "./db/TournamentRepository";
 
-class Store {
-  private static instance: Store;
+const log = createLogger("Store");
 
-  public static get Instance(): Store {
-    return this.instance || (this.instance = new this());
+export interface StoreOptions {
+  /** A file path or ":memory:". Defaults to DATABASE_PATH, else data/turnipinator.db. */
+  path?: string;
+  /** Create the DB when missing (tests and scripts; the bot refuses to start instead). */
+  create?: boolean;
+}
+
+/**
+ * The bot's data: one SQLite DB (bun:sqlite + Drizzle), opened once at startup. Queries
+ * are synchronous, so there is nothing to cache or reload.
+ */
+export class Store {
+  private opened?: { db: Db; path: string; tournaments: TournamentRepository; roles: RoleRepository };
+
+  /** Opens the DB and applies pending migrations. Throws if the file doesn't exist (unless `create`). */
+  public init({ path = process.env.DATABASE_PATH || DEFAULT_DATABASE_PATH, create = false }: StoreOptions = {}): void {
+    if (this.opened) {
+      throw new Error(`Store is already open (${this.opened.path}).`);
+    }
+    const db = openDatabase({ path, create });
+    this.opened = { db, path, tournaments: new TournamentRepository(db), roles: new RoleRepository(db) };
+    log(
+      `Data source: SQLite ${isMemoryPath(path) ? "(in memory)" : path}; ` +
+        `${this.opened.tournaments.count()} tournaments, ${this.opened.roles.roles().length} joinable roles.`,
+    );
   }
 
-  private db: Firestore;
-  private caches: Map<string, ICache>;
-
-  private constructor() {
-    admin.initializeApp({credential: admin.credential.cert(serviceAccount as admin.ServiceAccount)});
-    this.db = admin.firestore();
-
-    this.caches = new Map<string, ICache>([
-      ["joinableroles", new BasicMapCache<IJoinableRole>(this.db.collection("joinableroles"), 'name')],
-      ["role_categories", new BasicMapCache<IRoleCategory>(this.db.collection("role_categories"), 'name')],
-      ["shucfixes", new BasicSetCache(this.db.collection("shucfixes"), "prefix")],
-      ["shucfixbans", new BasicSetCache(this.db.collection("shucfixbans"), "id")],
-      ["botadmins", new BasicSetCache(this.db.collection("botadmins"), "id")],
-      ["tournaments", new TournamentStoreCache(this.db.collection(Config.TOURNAMENT_COLLECTION_NAME))],
-    ]);
+  public get tournaments(): TournamentRepository {
+    return this.require().tournaments;
   }
 
-  public collection(name: string) {
-    return this.db.collection(name);
+  public get roles(): RoleRepository {
+    return this.require().roles;
   }
 
-  public cache(name: string) {
-    return this.caches.get(name);
+  public get db(): Db {
+    return this.require().db;
   }
 
-  public async init(): Promise<void> {
-    const promises: Array<Promise<void>> = [];
-    this.caches.forEach((x) => promises.push(x.init()));
-    await Promise.all(promises);
-    return;
+  /** The path the DB was opened with (a file path or ":memory:"). */
+  public get path(): string {
+    return this.require().path;
+  }
+
+  /** Closes the DB for real (finalizing Drizzle's statements), so its WAL is folded in and the file unlocked. */
+  public close(): void {
+    this.opened?.db.$client.close(true);
+    this.opened = undefined;
+  }
+
+  private require() {
+    if (!this.opened) {
+      throw new Error("Store is not open: call store.init() first.");
+    }
+    return this.opened;
   }
 }
 
-export const store = Store.Instance;
+export const store = new Store();

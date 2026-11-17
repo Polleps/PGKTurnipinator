@@ -2,42 +2,36 @@ import * as Discord from "discord.js";
 import { ITrigger } from "./ITrigger";
 import Config from "../Config";
 
-export class NeeTrigger implements ITrigger {
-  private neeUsers: Map<string[], NodeJS.Timeout>;
-
-  constructor() {
-    this.neeUsers = new Map<string[], NodeJS.Timeout>();
+/**
+ * Answers members with one of NEE_ROLE_IDS with "Nee!" and deletes their message.
+ * Uses only the author, member roles and channel, never message.content, so it
+ * needs no MessageContent intent.
+ */
+/** True when any of the member's roles is one of NEE_ROLE_IDS. */
+export const hasNeeRole = (memberRoleIds: Iterable<string>, neeRoleIds: readonly string[] = Config.NEE_ROLE_IDS) => {
+  for (const id of memberRoleIds) {
+    if (neeRoleIds.includes(id)) {
+      return true;
+    }
   }
+  return false;
+};
 
+/** What a NEE member gets instead of a command (v13: the trigger answered "Nee!" before command parsing). */
+export const NEE_COMMAND_REPLY = "Nee!";
+
+export class NeeTrigger implements ITrigger {
   public run(msg: Discord.Message): boolean {
-    const { NEE_ROLE_IDS } = Config;
-    const { member, author, guild } = msg;
+    const { member } = msg;
 
-    if (NEE_ROLE_IDS.some((roleId) => member.roles.cache.has(roleId))) {
-      if (!this.neeUsers.has([ guild.id, author.id ])) {
-        this.handleMuteRole(guild, member);
-        msg.channel.send(`${msg.author.toString()} Nee!`);
+    if (member && hasNeeRole(member.roles.cache.keys())) {
+      if (msg.channel.isSendable()) {
+        msg.channel.send(`${msg.author.toString()} Nee!`).catch(console.error);
       }
       // tslint:disable-next-line:no-console
       msg.delete().catch(console.error);
       return true;
     }
     return false;
-  }
-
-  private async handleMuteRole(guild: Discord.Guild, member: Discord.GuildMember): Promise<void> {
-    const { MUTE_ROLES } = Config;
-    if (MUTE_ROLES.has(guild.id)) {
-      const muteRole = MUTE_ROLES.get(guild.id);
-
-      await member.roles.add(muteRole);
-
-      const timeoutID = setTimeout(() => {
-        member.roles.remove(muteRole);
-        this.neeUsers.delete([ guild.id, member.id ]);
-      }, 10000);
-
-      this.neeUsers.set([ guild.id, member.id ], timeoutID);
-    }
   }
 }

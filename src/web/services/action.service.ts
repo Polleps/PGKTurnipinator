@@ -12,7 +12,7 @@ export default class ActionService {
 
   public async run(userInfo: IUserInfo, action: IAction): Promise<string> {
     if (this.actions.has(action.name)) {
-      return this.actions.get(action.name)(userInfo, action);
+      return this.actions.get(action.name)!(userInfo, action);
     } else {
       return "Invalid action";
     }

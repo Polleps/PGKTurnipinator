@@ -1,0 +1,18 @@
+# Don't auto-load .env/.env.local/...: src/env.ts loads .env.dev/.env.prod with dotenv 6
+# semantics (Bun's parser expands `$` and strips `#` comments).
+env = false
+
+[install]
+# npm-style node_modules layout (one hoisted tree for the bot and both Vite apps).
+linker = "hoisted"
+
+[test]
+root = "./test"
+preload = ["./test/setup.ts"]
+
+[fmt]
+# `bun fmt` (Prettier-compatible); CI runs `bun run fmt:check`. Ignored paths: .gitignore + .prettierignore.
+printWidth = 120
+# The repo mixes CRLF and LF files; keep each file's own line endings
+# (otherwise .editorconfig's end_of_line = crlf would apply to every file).
+endOfLine = "auto"

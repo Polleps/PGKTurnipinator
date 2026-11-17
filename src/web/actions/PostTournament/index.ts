@@ -1,1 +1,1 @@
-export * from './PostTournament';
+export * from "./PostTournament";

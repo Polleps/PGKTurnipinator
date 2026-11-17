@@ -1,21 +1,10 @@
-import * as Discord from "discord.js";
-import { Command } from "./Command";
+import { ChatInputCommandInteraction, MessageFlags } from "discord.js";
+import { CommandHandler } from "./CommandHandler";
 
-export class FixbotCommand extends Command {
-  constructor() {
-    super();
-    this._tag = "fixbot";
-    this._usage = `Type \`${this._prefix}fixbot\``;
-    this._description = "Restarts the bot.";
-    this._isPublic = false;
-    this._isAdminCommand = true;
-  }
-
-  public run(message: Discord.Message, args?: string[]): boolean {
-    message.reply("Restarting... please wait 10 seconds.").then(() => {
-      message.delete();
-      process.exit();
-    });
-    return true;
+/** Exits; the process manager restarts the bot. */
+export class FixbotCommand implements CommandHandler {
+  public async execute(interaction: ChatInputCommandInteraction) {
+    await interaction.reply({ content: "Restarting... please wait 10 seconds.", flags: MessageFlags.Ephemeral });
+    process.exit();
   }
 }

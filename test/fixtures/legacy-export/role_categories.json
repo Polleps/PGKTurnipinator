@@ -1,0 +1,23 @@
+{
+  "format": "turnipinator-firestore-export",
+  "version": 1,
+  "collection": "role_categories",
+  "exportedAt": "2026-01-01T00:00:00.000Z",
+  "count": 2,
+  "docs": [
+    {
+      "id": "rc1",
+      "data": {
+        "name": "Fixture Category",
+        "description": "Fake category for tests"
+      }
+    },
+    {
+      "id": "rc2",
+      "data": {
+        "name": "Icons",
+        "description": "Fake icons"
+      }
+    }
+  ]
+}

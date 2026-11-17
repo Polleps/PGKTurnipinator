@@ -1,10 +1,10 @@
-@import url('https://fonts.googleapis.com/css?family=Roboto:300');
+@import url("https://fonts.googleapis.com/css?family=Roboto:300");
 body {
   margin: 0;
   padding: 0;
   background-color: #202225;
   color: white;
-  font-family: 'Roboto', sans-serif;
+  font-family: "Roboto", sans-serif;
   /* height: 100vh; */
 }
 
@@ -22,9 +22,10 @@ a:visited {
 }
 .page-container {
   display: grid;
-  grid-template-areas: '. header header header .'
-  '. content content content .'
-  '. footer footer footer .';
+  grid-template-areas:
+    ". header header header ."
+    ". content content content ."
+    ". footer footer footer .";
   grid-template-columns: 1fr 2fr 2fr 2fr 1fr;
   grid-template-rows: 1fr 10fr 0.2fr;
   height: 80vh;
@@ -154,11 +155,13 @@ footer a {
   color: white;
 }
 
-input[type=checkbox], label {
+input[type="checkbox"],
+label {
   cursor: pointer;
 }
 
-.form-row input:disabled, textarea:disabled {
+.form-row input:disabled,
+textarea:disabled {
   background-color: #3d3f44;
 }
 
@@ -196,15 +199,15 @@ input[type=checkbox], label {
   padding-left: 33px;
 }
 .form-row .ta-link {
-  background-image: url('./assets/link.svg');
+  background-image: url("./assets/link.svg");
 }
 
 .form-row .ta-date {
-  background-image: url('./assets/date.svg');
+  background-image: url("./assets/date.svg");
 }
 
 .form-row .ta-location {
-  background-image: url('./assets/place.svg');
+  background-image: url("./assets/place.svg");
 }
 
 .logo-holder {
@@ -265,18 +268,18 @@ input[type=checkbox], label {
 @media only screen and (max-width: 900px) {
   .page-container {
     grid-template-areas:
-    '. header header header .'
-    '. content content content .'
-    '. footer footer footer .';
+      ". header header header ."
+      ". content content content ."
+      ". footer footer footer .";
     grid-template-columns: 0.3fr 2fr 1fr 2fr 0.3fr;
   }
 }
 @media only screen and (max-width: 750px) {
   .page-container {
     grid-template-areas:
-    'header header header'
-    'content content content'
-    'footer footer footer';
+      "header header header"
+      "content content content"
+      "footer footer footer";
     grid-template-columns: 1fr 1fr 1fr;
     margin-top: 0px;
     height: 100vh;

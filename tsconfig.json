@@ -1,15 +1,18 @@
 {
   "compilerOptions": {
-    "outDir": "./built",
+    "target": "es2022",
+    "module": "preserve",
+    "moduleResolution": "bundler",
+    "types": ["bun"],
+    "noEmit": true,
+    "allowImportingTsExtensions": true,
     "allowJs": true,
-    "target": "es6",
-    "module": "CommonJS",
-    "moduleResolution": "node",
-    "experimentalDecorators": true,
-    "emitDecoratorMetadata": true,
     "esModuleInterop": true,
+    "strict": true,
+    // Bun transpiles each file on its own; flag what only tsc's whole-program emit
+    // could handle (e.g. ambient const enums, which caught scheduleEvent.ts).
+    "isolatedModules": true,
+    "skipLibCheck": true
   },
-  "include": [
-    "./src/**/*"
-  ]
+  "include": ["./src/**/*", "./scripts/**/*", "./test/**/*"]
 }

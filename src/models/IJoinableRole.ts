@@ -1,7 +1,1 @@
-export interface IJoinableRole {
-  name: string;
-  category: string;
-  categoryID: string;
-  ID: string;
-  description?: string;
-}
+export type { JoinableRole as IJoinableRole } from "../db/schema";

@@ -1,21 +1,25 @@
-import { Client, Intents, Message } from "discord.js";
+// Must stay the first import: it fills process.env before Config is evaluated.
 import "./env";
+import { Client, Events, GatewayIntentBits, Message } from "discord.js";
+import CommandController from "./CommandController";
 import Config from "./Config";
 import { sClient } from "./Context";
-import MessageHandler from "./MessageHandler";
+import TriggerController from "./TriggerController";
 import Server from "./web/Server";
 import { createLogger } from "./utils/logger";
 import { store } from "./Store";
-// import { NewsStreamer } from "./NewsStream";
+import { startStatusRefresh } from "./db/statusRefresh";
+import { startBackupSchedule } from "./db/backup";
 import { InteractionHandler } from "./InteractionHandler";
 
 const log = createLogger("Main");
 const intents = [
-  Intents.FLAGS.GUILDS,
-  Intents.FLAGS.GUILD_EMOJIS_AND_STICKERS,
-  Intents.FLAGS.GUILD_MEMBERS,
-  Intents.FLAGS.GUILD_MESSAGES,
-  Intents.FLAGS.GUILD_MESSAGE_REACTIONS,
+  GatewayIntentBits.Guilds,
+  // Privileged. Keeps the guild's member count (/serverinfo/membercount) up to date.
+  GatewayIntentBits.GuildMembers,
+  // messageCreate for NeeTrigger. No MessageContent: commands are slash commands and
+  // the trigger never reads message.content.
+  GatewayIntentBits.GuildMessages,
 ];
 class Main {
   private args: string[];
@@ -26,35 +30,45 @@ class Main {
   public async main() {
     const client = new Client({ intents });
     sClient.client = client;
-    await store.init();
-    log("Caches Loaded.");
-    const messageHandler = new MessageHandler();
+    // Throws if the DB file is missing: build it with `bun run import:firestore`.
+    store.init();
+    startStatusRefresh(store.tournaments);
+    // Only when BACKUP_ENABLED=true; failures are logged, never thrown.
+    startBackupSchedule(store.db.$client, store.path);
+    const triggerController = new TriggerController();
+    const commandController = new CommandController();
     const interactionHandler = new InteractionHandler(client);
-    // const newsStreamer = new NewsStreamer(client);
     const server = new Server(client);
     if (Config.EnableWebServer) {
-      await server.start(+process.env.PORT || Config.ServerPort);
+      await server.start(+process.env.PORT! || Config.ServerPort);
     }
 
-    client.once("ready", (): void => {
+    client.once(Events.ClientReady, (): void => {
       log("Bot is ready");
     });
 
-    client.on("messageCreate", (message: Message): void => {
-      messageHandler.processMessage(message);
+    client.on(Events.MessageCreate, (message: Message): void => {
+      // Never react to the bot's own messages.
+      if (message.author.id === client.user?.id) {
+        return;
+      }
+      triggerController.runTriggers(message);
     });
 
-    client.on("error", (error) => {
+    client.on(Events.Error, (error) => {
       console.error(error);
       process.exit();
     });
 
-    client.on("disconnect", (e) => {
-      console.error("Bot disconnected");
-      process.exit();
-    });
-
-    client.on("interactionCreate", (interaction) => {
+    client.on(Events.InteractionCreate, (interaction) => {
+      if (interaction.isChatInputCommand()) {
+        commandController.handle(interaction).catch(console.error);
+        return;
+      }
+      if (interaction.isAutocomplete()) {
+        commandController.autocomplete(interaction).catch(console.error);
+        return;
+      }
       interactionHandler.handle(interaction);
     });
 
@@ -68,4 +82,10 @@ class Main {
 }
 const bot = new Main([]);
 // tslint:disable-next-line:no-console
-bot.main().then(() => log("main done"));
+bot.main().then(
+  () => log("main done"),
+  (e) => {
+    console.error(e instanceof Error ? e.message : e);
+    process.exit(1);
+  },
+);

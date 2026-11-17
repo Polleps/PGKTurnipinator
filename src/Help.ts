@@ -1,42 +1,30 @@
-import * as Discord from "discord.js";
-import { Command } from "./commands/Command";
-import Config from "./Config";
+import { CommandDefinition } from "./commands/definitions";
 
-export default class Help {
-  private _commands: Map<string, Command>;
-
-  constructor(commands: Map<string, Command>) {
-    this._commands = commands;
-  }
-
-  public getHelp(author: Discord.User, args: string[]): string {
-    if (args.length === 0) {
-      return this.generateHelpText();
-    } else {
-      return this.getHelpFromCommand(author, args[0]);
-    }
-  }
-
-  private generateHelpText(): string {
-    const helpText: string[] = ["**Command List**"];
-    for (const [key, command] of this._commands) {
+/**
+ * Text for /help. Without a command name: the public commands. With one: its details,
+ * except that non-public commands only exist for bot admins.
+ */
+export const buildHelpText = (
+  commands: readonly CommandDefinition[],
+  isAdmin: boolean,
+  commandName?: string | null,
+): string => {
+  if (!commandName) {
+    const lines = ["**Command List**"];
+    for (const command of commands) {
       if (command.isPublic) {
-        helpText.push(`\`${Config.CommandPrefix}${key}\`: ${command.description}`);
+        lines.push(`\`/${command.name}\`: ${command.description}`);
       }
     }
-    return helpText.join("\n");
+    return lines.join("\n");
   }
 
-  private getHelpFromCommand(author: Discord.User, tag: string): string {
-    if (!this._commands.has(tag)) {
-      return `${tag} is not a command.`;
-    }
-    const command = this._commands.get(tag);
+  const tag = commandName.replace(/^\//, "").toLowerCase();
+  const command = commands.find((c) => c.name === tag);
 
-    if (!command.isPublic && !Config.BotAdmins.some((x) => x === author.id)) {
-      return `${tag} is not a command.`;
-    }
-
-    return `**${tag}**:\n**Description**: ${command.description}\n**Usage**: ${command.usage}`;
+  if (!command || (!command.isPublic && !isAdmin)) {
+    return `${tag} is not a command.`;
   }
-}
+
+  return `**${tag}**:\n**Description**: ${command.description}\n**Usage**: ${command.usage}`;
+};

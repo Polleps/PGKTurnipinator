@@ -62,15 +62,22 @@ typings/
 # next.js build output
 .next
 
-#Build output dir
-built/*
-!built/.gitkeep
-agenda/dist/*
-!agenda/dist/.gitkeep
-public/dist/*
-!public/dist/.gitkeep
+# Vite build output
+agenda/dist/
+public/dist/
 token.key
 .DS_Store
 firebasekey.json
 
 .DS_Store
+
+# Local data: Firestore JSON exports, SQLite DBs, import reports
+data/
+*.db
+*.db-wal
+*.db-shm
+*.db.importing
+
+# Internal planning notes (kept out of the public repo)
+planning/
+devops/

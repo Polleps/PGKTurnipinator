@@ -1,16 +1,7 @@
 import { Message } from "discord.js";
-import {
-  ITrigger,
-  ShucfixTrigger,
-  RainbowTrigger,
-  NeeTrigger,
-} from "./triggers";
+import { ITrigger, NeeTrigger } from "./triggers";
 export default class TriggerController {
-  private triggers: ITrigger[] = new Array<ITrigger>(
-    new NeeTrigger(),
-    new ShucfixTrigger(),
-    // new RainbowTrigger(),
-  );
+  private triggers: ITrigger[] = new Array<ITrigger>(new NeeTrigger());
 
   public runTriggers(msg: Message): boolean {
     for (const trigger of this.triggers) {

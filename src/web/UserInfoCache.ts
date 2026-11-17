@@ -15,12 +15,16 @@ class UserInfoCache {
 
   public async get(accessToken: string): Promise<IUserInfo> {
     if (this.cache.has(accessToken)) {
-      return this.cache.get(accessToken);
+      return this.cache.get(accessToken)!;
     }
     const fetchedInfo = await fetchUserInfo(accessToken);
 
-    if (this.cache.size > this.maxCache) {
-      this.cache.delete(this.cache.keys()[0]);
+    if (this.cache.size >= this.maxCache) {
+      // Maps iterate in insertion order, so this drops the oldest entry.
+      const oldest = this.cache.keys().next().value;
+      if (oldest !== undefined) {
+        this.cache.delete(oldest);
+      }
     }
 
     this.cache.set(accessToken, fetchedInfo);
