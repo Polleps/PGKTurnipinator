@@ -189,9 +189,15 @@ describe("schedule", () => {
     expect(summer?.toISOString()).toBe("2026-07-02T04:00:00.000Z");
   });
 
-  test("schedules an in-process Bun.cron job", () => {
-    const job = startEndedTournamentCleanup({} as Client, memoryRepo);
-    expect(job.cron).toBe("0 6 * * *");
-    job.stop();
+  test("schedules nothing unless MESSAGE_CLEANUP_ENABLED=true", () => {
+    expect(startEndedTournamentCleanup({} as Client, memoryRepo, {})).toBeUndefined();
+    expect(startEndedTournamentCleanup({} as Client, memoryRepo, { MESSAGE_CLEANUP_ENABLED: "false" })).toBeUndefined();
+    expect(startEndedTournamentCleanup({} as Client, memoryRepo, { MESSAGE_CLEANUP_ENABLED: "1" })).toBeUndefined();
+  });
+
+  test("schedules an in-process Bun.cron job when enabled", () => {
+    const job = startEndedTournamentCleanup({} as Client, memoryRepo, { MESSAGE_CLEANUP_ENABLED: "true" });
+    expect(job?.cron).toBe("0 6 * * *");
+    job?.stop();
   });
 });

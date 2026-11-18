@@ -139,8 +139,21 @@ export const runEndedTournamentCleanup = async (
   }
 };
 
-/** Schedules the daily cleanup in-process with Bun.cron. Returns the job (to stop it). */
-export const startEndedTournamentCleanup = (client: Client, repo: () => TournamentRepository): Bun.CronJob => {
+type Env = Record<string, string | undefined>;
+
+/**
+ * Schedules the daily cleanup in-process with Bun.cron, when MESSAGE_CLEANUP_ENABLED=true.
+ * Returns the job (to stop it), or undefined when the cleanup is off.
+ */
+export const startEndedTournamentCleanup = (
+  client: Client,
+  repo: () => TournamentRepository,
+  env: Env = process.env,
+): Bun.CronJob | undefined => {
+  if (env.MESSAGE_CLEANUP_ENABLED !== "true") {
+    log("Ended tournament message cleanup disabled (set MESSAGE_CLEANUP_ENABLED=true to enable).");
+    return undefined;
+  }
   // runEndedTournamentCleanup catches everything, so the job never emits an unhandled rejection.
   const job = Bun.cron(CLEANUP_SCHEDULE, () => runEndedTournamentCleanup(client, repo()), {
     tz: CLEANUP_TIME_ZONE,

@@ -36,7 +36,8 @@ class Main {
     startStatusRefresh(store.tournaments);
     // Only when BACKUP_ENABLED=true; failures are logged, never thrown.
     startBackupSchedule(store.db.$client, store.path);
-    // Daily at 06:00 Amsterdam: deletes agenda messages of ended tournaments (rows are kept).
+    // Only when MESSAGE_CLEANUP_ENABLED=true. Daily at 06:00 Amsterdam: deletes agenda messages
+    // of ended tournaments (rows are kept).
     startEndedTournamentCleanup(client, () => store.tournaments);
     const triggerController = new TriggerController();
     const commandController = new CommandController();
