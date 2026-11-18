@@ -1,9 +1,11 @@
 import {
+  DiscordAPIError,
   Guild,
   GuildScheduledEvent,
   GuildScheduledEventCreateOptions,
   GuildScheduledEventEntityType,
   GuildScheduledEventPrivacyLevel,
+  RESTJSONErrorCodes,
 } from "discord.js";
 
 import ITournament from "../../../models/ITournament";
@@ -102,17 +104,18 @@ const editExistingEvent = async (
   try {
     event = await guild.scheduledEvents.fetch(eventID);
   } catch (e) {
-    console.error(e);
+    // Only an event that is gone is created anew; recreating on other errors could leave two events.
+    if (e instanceof DiscordAPIError && e.code === RESTJSONErrorCodes.UnknownGuildScheduledEvent) {
+      console.warn(`Discord event ${eventID} was deleted; creating a new one.`);
 
-    return postEvent(guild, eventOptions, image);
+      return postEvent(guild, eventOptions, image);
+    }
+    throw e;
   }
 
-  try {
-    // Without a thumbnail `image` stays undefined, which leaves an existing cover as it is.
-    await withImageFallback(image, (img) => event.edit({ ...eventOptions, image: img }));
-  } catch (e) {
-    console.error(e);
-  }
+  // Without a thumbnail `image` stays undefined, which leaves an existing cover as it is.
+  // A failed edit is thrown, so the post reports that the event failed.
+  await withImageFallback(image, (img) => event.edit({ ...eventOptions, image: img }));
 
   return eventID;
 };

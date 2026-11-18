@@ -13,6 +13,7 @@ import {
 } from "discord.js";
 import Config from "../Config";
 import { store } from "../Store";
+import { withTournamentLock } from "../tournamentLock";
 import type { Tournament } from "../db/schema";
 import type { TournamentRepository } from "../db/TournamentRepository";
 import { createLogger } from "../utils/logger";
@@ -164,8 +165,12 @@ const deleteScheduledEvent = async (guild: Guild, eventId: string | null): Promi
  * row first (it may have been re-posted or removed while the admin was confirming). A message
  * or event that is already gone is fine; any other Discord failure keeps the row, so running
  * the command again retries (the parts already removed then count as gone).
+ * Runs under the tournament's lock, so a post of the same tournament can't run in between.
  */
-export const deleteTournament = async (
+export const deleteTournament = (deps: DeletionDeps, id: string): Promise<DeletionResult> =>
+  withTournamentLock(id, () => deleteTournamentNow(deps, id));
+
+const deleteTournamentNow = async (
   { repo, guild, now, channelIdFor = agendaChannelId }: DeletionDeps,
   id: string,
 ): Promise<DeletionResult> => {
