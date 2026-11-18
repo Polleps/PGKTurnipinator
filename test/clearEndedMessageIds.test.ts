@@ -54,7 +54,8 @@ describe("clear ended message ids", () => {
     const { sqlite, repo } = setup(...rows());
     const plan = planClear(sqlite, NOW, KEEP);
     expect(plan.keep.id).toBe("3");
-    expect(plan.clear.map((r) => r.id).sort()).toEqual(["1", "2"]);
+    // Newest end first.
+    expect(plan.clear.map((r) => r.id)).toEqual(["2", "1"]);
     expect(messageIds(repo)).toEqual({ "1": "msg-1", "2": "msg-2", "3": "msg-3", "4": "msg-4", "5": null });
   });
 
@@ -65,12 +66,25 @@ describe("clear ended message ids", () => {
     expect(applyClear(sqlite, NOW, KEEP).changed).toBe(0);
   });
 
+  test("the cutoff replaces now: tournaments that ended after it keep their id", () => {
+    const { sqlite, repo } = setup(...rows());
+    const cutoff = NOW - 5 * HOUR; // after 1 and the kept one ended (NOW - 10h), before 2 (NOW)
+    expect(planClear(sqlite, cutoff, KEEP).clear.map((r) => r.id)).toEqual(["1"]);
+    expect(applyClear(sqlite, cutoff, KEEP).changed).toBe(1);
+    expect(messageIds(repo)).toMatchObject({ "1": null, "2": "msg-2", "3": "msg-3" });
+  });
+
+  test("the kept slug matches ignoring case", () => {
+    const { sqlite } = setup(tournament("1"), tournament("3", { url: "Borderline-Smash-71" }));
+    expect(planClear(sqlite, NOW, KEEP).keep.id).toBe("3");
+  });
+
   test("refuses when the kept slug is missing, not ended, or ambiguous", () => {
     const cases: NormalizedTournament[][] = [
       [tournament("1")],
       [tournament("1"), tournament("3", { url: KEEP, messageID: null })],
       [tournament("1"), tournament("3", { url: KEEP, startDate: NOW - HOUR, endDate: NOW + HOUR })],
-      [tournament("1"), tournament("3", { url: KEEP }), tournament("6", { url: KEEP })],
+      [tournament("1"), tournament("3", { url: KEEP }), tournament("6", { url: KEEP.toUpperCase() })],
     ];
     for (const c of cases) {
       const { sqlite, repo } = setup(...c);
