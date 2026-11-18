@@ -27,24 +27,26 @@ const ENDED_WITH_MESSAGE = `
   SELECT id, url, title, end_date AS endDate, message_id AS messageID
   FROM tournaments
   WHERE end_date <= ? AND message_id IS NOT NULL
-  ORDER BY start_date, id`;
+  ORDER BY end_date DESC, id`;
 
 /**
- * Ended tournaments (`end_date <= now`, as everywhere in the bot) that still store a message id,
- * split into the one to keep (`url = keepSlug`) and the rest. Throws when the slug doesn't match
+ * Tournaments ended by `cutoff` (`end_date <= cutoff`, as everywhere in the bot) that still store
+ * a message id, newest end first, split into the one to keep (its `url`, the start.gg slug, equals
+ * `keepSlug` ignoring case, like upcomingBySlug) and the rest. Throws when the slug doesn't match
  * exactly one ended tournament with a message id: the maintainer kept that message on purpose.
  */
-export const planClear = (db: Database, now: number, keepSlug: string): ClearPlan => {
-  const rows = db.query<EndedRow, [number]>(ENDED_WITH_MESSAGE).all(now);
-  const keep = rows.filter((r) => r.url === keepSlug);
+export const planClear = (db: Database, cutoff: number, keepSlug: string): ClearPlan => {
+  const slug = keepSlug.trim().toLowerCase();
+  const rows = db.query<EndedRow, [number]>(ENDED_WITH_MESSAGE).all(cutoff);
+  const keep = rows.filter((r) => r.url.toLowerCase() === slug);
   if (keep.length !== 1) {
-    const any = db.query<{ id: string }, [string]>("SELECT id FROM tournaments WHERE url = ?").all(keepSlug);
+    const any = db.query<{ id: string }, [string]>("SELECT id FROM tournaments WHERE lower(url) = ?").all(slug);
     const why =
       any.length === 0
         ? "no tournament has that slug"
         : keep.length === 0
           ? `found ${any.length} tournament(s) with that slug (id ${any.map((r) => r.id).join(", ")}), ` +
-            "but none has ended with a stored message id"
+            "but none has ended by the cutoff with a stored message id"
           : `${keep.length} ended tournaments with a message id share that slug (id ${keep.map((r) => r.id).join(", ")})`;
     throw new ClearError(`Cannot keep "${keepSlug}": ${why}. Nothing changed.`);
   }
@@ -57,10 +59,10 @@ export const planClear = (db: Database, now: number, keepSlug: string): ClearPla
  * Only rows still holding the message id that was planned are touched. Returns the plan and the
  * number of rows changed.
  */
-export const applyClear = (db: Database, now: number, keepSlug: string): ClearPlan & { changed: number } =>
+export const applyClear = (db: Database, cutoff: number, keepSlug: string): ClearPlan & { changed: number } =>
   db
     .transaction(() => {
-      const plan = planClear(db, now, keepSlug);
+      const plan = planClear(db, cutoff, keepSlug);
       const update = db.prepare<unknown, [string, string]>(
         "UPDATE tournaments SET message_id = NULL WHERE id = ? AND message_id = ?",
       );
