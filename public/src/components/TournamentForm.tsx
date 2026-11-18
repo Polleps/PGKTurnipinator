@@ -64,7 +64,8 @@ export const TournamentForm = (): JSX.Element => {
   const [loaded, setLoaded] = createSignal(false);
   const [postMessage, setPostMessage] = createSignal("");
   const [posted, setPosted] = createSignal("");
-  let busy = false;
+  const [posting, setPosting] = createSignal(false);
+  let fetching = false;
 
   const linkSlug = () => {
     const r = extractSlug(linkText());
@@ -83,12 +84,12 @@ export const TournamentForm = (): JSX.Element => {
       setLinkError(r.error);
       return;
     }
-    if (busy) {
+    if (fetching) {
       return;
     }
-    busy = true;
+    fetching = true;
     const result = await fetchTournamentDetails(r.slug);
-    busy = false;
+    fetching = false;
     if (!result.ok) {
       setFetchError(result.message);
       return;
@@ -107,14 +108,18 @@ export const TournamentForm = (): JSX.Element => {
       setPostMessage(`Validation Error: ${invalid}`);
       return;
     }
-    if (busy) {
+    if (posting()) {
       return;
     }
-    busy = true;
+    setPosting(true);
+    setPostMessage("");
     const result = await postAction(postTournamentAction(state));
-    busy = false;
-    if (result.ok) {
+    setPosting(false);
+    if (result.ok && (result.value === "Done" || result.value === "")) {
       setPosted("Tournament Posted");
+    } else if (result.ok) {
+      // Posted, but with a problem to report (e.g. the stream event failed); posting again edits the message.
+      setPostMessage(result.value);
     } else {
       setPostMessage(result.message);
     }
@@ -272,8 +277,8 @@ export const TournamentForm = (): JSX.Element => {
           />
         </div>
         <div class="form-row">
-          <a href="#" class="btn post-btn" onClick={click(() => void submit())}>
-            Post
+          <a href="#" class="btn post-btn" aria-disabled={posting()} onClick={click(() => void submit())}>
+            {posting() ? "Posting…" : "Post"}
           </a>
         </div>
         <Show when={postMessage()}>

@@ -1,4 +1,12 @@
-import { Guild, GuildMember, EmbedBuilder, NewsChannel } from "discord.js";
+import {
+  DiscordAPIError,
+  EmbedBuilder,
+  Guild,
+  GuildMember,
+  type Message,
+  NewsChannel,
+  RESTJSONErrorCodes,
+} from "discord.js";
 
 import Config from "../../../Config";
 import ITournament from "../../../models/ITournament";
@@ -169,18 +177,26 @@ const postMessage = async (channel: NewsChannel, embed: EmbedBuilder): Promise<s
   return message.id;
 };
 
-const editExistingPost = async (channel: NewsChannel, tournament: ITournament, embed: EmbedBuilder) => {
+/**
+ * Edits the tournament's agenda message. Only a message that is gone (Unknown Message) is posted
+ * anew; any other failure is thrown, since posting then could leave a second message behind.
+ */
+const editExistingPost = async (channel: NewsChannel, messageID: string, embed: EmbedBuilder): Promise<string> => {
+  let prevMessage: Message;
   try {
-    const prevMessage = await channel.messages.fetch(tournament.messageID!);
-    prevMessage.edit({ embeds: [embed] });
+    prevMessage = await channel.messages.fetch(messageID);
   } catch (e) {
-    // If the message has already been deleted, post a new one.
-    console.error(e);
+    if (e instanceof DiscordAPIError && e.code === RESTJSONErrorCodes.UnknownMessage) {
+      console.warn(`Agenda message ${messageID} was deleted; posting a new one.`);
 
-    return postMessage(channel, embed);
+      return postMessage(channel, embed);
+    }
+    throw e;
   }
 
-  return tournament.messageID!;
+  await prevMessage.edit({ embeds: [embed] });
+
+  return messageID;
 };
 
 /**
@@ -204,7 +220,7 @@ export const postEmbed = async (guild: Guild, user: GuildMember, tournamentDetai
   );
 
   if (tournamentDetails.messageID) {
-    return editExistingPost(channel, tournamentDetails, embed);
+    return editExistingPost(channel, tournamentDetails.messageID, embed);
   }
 
   return postMessage(channel, embed);

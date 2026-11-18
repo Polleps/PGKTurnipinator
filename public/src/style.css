@@ -262,6 +262,13 @@ textarea:disabled {
   background: #5c6eaf;
 }
 
+.post-btn[aria-disabled="true"] {
+  background: #5c6eaf;
+  opacity: 0.6;
+  cursor: default;
+  pointer-events: none;
+}
+
 ::placeholder {
   color: rgb(175, 175, 175);
 }
