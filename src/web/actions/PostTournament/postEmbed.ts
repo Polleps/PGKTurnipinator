@@ -1,12 +1,4 @@
-import {
-  DiscordAPIError,
-  EmbedBuilder,
-  Guild,
-  GuildMember,
-  type Message,
-  NewsChannel,
-  RESTJSONErrorCodes,
-} from "discord.js";
+import { DiscordAPIError, EmbedBuilder, Guild, GuildMember, NewsChannel, RESTJSONErrorCodes } from "discord.js";
 
 import Config from "../../../Config";
 import ITournament from "../../../models/ITournament";
@@ -177,24 +169,26 @@ const postMessage = async (channel: NewsChannel, embed: EmbedBuilder): Promise<s
   return message.id;
 };
 
+const isUnknownMessage = (e: unknown): boolean =>
+  e instanceof DiscordAPIError && e.code === RESTJSONErrorCodes.UnknownMessage;
+
 /**
- * Edits the tournament's agenda message. Only a message that is gone (Unknown Message) is posted
- * anew; any other failure is thrown, since posting then could leave a second message behind.
+ * Edits the tournament's agenda message. Only a message that is gone (Unknown Message, from the
+ * fetch or from the edit of a cached message) is posted anew; any other failure is thrown, since
+ * posting then could leave a second message behind.
  */
 const editExistingPost = async (channel: NewsChannel, messageID: string, embed: EmbedBuilder): Promise<string> => {
-  let prevMessage: Message;
   try {
-    prevMessage = await channel.messages.fetch(messageID);
+    const prevMessage = await channel.messages.fetch(messageID);
+    await prevMessage.edit({ embeds: [embed] });
   } catch (e) {
-    if (e instanceof DiscordAPIError && e.code === RESTJSONErrorCodes.UnknownMessage) {
+    if (isUnknownMessage(e)) {
       console.warn(`Agenda message ${messageID} was deleted; posting a new one.`);
 
       return postMessage(channel, embed);
     }
     throw e;
   }
-
-  await prevMessage.edit({ embeds: [embed] });
 
   return messageID;
 };

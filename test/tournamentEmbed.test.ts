@@ -1,5 +1,11 @@
 import { describe, expect, mock, test } from "bun:test";
-import { Guild, GuildScheduledEventEntityType, GuildScheduledEventPrivacyLevel } from "discord.js";
+import {
+  DiscordAPIError,
+  Guild,
+  GuildScheduledEventEntityType,
+  GuildScheduledEventPrivacyLevel,
+  RESTJSONErrorCodes,
+} from "discord.js";
 import { buildEmbed, EmbedPoster } from "../src/web/actions/PostTournament/postEmbed";
 import { buildEvent, fetchEventImage, scheduleEvent } from "../src/web/actions/PostTournament/scheduleEvent";
 import ITournament from "../src/models/ITournament";
@@ -138,7 +144,14 @@ const eventGuild = (opts: { rejectImage?: boolean; missingEvent?: boolean } = {}
   });
   const fetchEvent = mock(async (_id: string) => {
     if (opts.missingEvent) {
-      throw new Error("Unknown Guild Scheduled Event");
+      throw new DiscordAPIError(
+        { code: RESTJSONErrorCodes.UnknownGuildScheduledEvent, message: "Unknown Guild Scheduled Event" },
+        RESTJSONErrorCodes.UnknownGuildScheduledEvent,
+        404,
+        "GET",
+        "https://discord.test/x",
+        {},
+      );
     }
     return { edit };
   });

@@ -1,13 +1,10 @@
 import { afterAll, beforeAll, beforeEach, describe, expect, test } from "bun:test";
 import { DiscordAPIError, RESTJSONErrorCodes } from "discord.js";
 import { sClient } from "../src/Context";
+import { deleteTournament } from "../src/commands/DeleteTournament";
 import { store } from "../src/Store";
-import {
-  EVENT_FAILED,
-  pendingTournamentLocks,
-  postTournament,
-  withTournamentLock,
-} from "../src/web/actions/PostTournament/PostTournament";
+import { pendingTournamentLocks, withTournamentLock } from "../src/tournamentLock";
+import { DISCORD_FAILED, EVENT_FAILED, postTournament } from "../src/web/actions/PostTournament/PostTournament";
 
 /**
  * Posting a tournament twice (a double click, a retry after an error) must never leave a second
@@ -26,8 +23,13 @@ let nextMessage = 0;
 let fetchError: Error | undefined;
 let editError: Error | undefined;
 let eventError: Error | undefined;
+let eventFetchError: Error | undefined;
+let eventEditError: Error | undefined;
+let eventEdits: string[] = [];
+let deletedMessages: string[] = [];
 
 const channel = {
+  isTextBased: () => true,
   send: async () => {
     // Slow enough that two concurrent posts overlap.
     await sleep(20);
@@ -51,6 +53,9 @@ const channel = {
         },
       };
     },
+    delete: async (id: string) => {
+      deletedMessages.push(id);
+    },
   },
 };
 
@@ -70,7 +75,22 @@ const guild = {
       eventsCreated++;
       return { id: `event${eventsCreated}` };
     },
-    fetch: async (id: string) => ({ id, edit: async () => ({ id }) }),
+    fetch: async (id: string) => {
+      if (eventFetchError) {
+        throw eventFetchError;
+      }
+      return {
+        id,
+        edit: async () => {
+          if (eventEditError) {
+            throw eventEditError;
+          }
+          eventEdits.push(id);
+          return { id };
+        },
+      };
+    },
+    delete: async () => {},
   },
 };
 
@@ -127,6 +147,10 @@ beforeEach(() => {
   fetchError = undefined;
   editError = undefined;
   eventError = undefined;
+  eventFetchError = undefined;
+  eventEditError = undefined;
+  eventEdits = [];
+  deletedMessages = [];
 });
 
 describe("posting a tournament never sends a second agenda message", () => {
@@ -167,7 +191,7 @@ describe("posting a tournament never sends a second agenda message", () => {
     const messageID = sends[0];
 
     editError = apiError(RESTJSONErrorCodes.MissingPermissions, "Missing Permissions", 403);
-    expect((await rejection(post(form(1004)))).message).toBe("Invalid Tournament Details.");
+    expect((await rejection(post(form(1004)))).message).toBe(DISCORD_FAILED);
     expect(sends).toHaveLength(1);
     expect(store.tournaments.getById("1004")?.messageID).toBe(messageID);
   });
@@ -175,7 +199,7 @@ describe("posting a tournament never sends a second agenda message", () => {
   test("a failed fetch other than Unknown Message doesn't send a new message", async () => {
     await post(form(1005));
     fetchError = apiError(RESTJSONErrorCodes.MissingAccess, "Missing Access", 403);
-    expect((await rejection(post(form(1005)))).message).toBe("Invalid Tournament Details.");
+    expect((await rejection(post(form(1005)))).message).toBe(DISCORD_FAILED);
     expect(sends).toHaveLength(1);
   });
 
@@ -185,6 +209,69 @@ describe("posting a tournament never sends a second agenda message", () => {
     expect(await post(form(1006))).toBe("Done");
     expect(sends).toHaveLength(2);
     expect(store.tournaments.getById("1006")?.messageID).toBe(sends[1]);
+  });
+
+  test("a cached message whose edit says Unknown Message is posted anew", async () => {
+    await post(form(1007));
+    editError = apiError(RESTJSONErrorCodes.UnknownMessage, "Unknown Message");
+    expect(await post(form(1007))).toBe("Done");
+    expect(sends).toHaveLength(2);
+    expect(store.tournaments.getById("1007")?.messageID).toBe(sends[1]);
+  });
+
+  test("details the embed refuses are still reported as invalid details", async () => {
+    // The embed needs at least one named event.
+    const error = await rejection(post(form(1008, { events: [{ name: "", cap: "" }] })));
+    expect(error.message).toBe("Invalid Tournament Details.");
+    expect(sends).toHaveLength(0);
+  });
+});
+
+describe("the stream event is never duplicated", () => {
+  test("a failed event edit is reported as a failed event, not as done", async () => {
+    await post(form(1101, withStream));
+    eventEditError = apiError(RESTJSONErrorCodes.MissingPermissions, "Missing Permissions", 403);
+    expect(await post(form(1101, withStream))).toBe(EVENT_FAILED);
+    expect(eventsCreated).toBe(1);
+    expect(store.tournaments.getById("1101")?.guildEventID).toBe("event1");
+  });
+
+  test("a failed event fetch other than Unknown Event doesn't create a second event", async () => {
+    await post(form(1102, withStream));
+    eventFetchError = apiError(RESTJSONErrorCodes.MissingAccess, "Missing Access", 403);
+    expect(await post(form(1102, withStream))).toBe(EVENT_FAILED);
+    expect(eventsCreated).toBe(1);
+  });
+
+  test("a deleted event is created anew and its new id stored", async () => {
+    await post(form(1103, withStream));
+    eventFetchError = apiError(RESTJSONErrorCodes.UnknownGuildScheduledEvent, "Unknown Guild Scheduled Event");
+    expect(await post(form(1103, withStream))).toBe("Done");
+    expect(eventsCreated).toBe(2);
+    expect(store.tournaments.getById("1103")?.guildEventID).toBe("event2");
+  });
+});
+
+describe("deleting a tournament", () => {
+  test("waits for a post of the same tournament, then removes its message and row", async () => {
+    const posting = post(form(1201));
+    while (pendingTournamentLocks() === 0) {
+      await sleep(1);
+    }
+    const deletion = deleteTournament(
+      {
+        repo: store.tournaments,
+        guild: guild as never,
+        now: Date.parse("2026-11-18T00:00:00Z"),
+        channelIdFor: () => "agenda",
+      },
+      "1201",
+    );
+    expect(await posting).toBe("Done");
+    expect(await deletion).toMatchObject({ ok: true, message: "deleted" });
+    expect(deletedMessages).toEqual(sends);
+    expect(store.tournaments.getById("1201")).toBeUndefined();
+    expect(pendingTournamentLocks()).toBe(0);
   });
 });
 
