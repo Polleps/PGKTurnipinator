@@ -10,6 +10,7 @@ import { createLogger } from "./utils/logger";
 import { store } from "./Store";
 import { startStatusRefresh } from "./db/statusRefresh";
 import { startBackupSchedule } from "./db/backup";
+import { startEndedTournamentCleanup } from "./endedTournamentCleanup";
 import { InteractionHandler } from "./InteractionHandler";
 
 const log = createLogger("Main");
@@ -35,6 +36,8 @@ class Main {
     startStatusRefresh(store.tournaments);
     // Only when BACKUP_ENABLED=true; failures are logged, never thrown.
     startBackupSchedule(store.db.$client, store.path);
+    // Daily at 06:00 Amsterdam: deletes agenda messages of ended tournaments (rows are kept).
+    startEndedTournamentCleanup(client, () => store.tournaments);
     const triggerController = new TriggerController();
     const commandController = new CommandController();
     const interactionHandler = new InteractionHandler(client);
