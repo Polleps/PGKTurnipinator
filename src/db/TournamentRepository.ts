@@ -1,4 +1,4 @@
-import { and, asc, count, desc, eq, gt, gte, lt, sql, type SQL } from "drizzle-orm";
+import { and, asc, count, desc, eq, gt, gte, isNotNull, lt, lte, sql, type SQL } from "drizzle-orm";
 import type { Db } from "./database";
 import type { NormalizedTournament } from "./normalizeTournament";
 import { tournaments, type Tournament } from "./schema";
@@ -141,6 +141,33 @@ export class TournamentRepository {
       .where(and(gt(tournaments.endDate, now), sql`lower(${tournaments.url}) = ${slug.trim().toLowerCase()}`))
       .orderBy(desc(tournaments.startDate), desc(tournaments.id))
       .all();
+  }
+
+  /**
+   * Tournaments that have ended at `now` (`end_date <= now`, the complement of `upcoming`) and
+   * still reference an agenda message, oldest first. For the daily message cleanup.
+   */
+  public endedWithMessage(now: number): Tournament[] {
+    return this.db
+      .select()
+      .from(tournaments)
+      .where(and(lte(tournaments.endDate, now), isNotNull(tournaments.messageID)))
+      .orderBy(asc(tournaments.startDate), asc(tournaments.id))
+      .all();
+  }
+
+  /**
+   * Forgets the agenda message of a tournament, but only while it is still `messageID` (a
+   * re-post in the meantime stored a new one, which must be kept). Returns false otherwise.
+   */
+  public clearMessageId(id: string, messageID: string): boolean {
+    const updated = this.db
+      .update(tournaments)
+      .set({ messageID: null })
+      .where(and(eq(tournaments.id, id), eq(tournaments.messageID, messageID)))
+      .returning({ id: tournaments.id })
+      .all();
+    return updated.length > 0;
   }
 
   public getById(id: string): Tournament | undefined {
